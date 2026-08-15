@@ -31,6 +31,7 @@ import javax.swing.WindowConstants;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.meeuw.functional.TriPredicate;
 
@@ -40,6 +41,8 @@ import net.miginfocom.swing.MigLayout;
 public class FractionJPanel extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1238012263601647765L;
+
+	private static final String WMIN = "wmin";
 
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
@@ -116,11 +119,13 @@ public class FractionJPanel extends JPanel implements ActionListener {
 		//
 		jPanel.setLayout(new MigLayout());
 		//
-		jPanel.add((fraction1 = new FractionJTextComponent()).getWhole(), "wmin 50,spany 2");
+		final int wmin = 50;
 		//
-		jPanel.add(fraction1.getNumerator(), "wmin 50,wrap");
+		jPanel.add((fraction1 = new FractionJTextComponent()).getWhole(), String.format("wmin %1$s,spany 2", wmin));
 		//
-		jPanel.add(fraction1.getDenominator(), "wmin 50");
+		jPanel.add(fraction1.getNumerator(), String.format("wmin %1$s,wrap", wmin));
+		//
+		jPanel.add(fraction1.getDenominator(), StringUtils.joinWith(" ", WMIN, wmin));
 		//
 		try {
 			//
@@ -171,11 +176,11 @@ public class FractionJPanel extends JPanel implements ActionListener {
 		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
 		//
-		jPanel.add((fraction2 = new FractionJTextComponent()).getWhole(), "wmin 50,spany 2");
+		jPanel.add((fraction2 = new FractionJTextComponent()).getWhole(), String.format("wmin %1$s,spany 2", wmin));
 		//
-		jPanel.add(fraction2.getNumerator(), "wmin 50,wrap");
+		jPanel.add(fraction2.getNumerator(), String.format("wmin %1$s,wrap", wmin));
 		//
-		jPanel.add(fraction2.getDenominator(), "wmin 50");
+		jPanel.add(fraction2.getDenominator(), StringUtils.joinWith(" ", WMIN, wmin));
 		//
 		add(jPanel);
 		//
@@ -185,11 +190,11 @@ public class FractionJPanel extends JPanel implements ActionListener {
 		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
 		//
-		jPanel.add((answer = new FractionJTextComponent()).getWhole(), "wmin 50,spany 2");
+		jPanel.add((answer = new FractionJTextComponent()).getWhole(), String.format("wmin %1$s,spany 2", wmin));
 		//
-		jPanel.add(answer.getNumerator(), "wmin 50,wrap");
+		jPanel.add(answer.getNumerator(), String.format("wmin %1$s,wrap", wmin));
 		//
-		jPanel.add(answer.getDenominator(), "wmin 50");
+		jPanel.add(answer.getDenominator(), StringUtils.joinWith(" ", WMIN, wmin));
 		//
 		add(jPanel);
 		//
