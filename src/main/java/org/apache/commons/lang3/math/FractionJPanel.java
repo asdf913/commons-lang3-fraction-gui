@@ -93,14 +93,14 @@ public class FractionJPanel extends JPanel implements ActionListener {
 	}
 
 	@Note("Fraction 1")
-	private FractionJTextComponent fraction1 = null;
+	private transient FractionJTextComponent fraction1 = null;
 
 	@Note("Fraction 2")
-	private FractionJTextComponent fraction2 = null;
+	private transient FractionJTextComponent fraction2 = null;
 
-	private FractionJTextComponent answer = null;
+	private transient FractionJTextComponent answer = null;
 
-	private ComboBoxModel<Method> cbm = null;
+	private transient ComboBoxModel<Method> cbm = null;
 
 	private AbstractButton btnExecute = null;
 
