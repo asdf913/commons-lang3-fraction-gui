@@ -256,44 +256,41 @@ public class FractionJPanel extends JPanel implements ActionListener {
 							NumberUtils::toInt, null),
 					Fraction::getFraction, null);
 			//
-			if (Boolean.logicalAnd(fractionA != null, fractionB != null)) {
+			try {
 				//
-				try {
+				final Fraction fraction = cast(Fraction.class,
+						Boolean.logicalAnd(fractionA != null, fractionB != null)
+								? invoke(cast(Method.class, getSelectedItem(cbm)), fractionA, fractionB)
+								: null);
+				//
+				if (fraction != null) {
 					//
-					final Fraction fraction = cast(Fraction.class,
-							invoke(cast(Method.class, getSelectedItem(cbm)), fractionA, fractionB));
+					setText(FractionJTextComponent.getWhole(answer), Integer.toString(fraction.getProperWhole()));
 					//
-					if (fraction != null) {
+					final StringBuilder properNumerator = new StringBuilder(
+							Integer.toString(fraction.getProperNumerator()));
+					//
+					if (Boolean.logicalAnd(fraction.floatValue() < 0, fraction.getProperWhole() == 0)) {
 						//
-						setText(FractionJTextComponent.getWhole(answer), Integer.toString(fraction.getProperWhole()));
-						//
-						final StringBuilder properNumerator = new StringBuilder(
-								Integer.toString(fraction.getProperNumerator()));
-						//
-						if (Boolean.logicalAnd(fraction.floatValue() < 0, fraction.getProperWhole() == 0)) {
-							//
-							properNumerator.insert(0, '-');
-							//
-						} // if
-							//
-						setText(FractionJTextComponent.getNumerator(answer), Objects.toString(properNumerator));
-						//
-						setText(FractionJTextComponent.getDenominator(answer),
-								Integer.toString(fraction.getDenominator()));
+						properNumerator.insert(0, '-');
 						//
 					} // if
 						//
-				} catch (final IllegalAccessException e) {
+					setText(FractionJTextComponent.getNumerator(answer), Objects.toString(properNumerator));
 					//
-					throw new RuntimeException(e);
+					setText(FractionJTextComponent.getDenominator(answer), Integer.toString(fraction.getDenominator()));
 					//
-				} catch (final InvocationTargetException e) {
+				} // if
 					//
-					throw new RuntimeException(ObjectUtils.getIfNull(e.getTargetException(), e));
-					//
-				} // try
-					//
-			} // if
+			} catch (final IllegalAccessException e) {
+				//
+				throw new RuntimeException(e);
+				//
+			} catch (final InvocationTargetException e) {
+				//
+				throw new RuntimeException(ObjectUtils.getIfNull(e.getTargetException(), e));
+				//
+			} // try
 				//
 		} // if
 			//
