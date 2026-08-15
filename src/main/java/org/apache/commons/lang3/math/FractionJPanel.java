@@ -272,7 +272,7 @@ public class FractionJPanel extends JPanel implements ActionListener {
 						final StringBuilder properNumerator = new StringBuilder(
 								Integer.toString(fraction.getProperNumerator()));
 						//
-						if (fraction.floatValue() < 0 && fraction.getProperWhole() == 0) {
+						if (Boolean.logicalAnd(fraction.floatValue() < 0, fraction.getProperWhole() == 0)) {
 							//
 							properNumerator.insert(0, '-');
 							//
