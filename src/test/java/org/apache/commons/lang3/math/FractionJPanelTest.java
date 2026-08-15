@@ -148,7 +148,7 @@ class FractionJPanelTest {
 		//
 		Object result = null;
 		//
-		String toString, name = null;
+		String toString = null;
 		//
 		Object[] os = null;
 		//
