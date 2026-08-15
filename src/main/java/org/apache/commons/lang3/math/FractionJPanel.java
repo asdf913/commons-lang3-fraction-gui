@@ -132,13 +132,21 @@ public class FractionJPanel extends JPanel implements ActionListener {
 			@Override
 			public Component getListCellRendererComponent(final JList arg0, final Object value, final int arg2,
 					final boolean arg3, final boolean arg4) {
+				//
 				final Method method = cast(Method.class, value);
+				//
 				if (method != null) {
+					//
 					return new JLabel(method.getName());
+					//
 				} else if (value == null) {
+					//
 					return new JLabel();
-				}
+					//
+				} // if
+					//
 				return lcr != null ? lcr.getListCellRendererComponent(arg0, arg0, arg2, arg3, arg4) : null;
+				//
 			}
 
 		});
