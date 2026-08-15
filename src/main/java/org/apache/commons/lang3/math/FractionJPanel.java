@@ -100,7 +100,7 @@ public class FractionJPanel extends JPanel implements ActionListener {
 		jPanel.add(fraction1.getNumerator(), "wmin 50,wrap");
 		//
 		jPanel.add(fraction1.getDenominator(), "wmin 50");
-		////
+		//
 		try {
 			//
 			if (Narcissus.getObjectField(this, Container.class.getDeclaredField("component")) == null) {
