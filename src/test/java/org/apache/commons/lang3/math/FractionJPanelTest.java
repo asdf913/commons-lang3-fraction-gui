@@ -218,8 +218,6 @@ class FractionJPanelTest {
 					//
 				} else {
 					//
-					System.out.println(parameterType);
-					//
 					add(collection, Narcissus.allocateInstance(parameterType));
 					//
 				} // if
