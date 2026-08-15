@@ -56,14 +56,10 @@ class FractionJPanelTest {
 					//
 				} // if
 					//
-			} else if (proxy instanceof ComboBoxModel) {
+			} else if (proxy instanceof ComboBoxModel && Objects.equals(name, "getSelectedItem")) {
 				//
-				if (Objects.equals(name, "getSelectedItem")) {
-					//
-					return null;
-					//
-				} // if
-					//
+				return null;
+				//
 			} // if
 				//
 			throw new Throwable(name);
