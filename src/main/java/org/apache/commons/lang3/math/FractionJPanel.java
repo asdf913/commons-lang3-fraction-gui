@@ -5,6 +5,10 @@ import java.awt.Container;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -39,9 +43,18 @@ public class FractionJPanel extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1238012263601647765L;
 
+	@Target(ElementType.FIELD)
+	@Retention(RetentionPolicy.RUNTIME)
+	private @interface Note {
+		String value();
+	}
+
 	private static class FractionJTextComponent {
 
-		private JTextComponent whole, numerator, denominator = null;
+		@Note("Whole")
+		private JTextComponent whole = null;
+
+		private JTextComponent numerator, denominator = null;
 
 		private JTextComponent getWhole() {
 			if (whole == null) {
@@ -78,7 +91,10 @@ public class FractionJPanel extends JPanel implements ActionListener {
 
 	}
 
-	private FractionJTextComponent fraction1, fraction2, answer = null;
+	@Note("Fraction 1")
+	private FractionJTextComponent fraction1 = null;
+
+	private FractionJTextComponent fraction2, answer = null;
 
 	private ComboBoxModel<Method> cbm = null;
 
