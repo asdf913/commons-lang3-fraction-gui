@@ -238,7 +238,7 @@ public class FractionJPanel extends JPanel implements ActionListener {
 		//
 		if (Objects.equals(getSource(evt), btnExecute)) {
 			//
-			final Fraction fractionA = testAndApply((a, b, c) -> a != null && b != null && c != null,
+			final Fraction fractionA = testAndApply((a, b, c) -> Boolean.logicalAnd(a != null, b != null) && c != null,
 					testAndApply(NumberUtils::isParsable, getText(FractionJTextComponent.getWhole(fraction1)),
 							NumberUtils::toInt, null),
 					testAndApply(NumberUtils::isParsable, getText(FractionJTextComponent.getNumerator(fraction1)),
@@ -247,7 +247,7 @@ public class FractionJPanel extends JPanel implements ActionListener {
 							NumberUtils::toInt, null),
 					Fraction::getFraction, null);
 			//
-			final Fraction fractionB = testAndApply((a, b, c) -> a != null && b != null && c != null,
+			final Fraction fractionB = testAndApply((a, b, c) -> Boolean.logicalAnd(a != null, b != null) && c != null,
 					testAndApply(NumberUtils::isParsable, getText(FractionJTextComponent.getWhole(fraction2)),
 							NumberUtils::toInt, null),
 					testAndApply(NumberUtils::isParsable, getText(FractionJTextComponent.getNumerator(fraction2)),
