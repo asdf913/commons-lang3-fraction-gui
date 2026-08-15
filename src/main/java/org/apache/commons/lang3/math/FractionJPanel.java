@@ -28,6 +28,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.WindowConstants;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.meeuw.functional.TriPredicate;
 
@@ -267,7 +268,7 @@ public class FractionJPanel extends JPanel implements ActionListener {
 					//
 				} catch (final InvocationTargetException e) {
 					//
-					throw new RuntimeException(e);
+					throw new RuntimeException(ObjectUtils.getIfNull(e.getTargetException(), e));
 					//
 				} // try
 					//
