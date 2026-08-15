@@ -258,7 +258,7 @@ public class FractionJPanel extends JPanel implements ActionListener {
 							NumberUtils::toInt, null),
 					Fraction::getFraction, null);
 			//
-			if (fractionA != null && fractionB != null) {
+			if (Boolean.logicalAnd(fractionA != null, fractionB != null)) {
 				//
 				try {
 					//
