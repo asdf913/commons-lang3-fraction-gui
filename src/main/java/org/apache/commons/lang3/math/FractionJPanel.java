@@ -54,7 +54,10 @@ public class FractionJPanel extends JPanel implements ActionListener {
 		@Note("Whole")
 		private JTextComponent whole = null;
 
-		private JTextComponent numerator, denominator = null;
+		@Note("Numerator")
+		private JTextComponent numerator = null;
+
+		private JTextComponent denominator = null;
 
 		private JTextComponent getWhole() {
 			if (whole == null) {
@@ -94,7 +97,10 @@ public class FractionJPanel extends JPanel implements ActionListener {
 	@Note("Fraction 1")
 	private FractionJTextComponent fraction1 = null;
 
-	private FractionJTextComponent fraction2, answer = null;
+	@Note("Fraction 2")
+	private FractionJTextComponent fraction2 = null;
+
+	private FractionJTextComponent answer = null;
 
 	private ComboBoxModel<Method> cbm = null;
 
