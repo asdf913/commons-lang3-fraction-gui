@@ -11,15 +11,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.EventObject;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.swing.AbstractButton;
@@ -27,6 +30,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComboBox.KeySelectionManager;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -39,11 +43,12 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import io.github.toolfactory.narcissus.Narcissus;
 import net.miginfocom.swing.MigLayout;
 
-public class FractionJPanel extends JPanel implements ActionListener {
+public class FractionJPanel extends JPanel implements ActionListener, KeySelectionManager {
 
 	private static final long serialVersionUID = 1238012263601647765L;
 
@@ -148,10 +153,9 @@ public class FractionJPanel extends JPanel implements ActionListener {
 			//
 		add(jPanel);
 		//
-		final List<Method> ms = Arrays.stream(Fraction.class.getMethods())
-				.filter(m -> m != null && Arrays.equals(m.getParameterTypes(), new Class<?>[] { m.getDeclaringClass() })
-						&& Objects.equals(m.getReturnType(), m.getDeclaringClass()))
-				.toList();
+		final List<Method> ms = toList(filter(Arrays.stream(Fraction.class.getMethods()),
+				m -> m != null && Arrays.equals(m.getParameterTypes(), new Class<?>[] { m.getDeclaringClass() })
+						&& Objects.equals(m.getReturnType(), m.getDeclaringClass())));
 		//
 		final JComboBox<Method> jcb = new JComboBox<>(cbm = new DefaultComboBoxModel<>(ms.toArray(Method[]::new)));
 		//
@@ -176,6 +180,8 @@ public class FractionJPanel extends JPanel implements ActionListener {
 		});
 		//
 		jcb.setSelectedItem(null);
+		//
+		jcb.setKeySelectionManager(this);
 		//
 		add(jcb);
 		//
@@ -214,6 +220,14 @@ public class FractionJPanel extends JPanel implements ActionListener {
 				FractionJTextComponent.getWhole(fraction2), FractionJTextComponent.getNumerator(fraction2),
 				FractionJTextComponent.getDenominator(fraction2), btnExecute)));
 		//
+	}
+
+	private static <T> Stream<T> filter(final Stream<T> instance, final Predicate<? super T> predicate) {
+		return instance != null ? instance.filter(predicate) : instance;
+	}
+
+	private static <T> List<T> toList(final Stream<T> instance) {
+		return instance != null ? instance.toList() : null;
 	}
 
 	private static FocusTraversalPolicy createFocusTraversalPolicy(final List<Component> components) {
@@ -587,6 +601,42 @@ public class FractionJPanel extends JPanel implements ActionListener {
 
 	private static <T, R> R apply(final Function<T, R> instance, final T value) {
 		return instance != null ? instance.apply(value) : null;
+	}
+
+	@Override
+	public int selectionForKey(final char aKey, final ComboBoxModel<?> aModel) {
+		//
+		final Integer integer = testAndApply(x -> IterableUtils.size(x) == 1,
+				toList(map(filter(
+						IntStream.range(0, getSize(aModel)).mapToObj(
+								i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i)))),
+						x -> getValue(x) != null && getName(getValue(x)) != null && getName(getValue(x)).length() > 0
+								&& getName(getValue(x)).charAt(0) == aKey),
+						FractionJPanel::getKey)),
+				x -> IterableUtils.get(x, 0), null);
+		//
+		return integer != null ? integer.intValue() : -1;
+		//
+	}
+
+	private static <K> K getKey(final Entry<K, ?> instance) {
+		return instance != null ? instance.getKey() : null;
+	}
+
+	private static <V> V getValue(final Entry<?, V> instance) {
+		return instance != null ? instance.getValue() : null;
+	}
+
+	private static String getName(final Member instance) {
+		return instance != null ? instance.getName() : null;
+	}
+
+	private static Object getElementAt(final ComboBoxModel<?> instance, final int index) {
+		return instance != null ? instance.getElementAt(index) : null;
+	}
+
+	private static int getSize(final ComboBoxModel<?> instance) {
+		return instance != null ? instance.getSize() : 0;
 	}
 
 }

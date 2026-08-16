@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -62,6 +63,8 @@ class FractionJPanelTest {
 
 		private Boolean test = null;
 
+		private Integer size = null;
+
 		@Override
 		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
 			//
@@ -78,29 +81,43 @@ class FractionJPanelTest {
 				//
 				return toString();
 				//
+			} else if (Objects.equals(getReturnType(method), method != null ? method.getDeclaringClass() : null)) {
+				//
+				return proxy;
+				//
 			} // if
 				//
-			if (proxy instanceof Predicate) {
+			if (Boolean.logicalAnd(proxy instanceof Predicate, Objects.equals(name, "test"))) {
 				//
-				if (Objects.equals(name, "test")) {
-					//
-					return test;
-					//
-				} // if
-					//
-			} else if (Boolean.logicalOr(proxy instanceof Function, proxy instanceof TriFunction)) {
+				return test;
 				//
-				if (Objects.equals(name, "apply")) {
-					//
-					return null;
-					//
-				} // if
-					//
-			} else if (proxy instanceof ComboBoxModel && Objects.equals(name, "getSelectedItem")) {
+			} else if (Boolean.logicalAnd(Boolean.logicalOr(proxy instanceof Function, proxy instanceof TriFunction),
+					Objects.equals(name, "apply"))) {
 				//
 				return null;
 				//
-			} else if (proxy instanceof Stream && Objects.equals(name, "map")) {
+			} else if (proxy instanceof ComboBoxModel) {
+				//
+				if (contains(Arrays.asList("getSelectedItem", "getElementAt"), name)) {
+					//
+					return null;
+					//
+				} else if (Objects.equals(name, "getSize")) {
+					//
+					return size;
+					//
+				} // if
+					//
+			} else if (Boolean.logicalAnd(proxy instanceof Stream, contains(Arrays.asList("map", "toList"), name))) {
+				//
+				return null;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof Member, Objects.equals(name, "getName"))) {
+				//
+				return null;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof Entry,
+					contains(Arrays.asList("getKey", "getValue"), name))) {
 				//
 				return null;
 				//
@@ -133,6 +150,8 @@ class FractionJPanelTest {
 		//
 		Class<?>[] parameterTypes = null;
 		//
+		Class<?> parameterType = null;
+		//
 		Collection<Object> collection = null;
 		//
 		for (int i = 0; ms != null && i < ms.length; i++) {
@@ -148,9 +167,17 @@ class FractionJPanelTest {
 			//
 			for (int j = 0; j < parameterTypes.length; j++) {
 				//
-				if (Objects.equals(ArrayUtils.get(parameterTypes, j), Boolean.TYPE)) {
+				if (Objects.equals(parameterType = ArrayUtils.get(parameterTypes, j), Boolean.TYPE)) {
 					//
 					add(collection, Boolean.TRUE);
+					//
+				} else if (Objects.equals(parameterType, Character.TYPE)) {
+					//
+					add(collection, Character.valueOf(' '));
+					//
+				} else if (Objects.equals(parameterType, Integer.TYPE)) {
+					//
+					add(collection, Integer.valueOf(1));
 					//
 				} else {
 					//
@@ -216,7 +243,7 @@ class FractionJPanelTest {
 					//
 			} // if
 				//
-			if (Boolean.logicalOr(Objects.equals(getReturnType(m), Boolean.TYPE),
+			if (Boolean.logicalOr(contains(Arrays.asList(Boolean.TYPE, Integer.TYPE), getReturnType(m)),
 					Boolean.logicalAnd(Objects.equals(name, "createFocusTraversalPolicy"),
 							Arrays.equals(parameterTypes, new Object[] { List.class })))) {
 				//
@@ -230,6 +257,10 @@ class FractionJPanelTest {
 				//
 		} // for
 			//
+	}
+
+	private static boolean contains(final Collection<?> instance, final Object item) {
+		return instance != null && instance.contains(item);
 	}
 
 	private static Class<?> getReturnType(final Method instance) {
@@ -257,7 +288,7 @@ class FractionJPanelTest {
 		//
 		Class<?>[] parameterTypes = null;
 		//
-		Class<?> parameterType = null;
+		Class<?> parameterType, type = null;
 		//
 		Collection<Object> collection = null;
 		//
@@ -288,6 +319,14 @@ class FractionJPanelTest {
 					//
 					add(collection, Boolean.TRUE);
 					//
+				} else if (Objects.equals(parameterType, Character.TYPE)) {
+					//
+					add(collection, Character.valueOf(' '));
+					//
+				} else if (Objects.equals(parameterType, Integer.TYPE)) {
+					//
+					add(collection, Integer.valueOf(1));
+					//
 				} else if (Objects.equals(parameterType, Class.class)) {
 					//
 					add(collection, Class.class);
@@ -309,9 +348,13 @@ class FractionJPanelTest {
 								//
 							} // if
 								//
-							if (Objects.equals(f.getType(), Boolean.class)) {
+							if (Objects.equals(type = f.getType(), Boolean.class)) {
 								//
 								Narcissus.setField(ih, f, Boolean.TRUE);
+								//
+							} else if (Objects.equals(type, Integer.class)) {
+								//
+								Narcissus.setField(ih, f, Integer.valueOf(1));
 								//
 							} // if
 								//
@@ -383,13 +426,17 @@ class FractionJPanelTest {
 					//
 			} // if
 				//
-			if (or(Objects.equals(getReturnType(m), Boolean.TYPE),
+			if (or(contains(Arrays.asList(Boolean.TYPE, Integer.TYPE), getReturnType(m)),
 					Boolean.logicalAnd(Objects.equals(name = getName(m), "getClass"),
 							Arrays.equals(parameterTypes, new Object[] { Object.class })),
 					Boolean.logicalAnd(Objects.equals(name, "toPlainString"),
 							Arrays.equals(parameterTypes, new Object[] { BigDecimal.class })),
 					Boolean.logicalAnd(Objects.equals(name, "createFocusTraversalPolicy"),
-							Arrays.equals(parameterTypes, new Object[] { List.class })))) {
+							Arrays.equals(parameterTypes, new Object[] { List.class })),
+					Boolean.logicalAnd(Objects.equals(name, "map"),
+							Arrays.equals(parameterTypes, new Object[] { Stream.class, Function.class })),
+					Boolean.logicalAnd(Objects.equals(name, "filter"),
+							Arrays.equals(parameterTypes, new Object[] { Stream.class, Predicate.class })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -483,10 +530,14 @@ class FractionJPanelTest {
 			} else if (obj == null) {
 				return null;
 			}
-			throw new Throwable(Objects.toString(obj.getClass()));
+			throw new Throwable(Objects.toString(getClass(obj)));
 		} catch (final InvocationTargetException e) {
 			throw e.getTargetException();
 		}
+	}
+
+	private static Class<?> getClass(final Object instance) {
+		return instance != null ? instance.getClass() : null;
 	}
 
 	private static Object invoke(final Method method, final Object instance, final Object... args)
