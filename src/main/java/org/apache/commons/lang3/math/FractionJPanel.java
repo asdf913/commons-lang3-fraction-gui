@@ -617,7 +617,7 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		//
 		final StringBuilder sb = new StringBuilder("<math>");
 		//
-		if (isValidString(whole) && StringUtils.isNotBlank(whole)) {
+		if (and(whole, FractionJPanel::isValidString, StringUtils::isNotBlank)) {
 			//
 			if (!Objects.equals(whole, "0")) {
 				//
@@ -662,6 +662,10 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			//
 		return Objects.toString(sb.append("</math>"));
 		//
+	}
+
+	private static <T> boolean and(final T value, final Predicate<T> predicateA, final Predicate<T> predicateB) {
+		return test(predicateA, value) && test(predicateB, value);
 	}
 
 	private static boolean startsWith(final String instance, final String prefix) {
