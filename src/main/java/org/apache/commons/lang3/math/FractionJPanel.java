@@ -638,7 +638,7 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			//
 			if (StringUtils.isNotBlank(numerator)) {
 				//
-				if (Objects.equals(whole, "0") && startsWith(numerator, "-")) {
+				if (Boolean.logicalAnd(Objects.equals(whole, "0"), startsWith(numerator, "-"))) {
 					//
 					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", StringUtils.substring(numerator, 1)));
 					//
