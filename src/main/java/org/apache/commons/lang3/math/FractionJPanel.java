@@ -637,7 +637,7 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				.mapToObj(i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i))))
 				.collect(LinkedHashMap::new, (a, b) -> a.put(getKey(b), getValue(b)), Map::putAll));
 		//
-		Integer integer = testAndApply(x -> IterableUtils.size(x) == 1, toList(map(filter(
+		final Integer integer = testAndApply(x -> IterableUtils.size(x) == 1, toList(map(filter(
 				StreamSupport.stream(spliterator(entrySet), false),
 				x -> getValue(x) != null && getName(getValue(x)) != null && StringUtils.isNotEmpty(getName(getValue(x)))
 						&& getName(getValue(x)).charAt(0) == aKey),
@@ -652,16 +652,18 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		final Map<Character, String> map2 = Map.of(Character.valueOf('+'), "add", Character.valueOf('-'), "subtract",
 				Character.valueOf('*'), "multiplyBy", Character.valueOf('/'), "divideBy");
 		//
-		integer = testAndApply(x -> IterableUtils.size(x) == 1,
+		return intValue(testAndApply(x -> IterableUtils.size(x) == 1,
 				toList(map(
 						filter(StreamSupport.stream(spliterator(entrySet), false),
 								x -> getValue(x) != null && getName(getValue(x)) != null
 										&& Objects.equals(getName(getValue(x)), get(map2, Character.valueOf(aKey)))),
 						FractionJPanel::getKey)),
-				x -> IterableUtils.get(x, 0), null);
+				x -> IterableUtils.get(x, 0), null), -1);
 		//
-		return integer != null ? integer.intValue() : -1;
-		//
+	}
+
+	private static int intValue(final Number instance, final int defaultValue) {
+		return instance != null ? instance.intValue() : defaultValue;
 	}
 
 	private static <T> Spliterator<T> spliterator(final Iterable<T> instance) {

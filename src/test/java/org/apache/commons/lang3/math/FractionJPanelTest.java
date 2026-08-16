@@ -376,6 +376,10 @@ class FractionJPanelTest {
 					//
 					add(collection, Narcissus.allocateInstance(JTextField.class));
 					//
+				} else if (Objects.equals(parameterType, Number.class)) {
+					//
+					add(collection, Narcissus.allocateInstance(Integer.class));
+					//
 				} else if (parameterType != null && parameterType.isInterface()) {
 					//
 					if ((ih = ObjectUtils.getIfNull(ih, IH::new)) != null
