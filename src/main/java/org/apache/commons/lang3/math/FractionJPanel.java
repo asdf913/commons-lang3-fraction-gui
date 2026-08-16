@@ -1,6 +1,8 @@
 package org.apache.commons.lang3.math;
 
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.FocusTraversalPolicy;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +35,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.WindowConstants;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -202,6 +206,59 @@ public class FractionJPanel extends JPanel implements ActionListener {
 		forEach(map(
 				testAndApply(Objects::nonNull, FractionJTextComponent.class.getDeclaredFields(), Arrays::stream, null),
 				f -> cast(JTextComponent.class, Narcissus.getField(answer, f))), x -> setEditable(x, false));
+		//
+		setFocusTraversalPolicyProvider(true);
+		//
+		final List<Component> components = Arrays.asList(FractionJTextComponent.getWhole(fraction1),
+				FractionJTextComponent.getNumerator(fraction1), FractionJTextComponent.getDenominator(fraction1), jcb,
+				FractionJTextComponent.getWhole(fraction2), FractionJTextComponent.getNumerator(fraction2),
+				FractionJTextComponent.getDenominator(fraction2), btnExecute);
+		//
+		setFocusTraversalPolicy(new FocusTraversalPolicy() {
+
+			@Override
+			public Component getLastComponent(final Container aContainer) {
+				//
+				return testAndApply(CollectionUtils::isNotEmpty, components,
+						x -> IterableUtils.get(x, IterableUtils.size(x) - 1), null);
+				//
+			}
+
+			@Override
+			public Component getFirstComponent(final Container aContainer) {
+				//
+				return testAndApply(CollectionUtils::isNotEmpty, components, x -> IterableUtils.get(x, 0), null);
+				//
+			}
+
+			@Override
+			public Component getDefaultComponent(final Container aContainer) {
+				//
+				return getFirstComponent(aContainer);
+				//
+			}
+
+			@Override
+			public Component getComponentBefore(final Container aContainer, final Component aComponent) {
+				//
+				final int index = components != null ? components.indexOf(aComponent) : null;
+				//
+				return testAndApply(x -> index > 0, components, x -> IterableUtils.get(components, index - 1),
+						x -> getLastComponent(aContainer));
+				//
+			}
+
+			@Override
+			public Component getComponentAfter(final Container aContainer, final Component aComponent) {
+				//
+				final int index = components != null ? components.indexOf(aComponent) : null;
+				//
+				return testAndApply(x -> IterableUtils.size(x) - 1 > index, components,
+						x -> IterableUtils.get(components, index + 1), x -> getFirstComponent(aContainer));
+				//
+			}
+
+		});
 		//
 	}
 
