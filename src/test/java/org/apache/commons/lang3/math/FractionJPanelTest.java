@@ -194,6 +194,8 @@ class FractionJPanelTest {
 		//
 		Collection<Object> collection = null;
 		//
+		final Class<?> clz = Class.forName("org.apache.commons.lang3.math.FractionJPanel$FractionJTextComponent");
+		//
 		for (int i = 0; ms != null && i < ms.length; i++) {
 			//
 			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
@@ -239,11 +241,11 @@ class FractionJPanelTest {
 			//
 			if (Modifier.isStatic(m.getModifiers())) {
 				//
-				if (Boolean.logicalAnd(Objects.equals(name, "toFraction"), Boolean.logicalOr(
-						Arrays.equals(parameterTypes = m.getParameterTypes(),
-								new Class<?>[] { String.class, String.class, String.class }),
-						Arrays.equals(parameterTypes, new Class<?>[] { Class
-								.forName("org.apache.commons.lang3.math.FractionJPanel$FractionJTextComponent") })))) {
+				if (Boolean.logicalAnd(Objects.equals(name, "toFraction"),
+						Boolean.logicalOr(
+								Arrays.equals(parameterTypes = m.getParameterTypes(),
+										new Class<?>[] { String.class, String.class, String.class }),
+								Arrays.equals(parameterTypes, new Class<?>[] { clz })))) {
 					//
 					Assert.assertThrows(IllegalStateException.class, () -> {
 						Narcissus.invokeStaticMethod(m1, os1);
@@ -286,9 +288,15 @@ class FractionJPanelTest {
 					//
 			} // if
 				//
-			if (Boolean.logicalOr(contains(Arrays.asList(Boolean.TYPE, Integer.TYPE), getReturnType(m)),
-					Boolean.logicalAnd(Objects.equals(name, "createFocusTraversalPolicy"),
-							Arrays.equals(parameterTypes, new Object[] { List.class })))) {
+			if (or(contains(Arrays.asList(Boolean.TYPE, Integer.TYPE), getReturnType(m)),
+					Boolean.logicalAnd(
+							Objects.equals(name, "createFocusTraversalPolicy"), Arrays.equals(parameterTypes,
+									new Object[] { List.class })),
+					Boolean.logicalAnd(Objects.equals(name, "toMathML"),
+							Boolean.logicalOr(
+									Arrays.equals(parameterTypes,
+											new Object[] { String.class, String.class, String.class }),
+									Arrays.equals(parameterTypes, new Object[] { clz }))))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -340,6 +348,8 @@ class FractionJPanelTest {
 		Field[] fs = null;
 		//
 		Field f = null;
+		//
+		final Class<?> clz = Class.forName("org.apache.commons.lang3.math.FractionJPanel$FractionJTextComponent");
 		//
 		for (int i = 0; ms != null && i < ms.length; i++) {
 			//
@@ -433,11 +443,14 @@ class FractionJPanelTest {
 			//
 			if (Modifier.isStatic(m.getModifiers())) {
 				//
-				if (Boolean.logicalAnd(Objects.equals(m.getName(), "toFraction"), Boolean.logicalOr(
-						Arrays.equals(parameterTypes = m.getParameterTypes(),
-								new Class<?>[] { String.class, String.class, String.class }),
-						Arrays.equals(parameterTypes, new Class<?>[] { Class
-								.forName("org.apache.commons.lang3.math.FractionJPanel$FractionJTextComponent") })))) {
+				if (Boolean
+						.logicalAnd(
+								Objects.equals(m
+										.getName(), "toFraction"),
+								Boolean.logicalOr(
+										Arrays.equals(parameterTypes = m.getParameterTypes(),
+												new Class<?>[] { String.class, String.class, String.class }),
+										Arrays.equals(parameterTypes, new Class<?>[] { clz })))) {
 					//
 					Assert.assertThrows(IllegalStateException.class, () -> {
 						Narcissus.invokeStaticMethod(m1, os1);
@@ -489,8 +502,14 @@ class FractionJPanelTest {
 							Arrays.equals(parameterTypes, new Object[] { List.class })),
 					Boolean.logicalAnd(Objects.equals(name, "map"),
 							Arrays.equals(parameterTypes, new Object[] { Stream.class, Function.class })),
-					Boolean.logicalAnd(Objects.equals(name, "filter"),
-							Arrays.equals(parameterTypes, new Object[] { Stream.class, Predicate.class })))) {
+					Boolean.logicalAnd(
+							Objects.equals(name, "filter"), Arrays.equals(parameterTypes,
+									new Object[] { Stream.class, Predicate.class })),
+					Boolean.logicalAnd(Objects.equals(name, "toMathML"),
+							Boolean.logicalOr(
+									Arrays.equals(parameterTypes,
+											new Object[] { String.class, String.class, String.class }),
+									Arrays.equals(parameterTypes, new Object[] { clz }))))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//

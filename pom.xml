@@ -36,6 +36,12 @@
 			<artifactId>commons-collections4</artifactId>
 			<version>4.6.0</version>
 		</dependency>
+		<!--https://mvnrepository.com/artifact/com.microsoft.playwright/playwright -->
+		<dependency>
+			<groupId>com.microsoft.playwright</groupId>
+			<artifactId>playwright</artifactId>
+			<version>1.62.0</version>
+		</dependency>
 		<!--https://mvnrepository.com/artifact/org.testng/testng-->
 		<dependency>
 			<groupId>org.testng</groupId>

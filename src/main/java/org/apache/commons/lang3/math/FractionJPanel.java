@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,13 +29,14 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
-import java.lang.reflect.Modifier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComboBox.KeySelectionManager;
@@ -50,11 +52,18 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.bidimap.TreeBidiMap;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
 
 import io.github.toolfactory.narcissus.Narcissus;
 import net.miginfocom.swing.MigLayout;
@@ -64,6 +73,10 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 	private static final long serialVersionUID = 1238012263601647765L;
 
 	private static final String WMIN = "wmin";
+
+	private static final BidiMap<Character, String> BIDI_MAP = new TreeBidiMap<>(
+			Map.of(Character.valueOf('+'), "add", Character.valueOf('-'), "subtract", Character.valueOf('*'),
+					"multiplyBy", Character.valueOf('/'), "divideBy"));
 
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
@@ -129,12 +142,14 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 	@Note("Execute")
 	private AbstractButton btnExecute = null;
 
-	private AbstractButton btnClear = null;
+	private AbstractButton btnClear, btnShowImage = null;
 
 	@Note("Fraction 1 Whole Document")
 	private transient Document documentWhole1 = null;
 
 	private transient Document documentWhole2 = null;
+
+	private JLabel labelImage = null;
 
 	private FractionJPanel() {
 		//
@@ -228,7 +243,15 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		//
 		add(jPanel, wrap);
 		//
-		add(btnClear = new JButton("Clear"));
+		(jPanel = new JPanel()).setLayout(new MigLayout());
+		//
+		jPanel.add(btnClear = new JButton("Clear"));
+		//
+		jPanel.add(btnShowImage = new JButton("Show Image"));
+		//
+		jPanel.add(labelImage = new JLabel());
+		//
+		add(jPanel, String.format("span %1$s", 3));
 		//
 		forEach(map(
 				testAndApply(Objects::nonNull, FractionJTextComponent.class.getDeclaredFields(), Arrays::stream, null),
@@ -242,8 +265,11 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				FractionJTextComponent.getDenominator(fraction2), btnExecute)));
 		//
 		forEach(Arrays.asList(documentWhole1 = getDocument(FractionJTextComponent.getWhole(fraction1)),
-				documentWhole2 = getDocument(FractionJTextComponent.getWhole(fraction2))),
-				x -> addDocumentListener(x, this));
+				getDocument(FractionJTextComponent.getNumerator(fraction1)),
+				getDocument(FractionJTextComponent.getDenominator(fraction1)),
+				documentWhole2 = getDocument(FractionJTextComponent.getWhole(fraction2)),
+				getDocument(FractionJTextComponent.getNumerator(fraction2)),
+				getDocument(FractionJTextComponent.getDenominator(fraction2))), x -> addDocumentListener(x, this));
 		//
 		forEach(map(Arrays.stream(FractionJPanel.class.getDeclaredFields()),
 				f -> cast(AbstractButton.class,
@@ -265,6 +291,34 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				x -> setText(x, ""));
 		//
 		setSelectedItem(cbm, null);
+		//
+		setIcon(labelImage, null);
+		//
+	}
+
+	private static void setIcon(final JLabel instance, final Icon icon) {
+		//
+		if (instance == null) {
+			//
+			return;
+			//
+		} // if
+			//
+		try {
+			//
+			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), "objectLock")) == null) {
+				//
+				return;
+				//
+			} // if
+				//
+		} catch (final NoSuchFieldException e) {
+			//
+			throw new RuntimeException(e);
+			//
+		} // try
+			//
+		instance.setIcon(icon);
 		//
 	}
 
@@ -509,8 +563,100 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			//
 			clear();
 			//
+		} else if (Objects.equals(source, btnShowImage)) {
+			//
+			final StringBuilder sb = new StringBuilder("<html><body><table><tbody><tr><td>");
+			//
+			sb.append(toMathML(fraction1));
+			//
+			sb.append(testAndApply(Objects::nonNull, getName(cast(Member.class, getSelectedItem(cbm))),
+					x -> get(BIDI_MAP != null ? BIDI_MAP.inverseBidiMap() : null, x), null));
+			//
+			sb.append(toMathML(fraction2));
+			//
+			sb.append('=');
+			//
+			sb.append(toMathML(answer));
+			//
+			sb.append("</td></tr></tbody></table></body></html>");
+			//
+			try (final Playwright playwright = Playwright.create();
+					final Browser browser = playwright != null
+							? playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true))
+							: null;
+					final Page page = browser != null ? browser.newPage() : null;) {
+				//
+				if (page != null) {
+					//
+					page.setContent(Objects.toString(sb));
+					//
+					setIcon(labelImage, new ImageIcon(page.locator("tbody").screenshot()));
+					//
+				} // if
+					//
+			} // try
+				//
 		} // if
 			//
+	}
+
+	private static String toMathML(final FractionJTextComponent instance) {
+		//
+		return toMathML(getText(FractionJTextComponent.getWhole(instance)),
+				getText(FractionJTextComponent.getNumerator(instance)),
+				getText(FractionJTextComponent.getDenominator(instance)));
+		//
+	}
+
+	private static String toMathML(final String whole, final String numerator, final String denominator) {
+		//
+		final StringBuilder sb = new StringBuilder("<math>");
+		//
+		if (isValidString(whole) && StringUtils.isNotBlank(whole)) {
+			//
+			if (!Objects.equals(whole, "0")) {
+				//
+				sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", whole));
+				//
+			} else if (numerator != null && numerator.startsWith("-")) {
+				//
+				sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", "-"));
+				//
+			} // if
+				//
+		} // if
+			//
+		if ((isValidString(numerator) && StringUtils.isNotBlank(numerator))
+				|| (isValidString(denominator) && StringUtils.isNotBlank(denominator))) {
+			//
+			sb.append("<mfrac>");
+			//
+			if (StringUtils.isNotBlank(numerator)) {
+				//
+				if (Objects.equals(whole, "0") && numerator != null && numerator.startsWith("-")) {
+					//
+					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", StringUtils.substring(numerator, 1)));
+					//
+				} else {
+					//
+					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", numerator));
+					//
+				} // if
+					//
+			} // if
+				//
+			if (StringUtils.isNotBlank(denominator)) {
+				//
+				sb.append(String.format("<%1$s>%2$s</%1$s>", "mn", denominator));
+				//
+			} // if
+				//
+			sb.append("</mfrac>");
+			//
+		} // if
+			//
+		return Objects.toString(sb.append("</math>"));
+		//
 	}
 
 	private static Fraction toFraction(final FractionJTextComponent instance) {
@@ -720,16 +866,16 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			//
 		} // if
 			//
-		final Map<Character, String> map2 = Map.of(Character.valueOf('+'), "add", Character.valueOf('-'), "subtract",
-				Character.valueOf('*'), "multiplyBy", Character.valueOf('/'), "divideBy");
-		//
-		return intValue(testAndApply(x -> IterableUtils.size(x) == 1,
-				toList(map(
-						filter(StreamSupport.stream(spliterator(entrySet), false),
-								x -> getValue(x) != null && getName(getValue(x)) != null
-										&& Objects.equals(getName(getValue(x)), get(map2, Character.valueOf(aKey)))),
-						FractionJPanel::getKey)),
-				x -> IterableUtils.get(x, 0), null), -1);
+		return intValue(
+				testAndApply(x -> IterableUtils.size(x) == 1,
+						toList(map(
+								filter(StreamSupport.stream(spliterator(entrySet), false),
+										x -> getValue(x) != null && getName(getValue(x)) != null
+												&& Objects.equals(getName(getValue(x)),
+														get(BIDI_MAP, Character.valueOf(aKey)))),
+								FractionJPanel::getKey)),
+						x -> IterableUtils.get(x, 0), null),
+				-1);
 		//
 	}
 
@@ -784,6 +930,11 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 	}
 
 	private void insertOrRemove(final Document document) {
+		//
+		setIcon(labelImage, null);
+		//
+		forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
+				FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 		//
 		if (Objects.equals(document, documentWhole1)) {
 			//
