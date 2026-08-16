@@ -623,7 +623,7 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				//
 				sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", whole));
 				//
-			} else if (numerator != null && numerator.startsWith("-")) {
+			} else if (startsWith(numerator, "-")) {
 				//
 				sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", "-"));
 				//
@@ -638,7 +638,7 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			//
 			if (StringUtils.isNotBlank(numerator)) {
 				//
-				if (Objects.equals(whole, "0") && numerator != null && numerator.startsWith("-")) {
+				if (Objects.equals(whole, "0") && startsWith(numerator, "-")) {
 					//
 					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", StringUtils.substring(numerator, 1)));
 					//
@@ -662,6 +662,10 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			//
 		return Objects.toString(sb.append("</math>"));
 		//
+	}
+
+	private static boolean startsWith(final String instance, final String prefix) {
+		return instance != null && isValidString(instance) && instance.startsWith(prefix);
 	}
 
 	private static Fraction toFraction(final FractionJTextComponent instance) {
