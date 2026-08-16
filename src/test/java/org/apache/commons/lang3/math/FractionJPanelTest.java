@@ -12,10 +12,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JTextField;
@@ -58,6 +58,12 @@ class FractionJPanelTest {
 		@Override
 		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
 			//
+			if (Objects.equals(method != null ? method.getReturnType() : null, Void.TYPE)) {
+				//
+				return null;
+				//
+			} // if
+				//
 			final String name = getName(method);
 			//
 			if (Boolean.logicalAnd(Objects.equals(name, "toString"),
@@ -87,6 +93,14 @@ class FractionJPanelTest {
 				//
 				return null;
 				//
+			} else if (proxy instanceof Stream) {
+				//
+				if (Objects.equals(name, "map")) {
+					//
+					return null;
+					//
+				} // if
+					//
 			} // if
 				//
 			throw new Throwable(name);
@@ -116,15 +130,34 @@ class FractionJPanelTest {
 		//
 		Class<?>[] parameterTypes = null;
 		//
+		Collection<Object> collection = null;
+		//
 		for (int i = 0; ms != null && i < ms.length; i++) {
 			//
-			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()) {
+			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
+					|| (parameterTypes = m.getParameterTypes()) == null) {
 				//
 				continue;
 				//
 			} // if
 				//
-			os = toArray(Collections.nCopies(m.getParameterCount(), null));
+			clear(collection = ObjectUtils.getIfNull(collection, ArrayList::new));
+			//
+			for (int j = 0; j < parameterTypes.length; j++) {
+				//
+				if (Objects.equals(ArrayUtils.get(parameterTypes, j), Boolean.TYPE)) {
+					//
+					add(collection, Boolean.TRUE);
+					//
+				} else {
+					//
+					add(collection, null);
+					//
+				} // if
+					//
+			} // for
+				//
+			os = toArray(collection);
 			//
 			toString = Objects.toString(m);
 			//
@@ -243,6 +276,10 @@ class FractionJPanelTest {
 				if ((parameterType = ArrayUtils.get(parameterTypes, j)) != null && parameterType.isArray()) {
 					//
 					add(collection, Array.newInstance(parameterType.getComponentType(), 0));
+					//
+				} else if (Objects.equals(parameterType, Boolean.TYPE)) {
+					//
+					add(collection, Boolean.TRUE);
 					//
 				} else if (Objects.equals(parameterType, Class.class)) {
 					//

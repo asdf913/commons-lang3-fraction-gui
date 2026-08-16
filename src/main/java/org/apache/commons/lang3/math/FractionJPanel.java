@@ -15,8 +15,10 @@ import java.util.Arrays;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
@@ -112,7 +114,7 @@ public class FractionJPanel extends JPanel implements ActionListener {
 
 	private void init() {
 		//
-		setLayout(new MigLayout("debug"));
+		setLayout(new MigLayout());
 		//
 		JPanel jPanel = new JPanel();
 		//
@@ -197,6 +199,46 @@ public class FractionJPanel extends JPanel implements ActionListener {
 		//
 		add(jPanel);
 		//
+		forEach(map(
+				testAndApply(Objects::nonNull, FractionJTextComponent.class.getDeclaredFields(), Arrays::stream, null),
+				f -> cast(JTextComponent.class, Narcissus.getField(answer, f))), x -> setEditable(x, false));
+		//
+	}
+
+	private static <T> void forEach(final Stream<T> instance, final Consumer<? super T> action) {
+		if (instance != null) {
+			instance.forEach(action);
+		}
+	}
+
+	private static void setEditable(final JTextComponent instance, final boolean editable) {
+		//
+		if (instance == null) {
+			//
+			return;
+			//
+		} // if
+			//
+		try {
+			//
+			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), "objectLock")) == null) {
+				//
+				return;
+				//
+			} // if
+				//
+		} catch (final NoSuchFieldException e) {
+			//
+			throw new RuntimeException(e);
+			//
+		} // try
+			//
+		instance.setEditable(editable);
+		//
+	}
+
+	private static <T, R> Stream<R> map(final Stream<T> instance, final Function<? super T, ? extends R> mapper) {
+		return instance != null ? instance.map(mapper) : null;
 	}
 
 	private static <T> T cast(final Class<T> clz, final Object instance) {
