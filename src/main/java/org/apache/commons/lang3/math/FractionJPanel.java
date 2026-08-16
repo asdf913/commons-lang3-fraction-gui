@@ -612,11 +612,14 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 	@Override
 	public int selectionForKey(final char aKey, final ComboBoxModel<?> aModel) {
 		//
-		final Integer integer = testAndApply(x -> IterableUtils.size(x) == 1,
-				toList(map(filter(
-						IntStream.range(0, getSize(aModel)).mapToObj(
-								i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i)))),
-						x -> getValue(x) != null && getName(getValue(x)) != null && getName(getValue(x)).length() > 0
+		final Integer integer = testAndApply(
+				x -> IterableUtils
+						.size(x) == 1,
+				toList(map(filter(IntStream
+						.range(0, getSize(aModel))
+						.mapToObj(i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i)))),
+						x -> getValue(x) != null && getName(getValue(x)) != null
+								&& StringUtils.isNotEmpty(getName(getValue(x)))
 								&& getName(getValue(x)).charAt(0) == aKey),
 						FractionJPanel::getKey)),
 				x -> IterableUtils.get(x, 0), null);
