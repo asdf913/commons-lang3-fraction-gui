@@ -589,7 +589,7 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 					final Browser browser = playwright != null
 							? playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true))
 							: null;
-					final Page page = browser != null ? browser.newPage() : null;) {
+					final Page page = newPage(browser)) {
 				//
 				if (page != null) {
 					//
@@ -603,6 +603,10 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				//
 		} // if
 			//
+	}
+
+	private static Page newPage(final Browser instance) {
+		return instance != null ? instance.newPage() : null;
 	}
 
 	private static <K, V> BidiMap<V, K> inverseBidiMap(final BidiMap<K, V> instance) {

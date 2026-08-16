@@ -40,6 +40,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.google.common.reflect.Reflection;
+import com.microsoft.playwright.Browser;
 
 import io.github.toolfactory.narcissus.Narcissus;
 
@@ -159,6 +160,10 @@ class FractionJPanelTest {
 				} // if
 					//
 			} else if (Boolean.logicalAnd(proxy instanceof Map, contains(Arrays.asList("get", "entrySet"), name))) {
+				//
+				return null;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof Browser, Objects.equals(name, "newPage"))) {
 				//
 				return null;
 				//
