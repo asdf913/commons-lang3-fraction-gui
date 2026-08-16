@@ -17,15 +17,19 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EventObject;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
@@ -629,20 +633,47 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 	@Override
 	public int selectionForKey(final char aKey, final ComboBoxModel<?> aModel) {
 		//
-		final Integer integer = testAndApply(
-				x -> IterableUtils
-						.size(x) == 1,
-				toList(map(filter(IntStream
-						.range(0, getSize(aModel))
-						.mapToObj(i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i)))),
-						x -> getValue(x) != null && getName(getValue(x)) != null
-								&& StringUtils.isNotEmpty(getName(getValue(x)))
-								&& getName(getValue(x)).charAt(0) == aKey),
+		final Iterable<Entry<Integer, Member>> entrySet = entrySet(IntStream.range(0, getSize(aModel))
+				.mapToObj(i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i))))
+				.collect(LinkedHashMap::new, (a, b) -> a.put(getKey(b), getValue(b)), Map::putAll));
+		//
+		Integer integer = testAndApply(x -> IterableUtils.size(x) == 1, toList(map(filter(
+				StreamSupport.stream(spliterator(entrySet), false),
+				x -> getValue(x) != null && getName(getValue(x)) != null && StringUtils.isNotEmpty(getName(getValue(x)))
+						&& getName(getValue(x)).charAt(0) == aKey),
+				FractionJPanel::getKey)), x -> IterableUtils.get(x, 0), null);
+		//
+		if (integer != null) {
+			//
+			return integer.intValue();
+			//
+		} // if
+			//
+		final Map<Character, String> map2 = Map.of(Character.valueOf('+'), "add", Character.valueOf('-'), "subtract",
+				Character.valueOf('*'), "multiplyBy", Character.valueOf('/'), "divideBy");
+		//
+		integer = testAndApply(x -> IterableUtils.size(x) == 1,
+				toList(map(
+						filter(StreamSupport.stream(spliterator(entrySet), false),
+								x -> getValue(x) != null && getName(getValue(x)) != null
+										&& Objects.equals(getName(getValue(x)), get(map2, Character.valueOf(aKey)))),
 						FractionJPanel::getKey)),
 				x -> IterableUtils.get(x, 0), null);
 		//
 		return integer != null ? integer.intValue() : -1;
 		//
+	}
+
+	private static <T> Spliterator<T> spliterator(final Iterable<T> instance) {
+		return instance != null ? instance.spliterator() : null;
+	}
+
+	private static <K, V> Collection<Entry<K, V>> entrySet(final Map<K, V> instance) {
+		return instance != null ? instance.entrySet() : null;
+	}
+
+	private static <V> V get(final Map<?, V> instance, final Object key) {
+		return instance != null ? instance.get(key) : null;
 	}
 
 	private static <K> K getKey(final Entry<K, ?> instance) {

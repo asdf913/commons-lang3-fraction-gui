@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Function;
@@ -92,7 +93,13 @@ class FractionJPanelTest {
 				//
 				return proxy;
 				//
-			} else if (Boolean.logicalAnd(proxy instanceof Collection, Objects.equals(name, "toArray"))) {
+			} else if (Boolean.logicalAnd(proxy instanceof Iterable, Objects.equals(name, "spliterator"))) {
+				//
+				return null;
+				//
+			} // if
+				//
+			if (Boolean.logicalAnd(proxy instanceof Collection, Objects.equals(name, "toArray"))) {
 				//
 				return null;
 				//
@@ -148,6 +155,10 @@ class FractionJPanelTest {
 					//
 				} // if
 					//
+			} else if (Boolean.logicalAnd(proxy instanceof Map, contains(Arrays.asList("get", "entrySet"), name))) {
+				//
+				return null;
+				//
 			} // if
 				//
 			throw new Throwable(name);
