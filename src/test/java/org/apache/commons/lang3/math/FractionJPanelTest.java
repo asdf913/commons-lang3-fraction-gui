@@ -83,6 +83,11 @@ class FractionJPanelTest {
 				//
 				return toString();
 				//
+			} else if (Boolean.logicalAnd(Objects.equals(name, "equals"),
+					method != null && Arrays.equals(method.getParameterTypes(), new Class<?>[] { Object.class }))) {
+				//
+				return equals(proxy);
+				//
 			} else if (Objects.equals(getReturnType(method), method != null ? method.getDeclaringClass() : null)) {
 				//
 				return proxy;

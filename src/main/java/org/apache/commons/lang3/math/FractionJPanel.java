@@ -675,7 +675,11 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 	@Override
 	public void insertUpdate(final DocumentEvent evt) {
 		//
-		final Document document = getDocument(evt);
+		insertOrRemove(getDocument(evt));
+		//
+	}
+
+	private void insertOrRemove(final Document document) {
 		//
 		if (Objects.equals(document, documentWhole1)) {
 			//
@@ -743,6 +747,7 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				//
 		} // if
 			//
+
 	}
 
 	private static int getLength(final Document instance) {
@@ -761,74 +766,8 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 	@Override
 	public void removeUpdate(final DocumentEvent evt) {
 		//
-		final Document document = getDocument(evt);
+		insertOrRemove(getDocument(evt));
 		//
-		if (Objects.equals(document, documentWhole1)) {
-			//
-			try {
-				//
-				final BigDecimal bd = testAndApply(NumberUtils::isCreatable,
-						getText(documentWhole1, 0, getLength(documentWhole1)), BigDecimal::new, null);
-				//
-				final Iterable<JTextComponent> iterable = Arrays.asList(FractionJTextComponent.getNumerator(fraction1),
-						FractionJTextComponent.getDenominator(fraction1));
-				//
-				if (bd != null && contains(toPlainString(bd.stripTrailingZeros()), ".")) {
-					//
-					forEach(iterable, x -> {
-						//
-						setText(x, "");
-						//
-						setEditable(x, false);
-						//
-					});
-					//
-				} else {
-					//
-					forEach(iterable, x -> setEditable(x, true));
-					//
-				} // if
-					//
-			} catch (final BadLocationException e) {
-				//
-				throw new RuntimeException(e);
-				//
-			} // try
-				//
-		} else if (Objects.equals(document, documentWhole2)) {
-			//
-			try {
-				//
-				final BigDecimal bd = testAndApply(NumberUtils::isCreatable,
-						getText(documentWhole2, 0, getLength(documentWhole2)), BigDecimal::new, null);
-				//
-				final Iterable<JTextComponent> iterable = Arrays.asList(FractionJTextComponent.getNumerator(fraction2),
-						FractionJTextComponent.getDenominator(fraction2));
-				//
-				if (bd != null && contains(toPlainString(bd.stripTrailingZeros()), ".")) {
-					//
-					forEach(iterable, x -> {
-						//
-						setText(x, "");
-						//
-						setEditable(x, false);
-						//
-					});
-					//
-				} else {
-					//
-					forEach(iterable, x -> setEditable(x, true));
-					//
-				} // if
-					//
-			} catch (final BadLocationException e) {
-				//
-				throw new RuntimeException(e);
-				//
-			} // try
-				//
-		} // if
-			//
 	}
 
 	private static <T> void forEach(final Iterable<T> instance, final Consumer<T> consumer) {
