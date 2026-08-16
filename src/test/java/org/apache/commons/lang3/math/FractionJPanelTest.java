@@ -85,6 +85,10 @@ class FractionJPanelTest {
 				//
 				return proxy;
 				//
+			} else if (Boolean.logicalAnd(proxy instanceof Collection, Objects.equals(name, "toArray"))) {
+				//
+				return null;
+				//
 			} // if
 				//
 			if (Boolean.logicalAnd(proxy instanceof Predicate, Objects.equals(name, "test"))) {

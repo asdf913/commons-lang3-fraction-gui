@@ -15,12 +15,14 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -153,11 +155,11 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			//
 		add(jPanel);
 		//
-		final List<Method> ms = toList(filter(Arrays.stream(Fraction.class.getMethods()),
-				m -> m != null && Arrays.equals(m.getParameterTypes(), new Class<?>[] { m.getDeclaringClass() })
-						&& Objects.equals(m.getReturnType(), m.getDeclaringClass())));
-		//
-		final JComboBox<Method> jcb = new JComboBox<>(cbm = new DefaultComboBoxModel<>(ms.toArray(Method[]::new)));
+		final JComboBox<Method> jcb = new JComboBox<>(
+				cbm = new DefaultComboBoxModel<>(toArray(toList(filter(Arrays.stream(Fraction.class.getMethods()),
+						m -> m != null && Arrays.equals(m.getParameterTypes(), new Class<?>[] { m.getDeclaringClass() })
+								&& Objects.equals(m.getReturnType(), m.getDeclaringClass()))),
+						Method[]::new)));
 		//
 		final ListCellRenderer lcr = jcb.getRenderer();
 		//
@@ -220,6 +222,10 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				FractionJTextComponent.getWhole(fraction2), FractionJTextComponent.getNumerator(fraction2),
 				FractionJTextComponent.getDenominator(fraction2), btnExecute)));
 		//
+	}
+
+	private static <T> T[] toArray(final Collection<T> instance, final IntFunction<T[]> generator) {
+		return instance != null ? instance.toArray(generator) : null;
 	}
 
 	private static <T> Stream<T> filter(final Stream<T> instance, final Predicate<? super T> predicate) {
