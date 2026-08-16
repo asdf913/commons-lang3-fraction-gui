@@ -28,6 +28,7 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import java.lang.reflect.Modifier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -125,7 +126,7 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 
 	private transient ComboBoxModel<Method> cbm = null;
 
-	private AbstractButton btnExecute = null;
+	private AbstractButton btnExecute, btnClear = null;
 
 	@Note("Fraction 1 Whole Document")
 	private transient Document documentWhole1 = null;
@@ -148,7 +149,9 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		//
 		jPanel.add((fraction1 = new FractionJTextComponent()).getWhole(), String.format("wmin %1$s,spany 2", wmin));
 		//
-		jPanel.add(fraction1.getNumerator(), String.format("wmin %1$s,wrap", wmin));
+		final String wrap = "wrap";
+		//
+		jPanel.add(fraction1.getNumerator(), String.format("wmin %1$s,%2$s", wmin, wrap));
 		//
 		jPanel.add(fraction1.getDenominator(), StringUtils.joinWith(" ", WMIN, wmin));
 		//
@@ -204,7 +207,7 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		//
 		jPanel.add((fraction2 = new FractionJTextComponent()).getWhole(), String.format("wmin %1$s,spany 2", wmin));
 		//
-		jPanel.add(fraction2.getNumerator(), String.format("wmin %1$s,wrap", wmin));
+		jPanel.add(fraction2.getNumerator(), String.format("wmin %1$s,%2$s", wmin, wrap));
 		//
 		jPanel.add(fraction2.getDenominator(), StringUtils.joinWith(" ", WMIN, wmin));
 		//
@@ -212,17 +215,17 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		//
 		add(btnExecute = new JButton("="));
 		//
-		btnExecute.addActionListener(this);
-		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
 		//
 		jPanel.add((answer = new FractionJTextComponent()).getWhole(), String.format("wmin %1$s,spany 2", wmin));
 		//
-		jPanel.add(answer.getNumerator(), String.format("wmin %1$s,wrap", wmin));
+		jPanel.add(answer.getNumerator(), String.format("wmin %1$s,%2$s", wmin, wrap));
 		//
 		jPanel.add(answer.getDenominator(), StringUtils.joinWith(" ", WMIN, wmin));
 		//
-		add(jPanel);
+		add(jPanel, wrap);
+		//
+		add(btnClear = new JButton("Clear"));
 		//
 		forEach(map(
 				testAndApply(Objects::nonNull, FractionJTextComponent.class.getDeclaredFields(), Arrays::stream, null),
@@ -238,6 +241,59 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		forEach(Arrays.asList(documentWhole1 = getDocument(FractionJTextComponent.getWhole(fraction1)),
 				documentWhole2 = getDocument(FractionJTextComponent.getWhole(fraction2))),
 				x -> addDocumentListener(x, this));
+		//
+		forEach(map(Arrays.stream(FractionJPanel.class.getDeclaredFields()),
+				f -> cast(AbstractButton.class,
+						f != null && Modifier.isStatic(f.getModifiers()) ? Narcissus.getStaticField(f)
+								: Narcissus.getField(this, f))),
+				x -> addActionListener(x, this));
+		//
+		clear();
+		//
+	}
+
+	private void clear() {
+		//
+		forEach(Arrays.asList(FractionJTextComponent.getWhole(fraction1),
+				FractionJTextComponent.getNumerator(fraction1), FractionJTextComponent.getDenominator(fraction1),
+				FractionJTextComponent.getWhole(fraction2), FractionJTextComponent.getNumerator(fraction2),
+				FractionJTextComponent.getDenominator(fraction2), FractionJTextComponent.getWhole(answer),
+				FractionJTextComponent.getNumerator(answer), FractionJTextComponent.getDenominator(answer)),
+				x -> setText(x, ""));
+		//
+		setSelectedItem(cbm, null);
+		//
+	}
+
+	private static void setSelectedItem(final ComboBoxModel<?> instance, final Object selectedItem) {
+		if (instance != null) {
+			instance.setSelectedItem(selectedItem);
+		}
+	}
+
+	private static void addActionListener(final AbstractButton instance, final ActionListener actionListener) {
+		//
+		if (instance == null) {
+			//
+			return;
+			//
+		} // if
+			//
+		try {
+			//
+			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), "listenerList")) == null) {
+				//
+				return;
+				//
+			} // if
+				//
+		} catch (final NoSuchFieldException e) {
+			//
+			throw new RuntimeException(e);
+			//
+		} // try
+			//
+		instance.addActionListener(actionListener);
 		//
 	}
 
@@ -402,7 +458,9 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 	@Override
 	public void actionPerformed(final ActionEvent evt) {
 		//
-		if (Objects.equals(getSource(evt), btnExecute)) {
+		final Object source = getSource(evt);
+		//
+		if (Objects.equals(source, btnExecute)) {
 			//
 			final Fraction fractionA = toFraction(fraction1);
 			//
@@ -444,6 +502,10 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				//
 			} // try
 				//
+		} else if (Objects.equals(source, btnClear)) {
+			//
+			clear();
+			//
 		} // if
 			//
 	}

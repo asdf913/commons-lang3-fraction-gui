@@ -23,7 +23,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.Document;
@@ -375,6 +377,10 @@ class FractionJPanelTest {
 				} else if (Objects.equals(parameterType, JTextComponent.class)) {
 					//
 					add(collection, Narcissus.allocateInstance(JTextField.class));
+					//
+				} else if (Objects.equals(parameterType, AbstractButton.class)) {
+					//
+					add(collection, Narcissus.allocateInstance(JButton.class));
 					//
 				} else if (Objects.equals(parameterType, Number.class)) {
 					//
