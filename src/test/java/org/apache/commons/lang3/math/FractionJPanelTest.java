@@ -41,8 +41,10 @@ import org.testng.annotations.Test;
 
 import com.google.common.reflect.Reflection;
 import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
 
 import io.github.toolfactory.narcissus.Narcissus;
 
@@ -174,6 +176,14 @@ class FractionJPanelTest {
 				return null;
 				//
 			} else if (Boolean.logicalAnd(proxy instanceof Page, Objects.equals(name, "locator"))) {
+				//
+				return null;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof Playwright, Objects.equals(name, "chromium"))) {
+				//
+				return null;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof BrowserType, Objects.equals(name, "launch"))) {
 				//
 				return null;
 				//

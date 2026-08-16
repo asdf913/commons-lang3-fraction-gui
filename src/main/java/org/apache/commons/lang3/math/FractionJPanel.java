@@ -584,15 +584,11 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			//
 			sb.append(toMathML(answer));
 			//
-			sb.append("</td></tr></tbody></table></body></html>");
-			//
 			try (final Playwright playwright = Playwright.create();
-					final Browser browser = playwright != null
-							? playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true))
-							: null;
+					final Browser browser = launch(chromium(playwright));
 					final Page page = newPage(browser)) {
 				//
-				setContent(page, Objects.toString(sb));
+				setContent(page, Objects.toString(sb.append("</td></tr></tbody></table></body></html>")));
 				//
 				setIcon(labelImage, new ImageIcon(screenshot(locator(page, "tbody"))));
 				//
@@ -600,6 +596,14 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				//
 		} // if
 			//
+	}
+
+	private static Browser launch(final BrowserType instance) {
+		return instance != null ? instance.launch() : null;
+	}
+
+	private static BrowserType chromium(final Playwright instance) {
+		return instance != null ? instance.chromium() : null;
 	}
 
 	private static Locator locator(final Page instance, final String selector) {
