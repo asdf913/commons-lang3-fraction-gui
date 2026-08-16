@@ -1,5 +1,7 @@
 package org.apache.commons.lang3.math;
 
+import java.awt.FocusTraversalPolicy;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -12,6 +14,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -34,7 +38,7 @@ import io.github.toolfactory.narcissus.Narcissus;
 
 class FractionJPanelTest {
 
-	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST = null;
+	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -48,6 +52,9 @@ class FractionJPanelTest {
 				.setAccessible(true);
 		//
 		(METHOD_CAST = clz.getDeclaredMethod("cast", Class.class, Object.class)).setAccessible(true);
+		//
+		(METHOD_CREATE_FOCUS_TRAVERSAL_POLICY = clz.getDeclaredMethod("createFocusTraversalPolicy", List.class))
+				.setAccessible(true);
 		//
 	}
 
@@ -118,7 +125,7 @@ class FractionJPanelTest {
 		//
 		Object result = null;
 		//
-		String toString = null;
+		String toString, name = null;
 		//
 		Object[] os = null;
 		//
@@ -161,9 +168,11 @@ class FractionJPanelTest {
 			//
 			final Object[] os1 = os;
 			//
+			name = getName(m);
+			//
 			if (Modifier.isStatic(m.getModifiers())) {
 				//
-				if (Boolean.logicalAnd(Objects.equals(m.getName(), "toFraction"), Boolean.logicalOr(
+				if (Boolean.logicalAnd(Objects.equals(name, "toFraction"), Boolean.logicalOr(
 						Arrays.equals(parameterTypes = m.getParameterTypes(),
 								new Class<?>[] { String.class, String.class, String.class }),
 						Arrays.equals(parameterTypes, new Class<?>[] { Class
@@ -183,7 +192,7 @@ class FractionJPanelTest {
 					//
 			} else {
 				//
-				if (Boolean.logicalAnd(Objects.equals(m.getName(), "actionPerformed"),
+				if (Boolean.logicalAnd(Objects.equals(name, "actionPerformed"),
 						Arrays.equals(m.getParameterTypes(), new Class<?>[] { ActionEvent.class }))) {
 					//
 					final FractionJPanel instance1 = instance = ObjectUtils.getIfNull(instance,
@@ -207,7 +216,9 @@ class FractionJPanelTest {
 					//
 			} // if
 				//
-			if (Objects.equals(getReturnType(m), Boolean.TYPE)) {
+			if (Boolean.logicalOr(Objects.equals(getReturnType(m), Boolean.TYPE),
+					Boolean.logicalAnd(Objects.equals(name, "createFocusTraversalPolicy"),
+							Arrays.equals(parameterTypes, new Object[] { List.class })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -372,11 +383,13 @@ class FractionJPanelTest {
 					//
 			} // if
 				//
-			if (Boolean.logicalOr(Objects.equals(getReturnType(m), Boolean.TYPE),
+			if (or(Objects.equals(getReturnType(m), Boolean.TYPE),
 					Boolean.logicalAnd(Objects.equals(name = getName(m), "getClass"),
-							Arrays.equals(parameterTypes, new Object[] { Object.class })))
-					|| Boolean.logicalAnd(Objects.equals(name, "toPlainString"),
-							Arrays.equals(parameterTypes, new Object[] { BigDecimal.class }))) {
+							Arrays.equals(parameterTypes, new Object[] { Object.class })),
+					Boolean.logicalAnd(Objects.equals(name, "toPlainString"),
+							Arrays.equals(parameterTypes, new Object[] { BigDecimal.class })),
+					Boolean.logicalAnd(Objects.equals(name, "createFocusTraversalPolicy"),
+							Arrays.equals(parameterTypes, new Object[] { List.class })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -388,6 +401,30 @@ class FractionJPanelTest {
 				//
 		} // for
 			//
+	}
+
+	private static boolean or(final boolean a, final boolean b, final boolean... bs) {
+		//
+		boolean result = a || b;
+		//
+		if (result) {
+			//
+			return result;
+			//
+		} // if
+			//
+		for (int i = 0; bs != null && i < bs.length; i++) {
+			//
+			if (result |= bs[i]) {
+				//
+				return result;
+				//
+			} // if
+				//
+		} // for
+			//
+		return result;
+		//
 	}
 
 	private static <E> void add(final Collection<E> instance, final E item) {
@@ -463,6 +500,84 @@ class FractionJPanelTest {
 		} catch (final InvocationTargetException e) {
 			throw e.getTargetException();
 		}
+	}
+
+	@Test
+	public void testCreateFocusTraversalPolicy() throws Throwable {
+		//
+		final FocusTraversalPolicy focusTraversalPolicy1 = cast(FocusTraversalPolicy.class,
+				invoke(METHOD_CREATE_FOCUS_TRAVERSAL_POLICY, null, new Object[] { null }));
+		//
+		if (focusTraversalPolicy1 == null) {
+			//
+			return;
+			//
+		} // if
+			//
+		final Method[] ms = FocusTraversalPolicy.class.getDeclaredMethods();
+		//
+		Method m = null;
+		//
+		for (int i = 0; ms != null && i < ms.length; i++) {
+			//
+			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()) {
+				//
+				continue;
+				//
+			} // if
+				//
+			if (Boolean.logicalAnd(Objects.equals(getName(m), "getInitialComponent"),
+					Arrays.equals(m.getParameterTypes(), new Class<?>[] { Window.class }))) {
+				//
+				final Method m1 = m;
+				//
+				Assert.assertThrows(IllegalArgumentException.class, () -> Narcissus.invokeMethod(focusTraversalPolicy1,
+						m1, toArray(Collections.nCopies(m1.getParameterCount(), null))));
+				//
+			} else {
+				//
+				Assert.assertNull(Narcissus.invokeMethod(focusTraversalPolicy1, m,
+						toArray(Collections.nCopies(m.getParameterCount(), null))));
+				//
+			} // if
+				//
+		} // for
+			//
+		final FocusTraversalPolicy focusTraversalPolicy2 = cast(FocusTraversalPolicy.class,
+				invoke(METHOD_CREATE_FOCUS_TRAVERSAL_POLICY, null,
+						new Object[] { Collections.singletonList(new JTextField()) }));
+		//
+		if (focusTraversalPolicy2 == null) {
+			//
+			return;
+			//
+		} // if
+			//
+		for (int i = 0; ms != null && i < ms.length; i++) {
+			//
+			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()) {
+				//
+				continue;
+				//
+			} // if
+				//
+			if (Boolean.logicalAnd(Objects.equals(getName(m), "getInitialComponent"),
+					Arrays.equals(m.getParameterTypes(), new Class<?>[] { Window.class }))) {
+				//
+				final Method m1 = m;
+				//
+				Assert.assertThrows(IllegalArgumentException.class, () -> Narcissus.invokeMethod(focusTraversalPolicy2,
+						m1, toArray(Collections.nCopies(m1.getParameterCount(), null))));
+				//
+			} else {
+				//
+				Assert.assertNotNull(Narcissus.invokeMethod(focusTraversalPolicy2, m,
+						toArray(Collections.nCopies(m.getParameterCount(), null))));
+				//
+			} // if
+				//
+		} // for
+			//
 	}
 
 }

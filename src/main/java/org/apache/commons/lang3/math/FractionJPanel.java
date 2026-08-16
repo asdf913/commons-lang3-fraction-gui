@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Objects;
@@ -209,12 +210,16 @@ public class FractionJPanel extends JPanel implements ActionListener {
 		//
 		setFocusTraversalPolicyProvider(true);
 		//
-		final List<Component> components = Arrays.asList(FractionJTextComponent.getWhole(fraction1),
+		setFocusTraversalPolicy(createFocusTraversalPolicy(Arrays.asList(FractionJTextComponent.getWhole(fraction1),
 				FractionJTextComponent.getNumerator(fraction1), FractionJTextComponent.getDenominator(fraction1), jcb,
 				FractionJTextComponent.getWhole(fraction2), FractionJTextComponent.getNumerator(fraction2),
-				FractionJTextComponent.getDenominator(fraction2), btnExecute);
+				FractionJTextComponent.getDenominator(fraction2), btnExecute)));
 		//
-		setFocusTraversalPolicy(new FocusTraversalPolicy() {
+	}
+
+	private static FocusTraversalPolicy createFocusTraversalPolicy(final List<Component> components) {
+		//
+		return new FocusTraversalPolicy() {
 
 			@Override
 			public Component getLastComponent(final Container aContainer) {
@@ -241,6 +246,12 @@ public class FractionJPanel extends JPanel implements ActionListener {
 			@Override
 			public Component getComponentBefore(final Container aContainer, final Component aComponent) {
 				//
+				if (IterableUtils.isEmpty(components)) {
+					//
+					return null;
+					//
+				} // if
+					//
 				final int index = components != null ? components.indexOf(aComponent) : null;
 				//
 				return testAndApply(x -> index > 0, components, x -> IterableUtils.get(components, index - 1),
@@ -251,6 +262,12 @@ public class FractionJPanel extends JPanel implements ActionListener {
 			@Override
 			public Component getComponentAfter(final Container aContainer, final Component aComponent) {
 				//
+				if (IterableUtils.isEmpty(components)) {
+					//
+					return null;
+					//
+				} // if
+					//
 				final int index = components != null ? components.indexOf(aComponent) : null;
 				//
 				return testAndApply(x -> IterableUtils.size(x) - 1 > index, components,
@@ -258,7 +275,7 @@ public class FractionJPanel extends JPanel implements ActionListener {
 				//
 			}
 
-		});
+		};
 		//
 	}
 
