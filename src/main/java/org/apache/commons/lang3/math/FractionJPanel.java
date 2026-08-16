@@ -152,8 +152,6 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		//
 		jPanel.add(fraction1.getDenominator(), StringUtils.joinWith(" ", WMIN, wmin));
 		//
-		(documentWhole1 = getDocument(FractionJTextComponent.getWhole(fraction1))).addDocumentListener(this);
-		//
 		try {
 			//
 			if (Narcissus.getObjectField(this, Container.class.getDeclaredField("component")) == null) {
@@ -210,8 +208,6 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		//
 		jPanel.add(fraction2.getDenominator(), StringUtils.joinWith(" ", WMIN, wmin));
 		//
-		(documentWhole2 = getDocument(FractionJTextComponent.getWhole(fraction2))).addDocumentListener(this);
-		//
 		add(jPanel);
 		//
 		add(btnExecute = new JButton("="));
@@ -239,6 +235,16 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				FractionJTextComponent.getWhole(fraction2), FractionJTextComponent.getNumerator(fraction2),
 				FractionJTextComponent.getDenominator(fraction2), btnExecute)));
 		//
+		forEach(Arrays.asList(documentWhole1 = getDocument(FractionJTextComponent.getWhole(fraction1)),
+				documentWhole2 = getDocument(FractionJTextComponent.getWhole(fraction2))),
+				x -> addDocumentListener(x, this));
+		//
+	}
+
+	private static void addDocumentListener(final Document instance, final DocumentListener documentListener) {
+		if (instance != null) {
+			instance.addDocumentListener(documentListener);
+		}
 	}
 
 	private static Document getDocument(final JTextComponent instance) {
