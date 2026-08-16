@@ -93,14 +93,10 @@ class FractionJPanelTest {
 				//
 				return null;
 				//
-			} else if (proxy instanceof Stream) {
+			} else if (proxy instanceof Stream && Objects.equals(name, "map")) {
 				//
-				if (Objects.equals(name, "map")) {
-					//
-					return null;
-					//
-				} // if
-					//
+				return null;
+				//
 			} // if
 				//
 			throw new Throwable(name);
