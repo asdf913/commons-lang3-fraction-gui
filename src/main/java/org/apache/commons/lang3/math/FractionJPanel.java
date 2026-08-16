@@ -124,9 +124,9 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 	private AbstractButton btnExecute = null;
 
 	@Note("Fraction 1 Whole Document")
-	private Document documentWhole1 = null;
+	private transient Document documentWhole1 = null;
 
-	private Document documentWhole2 = null;
+	private transient Document documentWhole2 = null;
 
 	private FractionJPanel() {
 		//
