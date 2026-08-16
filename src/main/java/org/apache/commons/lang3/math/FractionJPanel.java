@@ -631,8 +631,8 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				//
 		} // if
 			//
-		if ((isValidString(numerator) && StringUtils.isNotBlank(numerator))
-				|| (isValidString(denominator) && StringUtils.isNotBlank(denominator))) {
+		if (Boolean.logicalOr(isValidString(numerator) && StringUtils.isNotBlank(numerator),
+				isValidString(denominator) && StringUtils.isNotBlank(denominator))) {
 			//
 			sb.append("<mfrac>");
 			//
