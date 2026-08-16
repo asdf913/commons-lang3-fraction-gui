@@ -41,6 +41,7 @@ import org.testng.annotations.Test;
 
 import com.google.common.reflect.Reflection;
 import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.Locator;
 
 import io.github.toolfactory.narcissus.Narcissus;
 
@@ -164,6 +165,10 @@ class FractionJPanelTest {
 				return null;
 				//
 			} else if (Boolean.logicalAnd(proxy instanceof Browser, Objects.equals(name, "newPage"))) {
+				//
+				return null;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof Locator, Objects.equals(name, "screenshot"))) {
 				//
 				return null;
 				//

@@ -62,6 +62,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 
@@ -595,7 +596,7 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 					//
 					page.setContent(Objects.toString(sb));
 					//
-					setIcon(labelImage, new ImageIcon(page.locator("tbody").screenshot()));
+					setIcon(labelImage, new ImageIcon(screenshot(page.locator("tbody"))));
 					//
 				} // if
 					//
@@ -603,6 +604,10 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				//
 		} // if
 			//
+	}
+
+	private static byte[] screenshot(final Locator instance) {
+		return instance != null ? instance.screenshot() : null;
 	}
 
 	private static Page newPage(final Browser instance) {
