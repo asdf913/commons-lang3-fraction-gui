@@ -569,8 +569,10 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			//
 			sb.append(toMathML(fraction1));
 			//
-			sb.append(testAndApply(Objects::nonNull, getName(cast(Member.class, getSelectedItem(cbm))),
-					x -> get(BIDI_MAP != null ? BIDI_MAP.inverseBidiMap() : null, x), null));
+			final Object object = testAndApply(Objects::nonNull, getName(cast(Member.class, getSelectedItem(cbm))),
+					x -> get(BIDI_MAP != null ? BIDI_MAP.inverseBidiMap() : null, x), null);
+			//
+			sb.append(object);
 			//
 			sb.append(toMathML(fraction2));
 			//
