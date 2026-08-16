@@ -126,7 +126,10 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 
 	private transient ComboBoxModel<Method> cbm = null;
 
-	private AbstractButton btnExecute, btnClear = null;
+	@Note("Execute")
+	private AbstractButton btnExecute = null;
+
+	private AbstractButton btnClear = null;
 
 	@Note("Fraction 1 Whole Document")
 	private transient Document documentWhole1 = null;
