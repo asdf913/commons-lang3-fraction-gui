@@ -573,7 +573,7 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			sb.append(toMathML(fraction1));
 			//
 			final Object object = testAndApply(Objects::nonNull, getName(cast(Member.class, getSelectedItem(cbm))),
-					x -> get(BIDI_MAP != null ? BIDI_MAP.inverseBidiMap() : null, x), null);
+					x -> get(inverseBidiMap(BIDI_MAP), x), null);
 			//
 			sb.append(object);
 			//
@@ -603,6 +603,10 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				//
 		} // if
 			//
+	}
+
+	private static <K, V> BidiMap<V, K> inverseBidiMap(final BidiMap<K, V> instance) {
+		return instance != null ? instance.inverseBidiMap() : null;
 	}
 
 	private static String toMathML(final FractionJTextComponent instance) {

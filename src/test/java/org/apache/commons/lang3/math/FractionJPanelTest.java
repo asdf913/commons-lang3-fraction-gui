@@ -31,6 +31,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.function.TriFunction;
@@ -509,7 +510,9 @@ class FractionJPanelTest {
 							Boolean.logicalOr(
 									Arrays.equals(parameterTypes,
 											new Object[] { String.class, String.class, String.class }),
-									Arrays.equals(parameterTypes, new Object[] { clz }))))) {
+									Arrays.equals(parameterTypes, new Object[] { clz }))),
+					Boolean.logicalAnd(Objects.equals(name, "inverseBidiMap"),
+							Arrays.equals(parameterTypes, new Object[] { BidiMap.class })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
