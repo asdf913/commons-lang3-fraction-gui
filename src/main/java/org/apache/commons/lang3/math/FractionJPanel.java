@@ -592,18 +592,24 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 							: null;
 					final Page page = newPage(browser)) {
 				//
-				if (page != null) {
-					//
-					page.setContent(Objects.toString(sb));
-					//
-					setIcon(labelImage, new ImageIcon(screenshot(page.locator("tbody"))));
-					//
-				} // if
-					//
+				setContent(page, Objects.toString(sb));
+				//
+				setIcon(labelImage, new ImageIcon(screenshot(locator(page, "tbody"))));
+				//
 			} // try
 				//
 		} // if
 			//
+	}
+
+	private static Locator locator(final Page instance, final String selector) {
+		return instance != null ? instance.locator(selector) : null;
+	}
+
+	private static void setContent(final Page instance, final String content) {
+		if (instance != null) {
+			instance.setContent(content);
+		}
 	}
 
 	private static byte[] screenshot(final Locator instance) {
