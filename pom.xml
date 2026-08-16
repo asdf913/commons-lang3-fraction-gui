@@ -24,12 +24,6 @@
 			<artifactId>miglayout-swing</artifactId>
 			<version>11.4.3</version>
 		</dependency>
-		<!--https://mvnrepository.com/artifact/org.meeuw.util/mihxil-functional -->
-		<dependency>
-			<groupId>org.meeuw.util</groupId>
-			<artifactId>mihxil-functional</artifactId>
-			<version>1.17</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.github.toolfactory/narcissus -->
 		<dependency>
 			<groupId>io.github.toolfactory</groupId>

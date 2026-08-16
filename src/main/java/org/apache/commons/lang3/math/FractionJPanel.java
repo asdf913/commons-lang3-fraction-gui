@@ -10,6 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.EventObject;
 import java.util.List;
@@ -32,8 +33,6 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.TriFunction;
-import org.meeuw.functional.TriPredicate;
 
 import io.github.toolfactory.narcissus.Narcissus;
 import net.miginfocom.swing.MigLayout;
@@ -243,23 +242,9 @@ public class FractionJPanel extends JPanel implements ActionListener {
 		//
 		if (Objects.equals(getSource(evt), btnExecute)) {
 			//
-			final Fraction fractionA = testAndApply((a, b, c) -> Boolean.logicalAnd(a != null, b != null) && c != null,
-					testAndApply(NumberUtils::isParsable, getText(FractionJTextComponent.getWhole(fraction1)),
-							NumberUtils::toInt, null),
-					testAndApply(NumberUtils::isParsable, getText(FractionJTextComponent.getNumerator(fraction1)),
-							NumberUtils::toInt, null),
-					testAndApply(NumberUtils::isParsable, getText(FractionJTextComponent.getDenominator(fraction1)),
-							NumberUtils::toInt, null),
-					Fraction::getFraction, null);
+			final Fraction fractionA = toFraction(fraction1);
 			//
-			final Fraction fractionB = testAndApply((a, b, c) -> Boolean.logicalAnd(a != null, b != null) && c != null,
-					testAndApply(NumberUtils::isParsable, getText(FractionJTextComponent.getWhole(fraction2)),
-							NumberUtils::toInt, null),
-					testAndApply(NumberUtils::isParsable, getText(FractionJTextComponent.getNumerator(fraction2)),
-							NumberUtils::toInt, null),
-					testAndApply(NumberUtils::isParsable, getText(FractionJTextComponent.getDenominator(fraction2)),
-							NumberUtils::toInt, null),
-					Fraction::getFraction, null);
+			final Fraction fractionB = toFraction(fraction2);
 			//
 			try {
 				//
@@ -299,6 +284,112 @@ public class FractionJPanel extends JPanel implements ActionListener {
 				//
 		} // if
 			//
+	}
+
+	private static Fraction toFraction(final FractionJTextComponent instance) {
+		//
+		return toFraction(getText(FractionJTextComponent.getWhole(instance)),
+				getText(FractionJTextComponent.getNumerator(instance)),
+				getText(FractionJTextComponent.getDenominator(instance)));
+		//
+	}
+
+	private static Fraction toFraction(final String whole, final String numerator, final String denominator) {
+		//
+		final Predicate<String> predicate = x -> isValidString(x) && NumberUtils.isCreatable(x);
+		//
+		final BigDecimal bdWhole = testAndApply(predicate, whole, BigDecimal::new, null);
+		//
+		if (bdWhole != null && contains(toPlainString(bdWhole.stripTrailingZeros()), ".")) {
+			//
+			if (StringUtils.isNotEmpty(numerator)) {
+				//
+				throw new IllegalStateException("numerator is not empty");
+				//
+			} else if (StringUtils.isNotEmpty(denominator)) {
+				//
+				throw new IllegalStateException("denominator is not empty");
+				//
+			} // if
+				//
+			return Fraction.getFraction(bdWhole.doubleValue());
+			//
+		} // if
+			//
+		final BigDecimal bdNumerator = testAndApply(predicate, numerator, BigDecimal::new, null);
+		//
+		if (bdNumerator == null) {
+			//
+			throw new IllegalStateException("numerator is not a valid number");
+			//
+		} else if (contains(toPlainString(bdNumerator.stripTrailingZeros()), ".")) {
+			//
+			throw new IllegalStateException("numerator is not an integer");
+			//
+		} // if
+			//
+		final BigDecimal bdDenominator = testAndApply(NumberUtils::isCreatable, denominator, BigDecimal::new, null);
+		//
+		if (bdDenominator == null) {
+			//
+			throw new IllegalStateException("denominator is not a valid number");
+			//
+		} else if (contains(toPlainString(bdDenominator.stripTrailingZeros()), ".")) {
+			//
+			throw new IllegalStateException("denominator is not an integer");
+			//
+		} // if
+			//
+		if (bdWhole != null) {
+			//
+			return Fraction.getFraction(bdWhole.intValue(), bdNumerator.intValue(), bdDenominator.intValue());
+			//
+		} // if
+			//
+		return Fraction.getFraction(bdNumerator.intValue(), bdDenominator.intValue());
+		//
+	}
+
+	private static boolean isValidString(final String instance) {
+		//
+		if (instance == null) {
+			//
+			return false;
+			//
+		} // if
+			//
+		try {
+			//
+			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), "value")) == null) {
+				//
+				return false;
+				//
+			} // if
+				//
+		} catch (final NoSuchFieldException e) {
+			//
+			throw new RuntimeException(e);
+			//
+		} // try
+			//
+		return true;
+		//
+	}
+
+	private static boolean contains(final String instance, final CharSequence s) {
+		//
+		if (!isValidString(instance)) {
+			//
+			return false;
+			//
+		} // if
+			//
+		return instance.contains(s);
+		//
+	}
+
+	private static String toPlainString(final BigDecimal instance) {
+		return instance != null ? instance.toPlainString() : null;
 	}
 
 	private static Object invoke(final Method method, final Object instance, final Object... args)
@@ -342,16 +433,6 @@ public class FractionJPanel extends JPanel implements ActionListener {
 
 	private static Class<?> getClass(final Object instance) {
 		return instance != null ? instance.getClass() : null;
-	}
-
-	private static <T, R> R testAndApply(final TriPredicate<T, T, T> predicate, final T a, final T b, final T c,
-			final TriFunction<T, T, T, R> functionTrue, final TriFunction<T, T, T, R> functionFalse) {
-		return predicate != null && predicate.test(a, b, c) ? apply(functionTrue, a, b, c)
-				: apply(functionFalse, a, b, c);
-	}
-
-	private static <T, U, V, R> R apply(final TriFunction<T, U, V, R> instance, final T t, final U u, final V v) {
-		return instance != null ? instance.apply(t, u, v) : null;
 	}
 
 	private static String getText(final JTextComponent instance) {

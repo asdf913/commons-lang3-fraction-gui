@@ -1,11 +1,14 @@
 package org.apache.commons.lang3.math;
 
+import java.awt.event.ActionEvent;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,8 +24,8 @@ import javax.swing.text.JTextComponent;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.function.TriFunction;
-import org.meeuw.functional.TriPredicate;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.google.common.reflect.Reflection;
@@ -30,6 +33,23 @@ import com.google.common.reflect.Reflection;
 import io.github.toolfactory.narcissus.Narcissus;
 
 class FractionJPanelTest {
+
+	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST = null;
+
+	@BeforeClass
+	static void beforeClass() throws NoSuchMethodException {
+		//
+		final Class<?> clz = FractionJPanel.class;
+		//
+		(METHOD_TO_FRACTION = clz.getDeclaredMethod("toFraction", String.class, String.class, String.class))
+				.setAccessible(true);
+		//
+		(METHOD_INVOKE = clz.getDeclaredMethod("invoke", Method.class, Object.class, Object[].class))
+				.setAccessible(true);
+		//
+		(METHOD_CAST = clz.getDeclaredMethod("cast", Class.class, Object.class)).setAccessible(true);
+		//
+	}
 
 	private static class IH implements InvocationHandler {
 
@@ -40,7 +60,14 @@ class FractionJPanelTest {
 			//
 			final String name = getName(method);
 			//
-			if (Boolean.logicalOr(proxy instanceof Predicate, proxy instanceof TriPredicate)) {
+			if (Boolean.logicalAnd(Objects.equals(name, "toString"),
+					method != null && method.getParameterCount() == 0)) {
+				//
+				return toString();
+				//
+			} // if
+				//
+			if (proxy instanceof Predicate) {
 				//
 				if (Objects.equals(name, "test")) {
 					//
@@ -87,6 +114,8 @@ class FractionJPanelTest {
 		//
 		FractionJPanel instance = null;
 		//
+		Class<?>[] parameterTypes = null;
+		//
 		for (int i = 0; ms != null && i < ms.length; i++) {
 			//
 			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()) {
@@ -99,18 +128,54 @@ class FractionJPanelTest {
 			//
 			toString = Objects.toString(m);
 			//
+			final Method m1 = m;
+			//
+			final Object[] os1 = os;
+			//
 			if (Modifier.isStatic(m.getModifiers())) {
 				//
-				result = Narcissus.invokeStaticMethod(m, os);
-				//
+				if (Boolean.logicalAnd(Objects.equals(m.getName(), "toFraction"), Boolean.logicalOr(
+						Arrays.equals(parameterTypes = m.getParameterTypes(),
+								new Class<?>[] { String.class, String.class, String.class }),
+						Arrays.equals(parameterTypes, new Class<?>[] { Class
+								.forName("org.apache.commons.lang3.math.FractionJPanel$FractionJTextComponent") })))) {
+					//
+					Assert.assertThrows(IllegalStateException.class, () -> {
+						Narcissus.invokeStaticMethod(m1, os1);
+					});
+					//
+					continue;
+					//
+				} else {
+					//
+					result = Narcissus.invokeStaticMethod(m, os);
+					//
+				} // if
+					//
 			} else {
 				//
-				result = Narcissus
-						.invokeMethod(
-								instance = ObjectUtils.getIfNull(instance,
-										() -> (FractionJPanel) Narcissus.allocateInstance(FractionJPanel.class)),
-								m, os);
-				//
+				if (Boolean.logicalAnd(Objects.equals(m.getName(), "actionPerformed"),
+						Arrays.equals(m.getParameterTypes(), new Class<?>[] { ActionEvent.class }))) {
+					//
+					final FractionJPanel instance1 = instance = ObjectUtils.getIfNull(instance,
+							() -> (FractionJPanel) Narcissus.allocateInstance(FractionJPanel.class));
+					//
+					Assert.assertThrows(IllegalStateException.class, () -> {
+						Narcissus.invokeMethod(instance1, m1, os1);
+					});
+					//
+					continue;
+					//
+				} else {
+					//
+					result = Narcissus
+							.invokeMethod(
+									instance = ObjectUtils.getIfNull(instance,
+											() -> (FractionJPanel) Narcissus.allocateInstance(FractionJPanel.class)),
+									m, os);
+					//
+				} // if
+					//
 			} // if
 				//
 			if (Objects.equals(getReturnType(m), Boolean.TYPE)) {
@@ -144,7 +209,7 @@ class FractionJPanelTest {
 		//
 		Object result = null;
 		//
-		String toString = null;
+		String toString, name = null;
 		//
 		Object[] os = null;
 		//
@@ -224,23 +289,61 @@ class FractionJPanelTest {
 			//
 			toString = Objects.toString(m);
 			//
+			final Method m1 = m;
+			//
+			final Object[] os1 = os;
+			//
 			if (Modifier.isStatic(m.getModifiers())) {
 				//
-				result = Narcissus.invokeStaticMethod(m, os);
-				//
+				if (Boolean.logicalAnd(Objects.equals(m.getName(), "toFraction"), Boolean.logicalOr(
+						Arrays.equals(parameterTypes = m.getParameterTypes(),
+								new Class<?>[] { String.class, String.class, String.class }),
+						Arrays.equals(parameterTypes, new Class<?>[] { Class
+								.forName("org.apache.commons.lang3.math.FractionJPanel$FractionJTextComponent") })))) {
+					//
+					Assert.assertThrows(IllegalStateException.class, () -> {
+						Narcissus.invokeStaticMethod(m1, os1);
+					});
+					//
+					continue;
+					//
+				} else {
+					//
+					result = Narcissus.invokeStaticMethod(m, os);
+					//
+				} // if
+					//
 			} else {
 				//
-				result = Narcissus
-						.invokeMethod(
-								instance = ObjectUtils.getIfNull(instance,
-										() -> (FractionJPanel) Narcissus.allocateInstance(FractionJPanel.class)),
-								m, os);
-				//
+				if (Boolean.logicalAnd(Objects.equals(m.getName(), "actionPerformed"),
+						Arrays.equals(m.getParameterTypes(), new Class<?>[] { ActionEvent.class }))) {
+					//
+					final FractionJPanel instance1 = instance = ObjectUtils.getIfNull(instance,
+							() -> (FractionJPanel) Narcissus.allocateInstance(FractionJPanel.class));
+					//
+					Assert.assertThrows(IllegalStateException.class, () -> {
+						Narcissus.invokeMethod(instance1, m1, os1);
+					});
+					//
+					continue;
+					//
+				} else {
+					//
+					result = Narcissus
+							.invokeMethod(
+									instance = ObjectUtils.getIfNull(instance,
+											() -> (FractionJPanel) Narcissus.allocateInstance(FractionJPanel.class)),
+									m, os);
+					//
+				} // if
+					//
 			} // if
 				//
-			if (Objects.equals(getReturnType(m), Boolean.TYPE)
-					|| Boolean.logicalAnd(Objects.equals(getName(m), "getClass"),
-							Arrays.equals(parameterTypes, new Object[] { Object.class }))) {
+			if (Boolean.logicalOr(Objects.equals(getReturnType(m), Boolean.TYPE),
+					Boolean.logicalAnd(Objects.equals(name = getName(m), "getClass"),
+							Arrays.equals(parameterTypes, new Object[] { Object.class })))
+					|| Boolean.logicalAnd(Objects.equals(name, "toPlainString"),
+							Arrays.equals(parameterTypes, new Object[] { BigDecimal.class }))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -263,6 +366,69 @@ class FractionJPanelTest {
 	private static void clear(final Collection<?> instance) {
 		if (instance != null) {
 			instance.clear();
+		}
+	}
+
+	@Test
+	public void testToFraction() throws Throwable {
+		//
+		final String string = "1.2";
+		//
+		Assert.assertEquals(Fraction.getFraction(string), toFraction(string, null, null));
+		//
+		final String space = " ";
+		//
+		Assert.assertThrows(InvocationTargetException.class, () -> toFraction(string, space, null));
+		//
+		Assert.assertThrows(InvocationTargetException.class, () -> toFraction(string, null, space));
+		//
+		final int two = 2;
+		//
+		final int three = 3;
+		//
+		Assert.assertEquals(Fraction.getFraction(2, 3),
+				toFraction(null, Integer.toString(two), Integer.toString(three)));
+		//
+		Assert.assertThrows(InvocationTargetException.class,
+				() -> toFraction(null, String.join(".", Integer.toString(two), "1"), Integer.toString(three)));
+		//
+		Assert.assertThrows(InvocationTargetException.class, () -> toFraction(null, Integer.toString(two), space));
+		//
+		Assert.assertThrows(InvocationTargetException.class,
+				() -> toFraction(null, Integer.toString(two), String.join(".", Integer.toString(three), "1")));
+		//
+		final int four = 4;
+		//
+		Assert.assertEquals(Fraction.getFraction(2, 3, 4),
+				toFraction(Integer.toString(two), Integer.toString(three), Integer.toString(four)));
+		//
+	}
+
+	private static Fraction toFraction(final String whole, final String numerator, final String denominator)
+			throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_TO_FRACTION, null, whole, numerator, denominator);
+			if (obj instanceof Fraction) {
+				return cast(Fraction.class, obj);
+			} else if (obj == null) {
+				return null;
+			}
+			throw new Throwable(Objects.toString(obj.getClass()));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	private static Object invoke(final Method method, final Object instance, final Object... args)
+			throws IllegalAccessException, InvocationTargetException {
+		return METHOD_INVOKE != null ? METHOD_INVOKE.invoke(null, method, instance, args) : null;
+	}
+
+	private static <T> T cast(final Class<T> clz, final Object instance) throws Throwable {
+		try {
+			return (T) invoke(METHOD_CAST, null, clz, instance);
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
 		}
 	}
 
