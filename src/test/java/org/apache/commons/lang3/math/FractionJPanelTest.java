@@ -24,6 +24,8 @@ import java.util.stream.Stream;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -63,7 +65,7 @@ class FractionJPanelTest {
 
 		private Boolean test = null;
 
-		private Integer size = null;
+		private Integer size, length = null;
 
 		@Override
 		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
@@ -117,7 +119,7 @@ class FractionJPanelTest {
 				return null;
 				//
 			} else if (Boolean.logicalAnd(proxy instanceof Member, Objects.equals(name, "getName"))) {
-				//
+				// ,
 				return null;
 				//
 			} else if (Boolean.logicalAnd(proxy instanceof Entry,
@@ -125,6 +127,22 @@ class FractionJPanelTest {
 				//
 				return null;
 				//
+			} else if (Boolean.logicalAnd(proxy instanceof DocumentEvent, Objects.equals(name, "getDocument"))) {
+				//
+				return null;
+				//
+			} else if (proxy instanceof Document) {
+				//
+				if (Objects.equals(name, "getLength")) {
+					//
+					return length;
+					//
+				} else if (Objects.equals(name, "getText")) {
+					//
+					return null;
+					//
+				} // if
+					//
 			} // if
 				//
 			throw new Throwable(name);
@@ -223,8 +241,11 @@ class FractionJPanelTest {
 					//
 			} else {
 				//
-				if (Boolean.logicalAnd(Objects.equals(name, "actionPerformed"),
-						Arrays.equals(m.getParameterTypes(), new Class<?>[] { ActionEvent.class }))) {
+				if (Boolean.logicalOr(
+						Boolean.logicalAnd(Objects.equals(name, "actionPerformed"),
+								Arrays.equals(m.getParameterTypes(), new Class<?>[] { ActionEvent.class })),
+						Boolean.logicalAnd(Objects.equals(name, "changedUpdate"),
+								Arrays.equals(m.getParameterTypes(), new Class<?>[] { DocumentEvent.class })))) {
 					//
 					final FractionJPanel instance1 = instance = ObjectUtils.getIfNull(instance,
 							() -> (FractionJPanel) Narcissus.allocateInstance(FractionJPanel.class));
@@ -406,8 +427,11 @@ class FractionJPanelTest {
 					//
 			} else {
 				//
-				if (Boolean.logicalAnd(Objects.equals(m.getName(), "actionPerformed"),
-						Arrays.equals(m.getParameterTypes(), new Class<?>[] { ActionEvent.class }))) {
+				if (Boolean.logicalOr(
+						Boolean.logicalAnd(Objects.equals(name = m.getName(), "actionPerformed"),
+								Arrays.equals(m.getParameterTypes(), new Class<?>[] { ActionEvent.class })),
+						Boolean.logicalAnd(Objects.equals(name, "changedUpdate"),
+								Arrays.equals(parameterTypes, new Class<?>[] { DocumentEvent.class })))) {
 					//
 					final FractionJPanel instance1 = instance = ObjectUtils.getIfNull(instance,
 							() -> (FractionJPanel) Narcissus.allocateInstance(FractionJPanel.class));

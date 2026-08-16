@@ -39,6 +39,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.WindowConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -50,7 +54,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import io.github.toolfactory.narcissus.Narcissus;
 import net.miginfocom.swing.MigLayout;
 
-public class FractionJPanel extends JPanel implements ActionListener, KeySelectionManager {
+public class FractionJPanel extends JPanel implements ActionListener, KeySelectionManager, DocumentListener {
 
 	private static final long serialVersionUID = 1238012263601647765L;
 
@@ -119,6 +123,8 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 
 	private AbstractButton btnExecute = null;
 
+	private Document documentWhole1, documentWhole2 = null;
+
 	private FractionJPanel() {
 		//
 	}
@@ -138,6 +144,8 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		jPanel.add(fraction1.getNumerator(), String.format("wmin %1$s,wrap", wmin));
 		//
 		jPanel.add(fraction1.getDenominator(), StringUtils.joinWith(" ", WMIN, wmin));
+		//
+		(documentWhole1 = getDocument(FractionJTextComponent.getWhole(fraction1))).addDocumentListener(this);
 		//
 		try {
 			//
@@ -195,6 +203,8 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		//
 		jPanel.add(fraction2.getDenominator(), StringUtils.joinWith(" ", WMIN, wmin));
 		//
+		(documentWhole2 = getDocument(FractionJTextComponent.getWhole(fraction2))).addDocumentListener(this);
+		//
 		add(jPanel);
 		//
 		add(btnExecute = new JButton("="));
@@ -222,6 +232,10 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 				FractionJTextComponent.getWhole(fraction2), FractionJTextComponent.getNumerator(fraction2),
 				FractionJTextComponent.getDenominator(fraction2), btnExecute)));
 		//
+	}
+
+	private static Document getDocument(final JTextComponent instance) {
+		return instance != null ? instance.getDocument() : null;
 	}
 
 	private static <T> T[] toArray(final Collection<T> instance, final IntFunction<T[]> generator) {
@@ -646,6 +660,178 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 
 	private static int getSize(final ComboBoxModel<?> instance) {
 		return instance != null ? instance.getSize() : 0;
+	}
+
+	@Override
+	public void changedUpdate(final DocumentEvent evt) {
+		//
+		throw new IllegalStateException();
+		//
+	}
+
+	@Override
+	public void insertUpdate(final DocumentEvent evt) {
+		//
+		final Document document = getDocument(evt);
+		//
+		if (Objects.equals(document, documentWhole1)) {
+			//
+			try {
+				//
+				final BigDecimal bd = testAndApply(NumberUtils::isCreatable,
+						getText(documentWhole1, 0, getLength(documentWhole1)), BigDecimal::new, null);
+				//
+				final Iterable<JTextComponent> iterable = Arrays.asList(FractionJTextComponent.getNumerator(fraction1),
+						FractionJTextComponent.getDenominator(fraction1));
+				//
+				if (bd != null && contains(toPlainString(bd.stripTrailingZeros()), ".")) {
+					//
+					forEach(iterable, x -> {
+						//
+						setText(x, "");
+						//
+						setEditable(x, false);
+						//
+					});
+					//
+				} else {
+					//
+					forEach(iterable, x -> setEditable(x, true));
+					//
+				} // if
+					//
+			} catch (final BadLocationException e) {
+				//
+				throw new RuntimeException(e);
+				//
+			} // try
+				//
+		} else if (Objects.equals(document, documentWhole2)) {
+			//
+			try {
+				//
+				final BigDecimal bd = testAndApply(NumberUtils::isCreatable,
+						getText(documentWhole2, 0, getLength(documentWhole2)), BigDecimal::new, null);
+				//
+				final Iterable<JTextComponent> iterable = Arrays.asList(FractionJTextComponent.getNumerator(fraction2),
+						FractionJTextComponent.getDenominator(fraction2));
+				//
+				if (bd != null && contains(toPlainString(bd.stripTrailingZeros()), ".")) {
+					//
+					forEach(iterable, x -> {
+						//
+						setText(x, "");
+						//
+						setEditable(x, false);
+						//
+					});
+					//
+				} else {
+					//
+					forEach(iterable, x -> setEditable(x, true));
+					//
+				} // if
+					//
+			} catch (final BadLocationException e) {
+				//
+				throw new RuntimeException(e);
+				//
+			} // try
+				//
+		} // if
+			//
+	}
+
+	private static int getLength(final Document instance) {
+		return instance != null ? instance.getLength() : 0;
+	}
+
+	private static String getText(final Document instance, final int offset, final int length)
+			throws BadLocationException {
+		return instance != null ? instance.getText(offset, length) : null;
+	}
+
+	private static Document getDocument(final DocumentEvent instance) {
+		return instance != null ? instance.getDocument() : null;
+	}
+
+	@Override
+	public void removeUpdate(final DocumentEvent evt) {
+		//
+		final Document document = getDocument(evt);
+		//
+		if (Objects.equals(document, documentWhole1)) {
+			//
+			try {
+				//
+				final BigDecimal bd = testAndApply(NumberUtils::isCreatable,
+						getText(documentWhole1, 0, getLength(documentWhole1)), BigDecimal::new, null);
+				//
+				final Iterable<JTextComponent> iterable = Arrays.asList(FractionJTextComponent.getNumerator(fraction1),
+						FractionJTextComponent.getDenominator(fraction1));
+				//
+				if (bd != null && contains(toPlainString(bd.stripTrailingZeros()), ".")) {
+					//
+					forEach(iterable, x -> {
+						//
+						setText(x, "");
+						//
+						setEditable(x, false);
+						//
+					});
+					//
+				} else {
+					//
+					forEach(iterable, x -> setEditable(x, true));
+					//
+				} // if
+					//
+			} catch (final BadLocationException e) {
+				//
+				throw new RuntimeException(e);
+				//
+			} // try
+				//
+		} else if (Objects.equals(document, documentWhole2)) {
+			//
+			try {
+				//
+				final BigDecimal bd = testAndApply(NumberUtils::isCreatable,
+						getText(documentWhole2, 0, getLength(documentWhole2)), BigDecimal::new, null);
+				//
+				final Iterable<JTextComponent> iterable = Arrays.asList(FractionJTextComponent.getNumerator(fraction2),
+						FractionJTextComponent.getDenominator(fraction2));
+				//
+				if (bd != null && contains(toPlainString(bd.stripTrailingZeros()), ".")) {
+					//
+					forEach(iterable, x -> {
+						//
+						setText(x, "");
+						//
+						setEditable(x, false);
+						//
+					});
+					//
+				} else {
+					//
+					forEach(iterable, x -> setEditable(x, true));
+					//
+				} // if
+					//
+			} catch (final BadLocationException e) {
+				//
+				throw new RuntimeException(e);
+				//
+			} // try
+				//
+		} // if
+			//
+	}
+
+	private static <T> void forEach(final Iterable<T> instance, final Consumer<T> consumer) {
+		if (instance != null) {
+			instance.forEach(consumer);
+		}
 	}
 
 }
