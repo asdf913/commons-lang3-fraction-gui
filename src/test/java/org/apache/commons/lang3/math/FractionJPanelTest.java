@@ -860,7 +860,7 @@ class FractionJPanelTest {
 		//
 		Assert.assertNull(replaceAll(EMPTY, EMPTY, string));
 		//
-		Assert.assertSame(EMPTY, replaceAll(EMPTY, EMPTY, EMPTY));
+		Assert.assertSame(replaceAll(EMPTY, EMPTY, EMPTY), EMPTY);
 		//
 	}
 
