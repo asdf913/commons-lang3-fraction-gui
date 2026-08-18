@@ -764,11 +764,15 @@ public class FractionJPanel extends JPanel
 
 	private static String toMathML(final String whole, final String numerator, final String denominator) {
 		//
-		if (Boolean.logicalAnd(isValidString(whole) && NumberUtils.isDigits(whole), Boolean.logicalOr(
-				Boolean.logicalAnd(numerator == null || (isValidString(numerator) && StringUtils.isEmpty(numerator)),
-						denominator == null || (isValidString(denominator) && StringUtils.isEmpty(denominator))),
-				Boolean.logicalAnd(numerator == null || (isValidString(numerator) && Objects.equals(numerator, "0")),
-						denominator == null || (isValidString(denominator) && Objects.equals(denominator, "1")))))) {
+		if (Boolean.logicalAnd(and(whole, FractionJPanel::isValidString, NumberUtils::isDigits),
+				Boolean.logicalOr(Boolean.logicalAnd(
+						numerator == null || and(numerator, FractionJPanel::isValidString, StringUtils::isEmpty),
+						denominator == null || and(denominator, FractionJPanel::isValidString, StringUtils::isEmpty)),
+						Boolean.logicalAnd(
+								numerator == null
+										|| and(numerator, FractionJPanel::isValidString, x -> Objects.equals(x, "0")),
+								denominator == null || and(denominator, FractionJPanel::isValidString,
+										x -> Objects.equals(x, "1")))))) {
 			//
 			return whole;
 			//
