@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.Document;
@@ -427,7 +428,8 @@ class FractionJPanelTest {
 					//
 					add(collection, Class.class);
 					//
-				} else if (Objects.equals(parameterType, JTextComponent.class)) {
+				} else if (Boolean.logicalOr(Objects.equals(parameterType, JComponent.class),
+						Objects.equals(parameterType, JTextComponent.class))) {
 					//
 					add(collection, Narcissus.allocateInstance(JTextField.class));
 					//

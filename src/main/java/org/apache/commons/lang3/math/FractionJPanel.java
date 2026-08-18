@@ -42,6 +42,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComboBox.KeySelectionManager;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -398,6 +399,29 @@ public class FractionJPanel extends JPanel
 		//
 		setIcon(labelImage, null);
 		//
+		setEnabled(btnShowImage, false);
+		//
+	}
+
+	private static void setEnabled(final JComponent instance, final boolean enabled) {
+		//
+		try {
+			//
+			if (instance == null
+					|| Narcissus.getField(instance, Narcissus.findField(getClass(instance), "appContext")) == null) {
+				//
+				return;
+				//
+			} // if
+				//
+		} catch (final NoSuchFieldException e) {
+			//
+			throw new RuntimeException(e);
+			//
+		} // try
+			//
+		instance.setEnabled(enabled);
+		//
 	}
 
 	private static void setIcon(final JLabel instance, final Icon icon) {
@@ -653,6 +677,8 @@ public class FractionJPanel extends JPanel
 					//
 				} // if
 					//
+				setEnabled(btnShowImage, true);
+				//
 			} catch (final IllegalAccessException e) {
 				//
 				throw new RuntimeException(e);
@@ -1072,6 +1098,8 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 				FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 		//
+		setEnabled(btnShowImage, false);
+		//
 		if (Objects.equals(document, documentWhole1)) {
 			//
 			try {
@@ -1176,6 +1204,8 @@ public class FractionJPanel extends JPanel
 					FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 			//
 			setIcon(labelImage, null);
+			//
+			setEnabled(btnShowImage, false);
 			//
 		} // if
 			//
