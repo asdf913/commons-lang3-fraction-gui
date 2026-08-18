@@ -54,8 +54,10 @@ import io.github.toolfactory.narcissus.Narcissus;
 
 class FractionJPanelTest {
 
+	private static final String EMPTY = "";
+
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
-			METHOD_CREATE_DOCUMENT_FILTER, METHOD_REPLACE_ALL = null;
+			METHOD_CREATE_DOCUMENT_FILTER, METHOD_REPLACE_ALL, METHOD_TO_MATH_ML = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -76,6 +78,9 @@ class FractionJPanelTest {
 		(METHOD_CREATE_DOCUMENT_FILTER = clz.getDeclaredMethod("createDocumentFilter")).setAccessible(true);
 		//
 		(METHOD_REPLACE_ALL = clz.getDeclaredMethod("replaceAll", String.class, String.class, String.class))
+				.setAccessible(true);
+		//
+		(METHOD_TO_MATH_ML = clz.getDeclaredMethod("toMathML", String.class, String.class, String.class))
 				.setAccessible(true);
 		//
 	}
@@ -845,19 +850,17 @@ class FractionJPanelTest {
 	@Test
 	public void testReplaceAll() throws Throwable {
 		//
-		final String empty = "";
-		//
-		Assert.assertNull(replaceAll(empty, null, null));
+		Assert.assertNull(replaceAll(EMPTY, null, null));
 		//
 		final String string = cast(String.class, Narcissus.allocateInstance(String.class));
 		//
-		Assert.assertNull(replaceAll(empty, string, null));
+		Assert.assertNull(replaceAll(EMPTY, string, null));
 		//
-		Assert.assertNull(replaceAll(empty, empty, null));
+		Assert.assertNull(replaceAll(EMPTY, EMPTY, null));
 		//
-		Assert.assertNull(replaceAll(empty, empty, string));
+		Assert.assertNull(replaceAll(EMPTY, EMPTY, string));
 		//
-		Assert.assertSame(empty, replaceAll(empty, empty, empty));
+		Assert.assertSame(EMPTY, replaceAll(EMPTY, EMPTY, EMPTY));
 		//
 	}
 
@@ -865,6 +868,42 @@ class FractionJPanelTest {
 			throws Throwable {
 		try {
 			final Object obj = invoke(METHOD_REPLACE_ALL, null, instance, regex, replacement);
+			if (obj instanceof String) {
+				return cast(String.class, obj);
+			} else if (obj == null) {
+				return null;
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	@Test
+	public void testToMathML() throws Throwable {
+		//
+		final int one = 1;
+		//
+		final String oneString = Integer.toString(one);
+		//
+		Assert.assertEquals(oneString, toMathML(oneString, null, null));
+		//
+		Assert.assertEquals(oneString, toMathML(oneString, EMPTY, EMPTY));
+		//
+		Assert.assertEquals(oneString, toMathML(oneString, Integer.toString(0), oneString));
+		//
+		final int two = 2;
+		//
+		Assert.assertEquals(
+				String.format("<math><mi>%1$s</mi><mfrac><mi>%1$s</mi><mn>%2$s</mn></mfrac></math>", one, two),
+				toMathML(oneString, oneString, Integer.toString(two)));
+		//
+	}
+
+	private static String toMathML(final String whole, final String numerator, final String denominator)
+			throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_TO_MATH_ML, null, whole, numerator, denominator);
 			if (obj instanceof String) {
 				return cast(String.class, obj);
 			} else if (obj == null) {

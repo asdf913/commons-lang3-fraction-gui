@@ -764,6 +764,16 @@ public class FractionJPanel extends JPanel
 
 	private static String toMathML(final String whole, final String numerator, final String denominator) {
 		//
+		if (Boolean.logicalAnd(isValidString(whole) && NumberUtils.isDigits(whole), Boolean.logicalOr(
+				Boolean.logicalAnd(numerator == null || (isValidString(numerator) && StringUtils.isEmpty(numerator)),
+						denominator == null || (isValidString(denominator) && StringUtils.isEmpty(denominator))),
+				Boolean.logicalAnd(numerator == null || (isValidString(numerator) && Objects.equals(numerator, "0")),
+						denominator == null || (isValidString(denominator) && Objects.equals(denominator, "1")))))) {
+			//
+			return whole;
+			//
+		} // if
+			//
 		final StringBuilder sb = new StringBuilder("<math>");
 		//
 		if (and(whole, FractionJPanel::isValidString, StringUtils::isNotBlank)) {
@@ -835,20 +845,28 @@ public class FractionJPanel extends JPanel
 		//
 		final BigDecimal bdWhole = testAndApply(predicate, whole, BigDecimal::new, null);
 		//
-		if (bdWhole != null && contains(toPlainString(bdWhole.stripTrailingZeros()), ".")) {
+		if (bdWhole != null) {
 			//
-			if (StringUtils.isNotEmpty(numerator)) {
+			if (contains(toPlainString(bdWhole.stripTrailingZeros()), ".")) {
 				//
-				throw new IllegalStateException("numerator is not empty");
+				if (StringUtils.isNotEmpty(numerator)) {
+					//
+					throw new IllegalStateException("numerator is not empty");
+					//
+				} else if (StringUtils.isNotEmpty(denominator)) {
+					//
+					throw new IllegalStateException("denominator is not empty");
+					//
+				} // if
+					//
+				return Fraction.getFraction(bdWhole.doubleValue());
 				//
-			} else if (StringUtils.isNotEmpty(denominator)) {
+			} else if (StringUtils.isEmpty(numerator) && StringUtils.isEmpty(denominator)) {
 				//
-				throw new IllegalStateException("denominator is not empty");
+				return Fraction.getFraction(whole);
 				//
 			} // if
 				//
-			return Fraction.getFraction(bdWhole.doubleValue());
-			//
 		} // if
 			//
 		final BigDecimal bdNumerator = testAndApply(predicate, numerator, BigDecimal::new, null);
