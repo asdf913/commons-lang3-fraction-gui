@@ -790,8 +790,8 @@ public class FractionJPanel extends JPanel
 				//
 		} // if
 			//
-		if (Boolean.logicalOr(isValidString(numerator) && StringUtils.isNotBlank(numerator),
-				isValidString(denominator) && StringUtils.isNotBlank(denominator))) {
+		if (Boolean.logicalOr(and(numerator, FractionJPanel::isValidString, StringUtils::isNotBlank),
+				and(denominator, FractionJPanel::isValidString, StringUtils::isNotBlank))) {
 			//
 			sb.append("<mfrac>");
 			//
