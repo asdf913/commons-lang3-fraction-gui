@@ -813,18 +813,27 @@ public class FractionJPanel extends JPanel
 					//
 			} // if
 				//
-			if (StringUtils.isNotBlank(denominator)) {
-				//
-				sb.append(String.format("<%1$s>%2$s</%1$s>", "mn", denominator));
-				//
-			} // if
-				//
+			testAndAccept(StringUtils::isNotBlank, denominator,
+					x -> sb.append(String.format("<%1$s>%2$s</%1$s>", "mn", x)));
+			//
 			sb.append("</mfrac>");
 			//
 		} // if
 			//
 		return Objects.toString(sb.append("</math>"));
 		//
+	}
+
+	private static <T> void testAndAccept(final Predicate<T> predicate, final T value, final Consumer<T> consumer) {
+		if (test(predicate, value)) {
+			accept(consumer, value);
+		}
+	}
+
+	private static <T> void accept(final Consumer<T> instance, final T value) {
+		if (instance != null) {
+			instance.accept(value);
+		}
 	}
 
 	private static <T> boolean and(final T value, final Predicate<T> predicateA, final Predicate<T> predicateB) {
