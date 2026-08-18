@@ -316,25 +316,11 @@ public class FractionJPanel extends JPanel
 			public void insertString(final FilterBypass fb, final int offset, final String string,
 					final AttributeSet attributeSet) throws BadLocationException {
 				//
-				if (fb == null) {
+				if (fb == null || isFieldNull(fb, "this$0")) {
 					//
 					return;
 					//
 				} // if
-					//
-				try {
-					//
-					if (Narcissus.getField(fb, Narcissus.findField(FractionJPanel.getClass(fb), "this$0")) == null) {
-						//
-						return;
-						//
-					} // if
-						//
-				} catch (final NoSuchFieldException e) {
-					//
-					throw new RuntimeException(e);
-					//
-				} // try
 					//
 				fb.insertString(offset, replaceAll(string, "\\D++", ""), attributeSet);
 				//
@@ -344,25 +330,11 @@ public class FractionJPanel extends JPanel
 			public void replace(final FilterBypass fb, int offset, final int length, final String string,
 					final AttributeSet attributeSet) throws BadLocationException {
 				//
-				if (fb == null) {
+				if (fb == null || isFieldNull(fb, "this$0")) {
 					//
 					return;
 					//
 				} // if
-					//
-				try {
-					//
-					if (Narcissus.getField(fb, Narcissus.findField(FractionJPanel.getClass(fb), "this$0")) == null) {
-						//
-						return;
-						//
-					} // if
-						//
-				} catch (final NoSuchFieldException e) {
-					//
-					throw new RuntimeException(e);
-					//
-				} // try
 					//
 				fb.replace(offset, length, replaceAll(string, "\\D++", ""), attributeSet);
 				//
@@ -371,17 +343,24 @@ public class FractionJPanel extends JPanel
 			@Override
 			public void remove(final FilterBypass fb, final int offset, final int length) throws BadLocationException {
 				//
-				if (fb == null) {
+				if (fb == null || isFieldNull(fb, "this$0")) {
 					//
 					return;
 					//
 				} // if
 					//
+				super.remove(fb, offset, length);
+				//
+			}
+
+			private static boolean isFieldNull(final Object instance, final String fieldName) {
+				//
 				try {
 					//
-					if (Narcissus.getField(fb, Narcissus.findField(FractionJPanel.getClass(fb), "this$0")) == null) {
+					if (Narcissus.getField(instance,
+							Narcissus.findField(FractionJPanel.getClass(instance), fieldName)) == null) {
 						//
-						return;
+						return true;
 						//
 					} // if
 						//
@@ -391,7 +370,7 @@ public class FractionJPanel extends JPanel
 					//
 				} // try
 					//
-				super.remove(fb, offset, length);
+				return false;
 				//
 			}
 
