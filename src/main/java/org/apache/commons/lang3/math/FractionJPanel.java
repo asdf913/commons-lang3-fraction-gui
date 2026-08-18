@@ -6,6 +6,8 @@ import java.awt.FocusTraversalPolicy;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -69,7 +71,8 @@ import com.microsoft.playwright.Playwright;
 import io.github.toolfactory.narcissus.Narcissus;
 import net.miginfocom.swing.MigLayout;
 
-public class FractionJPanel extends JPanel implements ActionListener, KeySelectionManager, DocumentListener {
+public class FractionJPanel extends JPanel
+		implements ActionListener, KeySelectionManager, DocumentListener, ItemListener {
 
 	private static final long serialVersionUID = 1238012263601647765L;
 
@@ -155,6 +158,8 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 
 	private JLabel labelImage = null;
 
+	private JComboBox<?> jcb = null;
+
 	private FractionJPanel() {
 		//
 	}
@@ -193,13 +198,12 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			//
 		add(jPanel);
 		//
-		final JComboBox<Method> jcb = new JComboBox<>(
+		final ListCellRenderer lcr = (jcb = new JComboBox<>(
 				cbm = new DefaultComboBoxModel<>(toArray(toList(filter(Arrays.stream(Fraction.class.getMethods()),
 						m -> m != null && Arrays.equals(m.getParameterTypes(), new Class<?>[] { m.getDeclaringClass() })
 								&& Objects.equals(m.getReturnType(), m.getDeclaringClass()))),
-						Method[]::new)));
-		//
-		final ListCellRenderer lcr = jcb.getRenderer();
+						Method[]::new))))
+				.getRenderer();
 		//
 		jcb.setRenderer((arg0, value, arg2, arg3, arg4) -> {
 			//
@@ -219,9 +223,11 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 			//
 		});
 		//
-		jcb.setSelectedItem(null);
+		setSelectedItem(cbm, null);
 		//
 		jcb.setKeySelectionManager(this);
+		//
+		jcb.addItemListener(this);
 		//
 		add(jcb);
 		//
@@ -1065,6 +1071,20 @@ public class FractionJPanel extends JPanel implements ActionListener, KeySelecti
 		if (instance != null) {
 			instance.forEach(consumer);
 		}
+	}
+
+	@Override
+	public void itemStateChanged(final ItemEvent evt) {
+		//
+		if (Objects.equals(getSource(evt), jcb)) {
+			//
+			forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
+					FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
+			//
+			setIcon(labelImage, null);
+			//
+		} // if
+			//
 	}
 
 }
