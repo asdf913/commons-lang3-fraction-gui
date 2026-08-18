@@ -50,8 +50,11 @@ import javax.swing.ListCellRenderer;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.collections4.BidiMap;
@@ -288,6 +291,118 @@ public class FractionJPanel extends JPanel
 				x -> addActionListener(x, this));
 		//
 		clear();
+		//
+		final DocumentFilter documentFilter = createDocumentFilter();
+		//
+		forEach(Arrays.asList(FractionJTextComponent.getNumerator(fraction1),
+				FractionJTextComponent.getDenominator(fraction1), FractionJTextComponent.getNumerator(fraction2),
+				FractionJTextComponent.getDenominator(fraction2)), x -> {
+					//
+					if (getDocument(x) instanceof AbstractDocument ad && ad != null) {
+						//
+						ad.setDocumentFilter(documentFilter);
+						//
+					} // if
+						//
+				});//
+		//
+	}
+
+	private static DocumentFilter createDocumentFilter() {
+		//
+		return new DocumentFilter() {
+
+			@Override
+			public void insertString(final FilterBypass fb, final int offset, final String string,
+					final AttributeSet attributeSet) throws BadLocationException {
+				//
+				if (fb == null) {
+					//
+					return;
+					//
+				} // if
+					//
+				try {
+					//
+					if (Narcissus.getField(fb, Narcissus.findField(FractionJPanel.getClass(fb), "this$0")) == null) {
+						//
+						return;
+						//
+					} // if
+						//
+				} catch (final NoSuchFieldException e) {
+					//
+					throw new RuntimeException(e);
+					//
+				} // try
+					//
+				fb.insertString(offset, replaceAll(string, "\\D++", ""), attributeSet);
+				//
+			}
+
+			@Override
+			public void replace(final FilterBypass fb, int offset, final int length, final String string,
+					final AttributeSet attributeSet) throws BadLocationException {
+				//
+				if (fb == null) {
+					//
+					return;
+					//
+				} // if
+					//
+				try {
+					//
+					if (Narcissus.getField(fb, Narcissus.findField(FractionJPanel.getClass(fb), "this$0")) == null) {
+						//
+						return;
+						//
+					} // if
+						//
+				} catch (final NoSuchFieldException e) {
+					//
+					throw new RuntimeException(e);
+					//
+				} // try
+					//
+				fb.replace(offset, length, replaceAll(string, "\\D++", ""), attributeSet);
+				//
+			}
+
+			@Override
+			public void remove(final FilterBypass fb, final int offset, final int length) throws BadLocationException {
+				//
+				if (fb == null) {
+					//
+					return;
+					//
+				} // if
+					//
+				try {
+					//
+					if (Narcissus.getField(fb, Narcissus.findField(FractionJPanel.getClass(fb), "this$0")) == null) {
+						//
+						return;
+						//
+					} // if
+						//
+				} catch (final NoSuchFieldException e) {
+					//
+					throw new RuntimeException(e);
+					//
+				} // try
+					//
+				super.remove(fb, offset, length);
+				//
+			}
+
+		};
+		//
+	}
+
+	private static String replaceAll(final String instance, final String regex, final String replacement) {
+		//
+		return instance != null && isValidString(instance) && regex != null && isValidString(regex)
+				&& replacement != null && isValidString(replacement) ? instance.replaceAll(regex, replacement) : null;
 		//
 	}
 

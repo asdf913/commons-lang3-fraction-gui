@@ -29,6 +29,8 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.Document;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.DocumentFilter.FilterBypass;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.collections4.BidiMap;
@@ -37,6 +39,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.google.common.reflect.Reflection;
@@ -50,7 +53,8 @@ import io.github.toolfactory.narcissus.Narcissus;
 
 class FractionJPanelTest {
 
-	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY = null;
+	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
+			METHOD_CREATE_DOCUMENT_FILTER, METHOD_REPLACE_ALL = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -66,6 +70,11 @@ class FractionJPanelTest {
 		(METHOD_CAST = clz.getDeclaredMethod("cast", Class.class, Object.class)).setAccessible(true);
 		//
 		(METHOD_CREATE_FOCUS_TRAVERSAL_POLICY = clz.getDeclaredMethod("createFocusTraversalPolicy", List.class))
+				.setAccessible(true);
+		//
+		(METHOD_CREATE_DOCUMENT_FILTER = clz.getDeclaredMethod("createDocumentFilter")).setAccessible(true);
+		//
+		(METHOD_REPLACE_ALL = clz.getDeclaredMethod("replaceAll", String.class, String.class, String.class))
 				.setAccessible(true);
 		//
 	}
@@ -199,6 +208,15 @@ class FractionJPanelTest {
 		return instance != null ? instance.getName() : null;
 	}
 
+	private IH ih = null;
+
+	@BeforeMethod
+	void beforeMethod() {
+		//
+		ih = new IH();
+		//
+	}
+
 	@Test
 	void testNull() throws Throwable {
 		//
@@ -322,7 +340,8 @@ class FractionJPanelTest {
 							Boolean.logicalOr(
 									Arrays.equals(parameterTypes,
 											new Object[] { String.class, String.class, String.class }),
-									Arrays.equals(parameterTypes, new Object[] { clz }))))) {
+									Arrays.equals(parameterTypes, new Object[] { clz }))),
+					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"), m.getParameterCount() == 0))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -368,8 +387,6 @@ class FractionJPanelTest {
 		Class<?> parameterType, type = null;
 		//
 		Collection<Object> collection = null;
-		//
-		IH ih = null;
 		//
 		Field[] fs = null;
 		//
@@ -537,7 +554,8 @@ class FractionJPanelTest {
 											new Object[] { String.class, String.class, String.class }),
 									Arrays.equals(parameterTypes, new Object[] { clz }))),
 					Boolean.logicalAnd(Objects.equals(name, "inverseBidiMap"),
-							Arrays.equals(parameterTypes, new Object[] { BidiMap.class })))) {
+							Arrays.equals(parameterTypes, new Object[] { BidiMap.class })),
+					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"), m.getParameterCount() == 0))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -730,6 +748,130 @@ class FractionJPanelTest {
 				//
 		} // for
 			//
+	}
+
+	@Test
+	public void testCreateDocumentFilter() throws Throwable {
+		//
+		final DocumentFilter documentFilter = cast(DocumentFilter.class, invoke(METHOD_CREATE_DOCUMENT_FILTER, null));
+		//
+		if (documentFilter == null) {
+			//
+			return;
+			//
+		} // if
+			//
+		final Method[] ms = DocumentFilter.class.getDeclaredMethods();
+		//
+		Method m = null;
+		//
+		Class<?>[] parameterTypes = null;
+		//
+		Collection<Object> collection = null;
+		//
+		for (int i = 0; ms != null && i < ms.length; i++) {
+			//
+			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
+					|| (parameterTypes = m.getParameterTypes()) == null) {
+				//
+				continue;
+				//
+			} // if
+				//
+			clear(collection = ObjectUtils.getIfNull(collection, ArrayList::new));
+			//
+			for (int j = 0; j < parameterTypes.length; j++) {
+				//
+				if (Objects.equals(ArrayUtils.get(parameterTypes, j), Integer.TYPE)) {
+					//
+					add(collection, Integer.valueOf(0));
+					//
+				} else {
+					//
+					add(collection, null);
+					//
+				} // if
+					//
+			} // for
+				//
+			Assert.assertNull(Narcissus.invokeMethod(documentFilter, m, toArray(collection)));
+			//
+		} // for
+			//
+		Class<?> parameterType = null;
+		//
+		for (int i = 0; ms != null && i < ms.length; i++) {
+			//
+			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
+					|| (parameterTypes = m.getParameterTypes()) == null) {
+				//
+				continue;
+				//
+			} // if
+				//
+			clear(collection = ObjectUtils.getIfNull(collection, ArrayList::new));
+			//
+			for (int j = 0; j < parameterTypes.length; j++) {
+				//
+				if (Objects.equals(parameterType = ArrayUtils.get(parameterTypes, j), Integer.TYPE)) {
+					//
+					add(collection, Integer.valueOf(0));
+					//
+				} else if (Objects.equals(parameterType, FilterBypass.class)) {
+					//
+					add(collection, Narcissus
+							.allocateInstance(Class.forName("javax.swing.text.AbstractDocument$DefaultFilterBypass")));
+					//
+				} else if (parameterType != null && parameterType.isInterface()) {
+					//
+					add(collection, Reflection.newProxy(parameterType, ih = ObjectUtils.getIfNull(ih, IH::new)));
+					//
+				} else {
+					//
+					add(collection, Narcissus.allocateInstance(parameterType));
+					//
+				} // if
+					//
+			} // for
+				//
+			Assert.assertNull(Narcissus.invokeMethod(documentFilter, m, toArray(collection)));
+			//
+		} // for
+			//
+	}
+
+	@Test
+	public void testReplaceAll() throws Throwable {
+		//
+		final String empty = "";
+		//
+		Assert.assertNull(replaceAll(empty, null, null));
+		//
+		final String string = cast(String.class, Narcissus.allocateInstance(String.class));
+		//
+		Assert.assertNull(replaceAll(empty, string, null));
+		//
+		Assert.assertNull(replaceAll(empty, empty, null));
+		//
+		Assert.assertNull(replaceAll(empty, empty, string));
+		//
+		Assert.assertSame(empty, replaceAll(empty, empty, empty));
+		//
+	}
+
+	private static String replaceAll(final String instance, final String regex, final String replacement)
+			throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_REPLACE_ALL, null, instance, regex, replacement);
+			if (obj instanceof String) {
+				return cast(String.class, obj);
+			} else if (obj == null) {
+				return null;
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
 	}
 
 }
