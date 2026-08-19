@@ -29,10 +29,12 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.DocumentFilter.FilterBypass;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.lang3.ArrayUtils;
@@ -447,6 +449,10 @@ class FractionJPanelTest {
 				} else if (Objects.equals(parameterType, Number.class)) {
 					//
 					add(collection, Narcissus.allocateInstance(Integer.class));
+					//
+				} else if (Objects.equals(parameterType, AbstractDocument.class)) {
+					//
+					add(collection, Narcissus.allocateInstance(PlainDocument.class));
 					//
 				} else if (parameterType != null && parameterType.isInterface()) {
 					//

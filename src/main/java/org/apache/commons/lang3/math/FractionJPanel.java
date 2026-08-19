@@ -298,12 +298,8 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getNumerator(fraction1),
 				FractionJTextComponent.getNumerator(fraction2)), x -> {
 					//
-					if (getDocument(x) instanceof AbstractDocument ad && ad != null) {
-						//
-						ad.setDocumentFilter(documentFilter1);
-						//
-					} // if
-						//
+					setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter1);
+					//
 				});//
 		//
 		final DocumentFilter documentFilter2 = createDocumentFilter(false);
@@ -311,14 +307,16 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getDenominator(fraction1),
 				FractionJTextComponent.getDenominator(fraction2)), x -> {
 					//
-					if (getDocument(x) instanceof AbstractDocument ad && ad != null) {
-						//
-						ad.setDocumentFilter(documentFilter2);
-						//
-					} // if
-						//
+					setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2);
+					//
 				});//
 		//
+	}
+
+	private static void setDocumentFilter(final AbstractDocument instance, final DocumentFilter documentFilter) {
+		if (instance != null) {
+			instance.setDocumentFilter(documentFilter);
+		}
 	}
 
 	private static DocumentFilter createDocumentFilter(final boolean negative) {
