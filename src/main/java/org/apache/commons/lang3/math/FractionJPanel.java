@@ -296,20 +296,14 @@ public class FractionJPanel extends JPanel
 		final DocumentFilter documentFilter1 = createDocumentFilter(true);
 		//
 		forEach(Arrays.asList(FractionJTextComponent.getNumerator(fraction1),
-				FractionJTextComponent.getNumerator(fraction2)), x -> {
-					//
-					setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter1);
-					//
-				});//
+				FractionJTextComponent.getNumerator(fraction2)),
+				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter1));
 		//
 		final DocumentFilter documentFilter2 = createDocumentFilter(false);
 		//
 		forEach(Arrays.asList(FractionJTextComponent.getDenominator(fraction1),
-				FractionJTextComponent.getDenominator(fraction2)), x -> {
-					//
-					setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2);
-					//
-				});//
+				FractionJTextComponent.getDenominator(fraction2)),
+				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
 	}
 
