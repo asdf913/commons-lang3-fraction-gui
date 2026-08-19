@@ -399,7 +399,7 @@ public class FractionJPanel extends JPanel
 		//
 		setIcon(labelImage, null);
 		//
-		setEnabled(btnShowImage, false);
+		forEach(Arrays.asList(btnShowImage, btnExecute), x -> setEnabled(x, false));
 		//
 	}
 
@@ -1206,7 +1206,23 @@ public class FractionJPanel extends JPanel
 				//
 		} // if
 			//
+		btnExecuteSetEnabled();
+		//
+	}
 
+	private void btnExecuteSetEnabled() {
+		//
+		try {
+			//
+			setEnabled(btnExecute,
+					toFraction(fraction1) != null && toFraction(fraction2) != null && getSelectedItem(cbm) != null);
+			//
+		} catch (final Exception e) {
+			//
+			setEnabled(btnExecute, false);
+			//
+		} // try
+			//
 	}
 
 	private static int getLength(final Document instance) {
@@ -1237,6 +1253,8 @@ public class FractionJPanel extends JPanel
 
 	@Override
 	public void itemStateChanged(final ItemEvent evt) {
+		//
+		btnExecuteSetEnabled();
 		//
 		if (Objects.equals(getSource(evt), jcb)) {
 			//
