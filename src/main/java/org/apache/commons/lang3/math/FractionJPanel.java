@@ -368,14 +368,12 @@ public class FractionJPanel extends JPanel
 			@Override
 			public void remove(final FilterBypass fb, final int offset, final int length) throws BadLocationException {
 				//
-				if (fb == null || isFieldNull(fb, "this$0")) {
+				if (and(fb, Objects::nonNull, x -> !isFieldNull(x, "this$0"))) {
 					//
-					return;
+					super.remove(fb, offset, length);
 					//
 				} // if
 					//
-				super.remove(fb, offset, length);
-				//
 			}
 
 			private static boolean isFieldNull(final Object instance, final String fieldName) {
