@@ -327,7 +327,7 @@ public class FractionJPanel extends JPanel
 					//
 				} // if
 					//
-				if (Boolean.logicalAnd(getLength(fb.getDocument()) == 0, Objects.equals(string, "-")) && negative) {
+				if (and(getLength(fb.getDocument()) == 0, Objects.equals(string, "-"), negative)) {
 					//
 					fb.insertString(offset, string, attributeSet);
 					//
@@ -337,6 +337,10 @@ public class FractionJPanel extends JPanel
 					//
 				} // if
 					//
+			}
+
+			private static boolean and(final boolean a, final boolean b, final boolean c) {
+				return Boolean.logicalAnd(Boolean.logicalAnd(a, b), c);
 			}
 
 			private static int getLength(final Document instance) {
@@ -353,7 +357,7 @@ public class FractionJPanel extends JPanel
 					//
 				} // if
 					//
-				if (Boolean.logicalAnd(offset == 0, Objects.equals(string, "-")) && negative) {
+				if (and(offset == 0, Objects.equals(string, "-"), negative)) {
 					//
 					fb.replace(offset, length, string, attributeSet);
 					//
@@ -368,7 +372,7 @@ public class FractionJPanel extends JPanel
 			@Override
 			public void remove(final FilterBypass fb, final int offset, final int length) throws BadLocationException {
 				//
-				if (and(fb, Objects::nonNull, x -> !isFieldNull(x, "this$0"))) {
+				if (FractionJPanel.and(fb, Objects::nonNull, x -> !isFieldNull(x, "this$0"))) {
 					//
 					super.remove(fb, offset, length);
 					//
