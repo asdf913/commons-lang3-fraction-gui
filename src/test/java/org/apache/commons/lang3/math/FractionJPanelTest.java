@@ -59,7 +59,7 @@ class FractionJPanelTest {
 	private static final String EMPTY = "";
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
-			METHOD_CREATE_DOCUMENT_FILTER, METHOD_REPLACE_ALL, METHOD_TO_MATH_ML = null;
+			METHOD_REPLACE_ALL, METHOD_TO_MATH_ML = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
