@@ -327,7 +327,7 @@ public class FractionJPanel extends JPanel
 					//
 				} // if
 					//
-				if (getLength(fb.getDocument()) == 0 && Objects.equals(string, "-") && negative) {
+				if (Boolean.logicalAnd(getLength(fb.getDocument()) == 0, Objects.equals(string, "-")) && negative) {
 					//
 					fb.insertString(offset, string, attributeSet);
 					//
@@ -353,7 +353,7 @@ public class FractionJPanel extends JPanel
 					//
 				} // if
 					//
-				if (offset == 0 && Objects.equals(string, "-") && negative) {
+				if (Boolean.logicalAnd(offset == 0, Objects.equals(string, "-")) && negative) {
 					//
 					fb.replace(offset, length, string, attributeSet);
 					//
