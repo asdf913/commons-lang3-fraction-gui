@@ -77,9 +77,6 @@ class FractionJPanelTest {
 		(METHOD_CREATE_FOCUS_TRAVERSAL_POLICY = clz.getDeclaredMethod("createFocusTraversalPolicy", List.class))
 				.setAccessible(true);
 		//
-		(METHOD_CREATE_DOCUMENT_FILTER = clz.getDeclaredMethod("createDocumentFilter", Boolean.TYPE))
-				.setAccessible(true);
-		//
 		(METHOD_REPLACE_ALL = clz.getDeclaredMethod("replaceAll", String.class, String.class, String.class))
 				.setAccessible(true);
 		//
@@ -767,17 +764,11 @@ class FractionJPanelTest {
 	}
 
 	@Test
-	public void testCreateDocumentFilter() throws Throwable {
+	public void testDocumentFilterImpl() throws Throwable {
 		//
-		final DocumentFilter documentFilter = cast(DocumentFilter.class,
-				invoke(METHOD_CREATE_DOCUMENT_FILTER, null, Boolean.TRUE));
+		final DocumentFilter documentFilter = cast(DocumentFilter.class, Narcissus
+				.allocateInstance(Class.forName("org.apache.commons.lang3.math.FractionJPanel$DocumentFilterImpl")));
 		//
-		if (documentFilter == null) {
-			//
-			return;
-			//
-		} // if
-			//
 		final Method[] ms = DocumentFilter.class.getDeclaredMethods();
 		//
 		Method m = null;
