@@ -293,15 +293,27 @@ public class FractionJPanel extends JPanel
 		//
 		clear();
 		//
-		final DocumentFilter documentFilter = createDocumentFilter();
+		final DocumentFilter documentFilter1 = createDocumentFilter(true);
 		//
 		forEach(Arrays.asList(FractionJTextComponent.getNumerator(fraction1),
-				FractionJTextComponent.getDenominator(fraction1), FractionJTextComponent.getNumerator(fraction2),
+				FractionJTextComponent.getNumerator(fraction2)), x -> {
+					//
+					if (getDocument(x) instanceof AbstractDocument ad && ad != null) {
+						//
+						ad.setDocumentFilter(documentFilter1);
+						//
+					} // if
+						//
+				});//
+		//
+		final DocumentFilter documentFilter2 = createDocumentFilter(false);
+		//
+		forEach(Arrays.asList(FractionJTextComponent.getDenominator(fraction1),
 				FractionJTextComponent.getDenominator(fraction2)), x -> {
 					//
 					if (getDocument(x) instanceof AbstractDocument ad && ad != null) {
 						//
-						ad.setDocumentFilter(documentFilter);
+						ad.setDocumentFilter(documentFilter2);
 						//
 					} // if
 						//
@@ -309,7 +321,7 @@ public class FractionJPanel extends JPanel
 		//
 	}
 
-	private static DocumentFilter createDocumentFilter() {
+	private static DocumentFilter createDocumentFilter(final boolean negative) {
 		//
 		return new DocumentFilter() {
 
@@ -323,8 +335,20 @@ public class FractionJPanel extends JPanel
 					//
 				} // if
 					//
-				fb.insertString(offset, replaceAll(string, "\\D++", ""), attributeSet);
-				//
+				if (getLength(fb.getDocument()) == 0 && Objects.equals(string, "-") && negative) {
+					//
+					fb.insertString(offset, string, attributeSet);
+					//
+				} else {
+					//
+					fb.insertString(offset, replaceAll(string, "\\D++", ""), attributeSet);
+					//
+				} // if
+					//
+			}
+
+			private static int getLength(final Document instance) {
+				return instance != null ? instance.getLength() : 0;
 			}
 
 			@Override
@@ -337,8 +361,16 @@ public class FractionJPanel extends JPanel
 					//
 				} // if
 					//
-				fb.replace(offset, length, replaceAll(string, "\\D++", ""), attributeSet);
-				//
+				if (offset == 0 && Objects.equals(string, "-") && negative) {
+					//
+					fb.replace(offset, length, string, attributeSet);
+					//
+				} else {
+					//
+					fb.replace(offset, length, replaceAll(string, "\\D++", ""), attributeSet);
+					//
+				} // if
+					//
 			}
 
 			@Override

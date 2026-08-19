@@ -75,7 +75,8 @@ class FractionJPanelTest {
 		(METHOD_CREATE_FOCUS_TRAVERSAL_POLICY = clz.getDeclaredMethod("createFocusTraversalPolicy", List.class))
 				.setAccessible(true);
 		//
-		(METHOD_CREATE_DOCUMENT_FILTER = clz.getDeclaredMethod("createDocumentFilter")).setAccessible(true);
+		(METHOD_CREATE_DOCUMENT_FILTER = clz.getDeclaredMethod("createDocumentFilter", Boolean.TYPE))
+				.setAccessible(true);
 		//
 		(METHOD_REPLACE_ALL = clz.getDeclaredMethod("replaceAll", String.class, String.class, String.class))
 				.setAccessible(true);
@@ -347,7 +348,8 @@ class FractionJPanelTest {
 									Arrays.equals(parameterTypes,
 											new Object[] { String.class, String.class, String.class }),
 									Arrays.equals(parameterTypes, new Object[] { clz }))),
-					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"), m.getParameterCount() == 0))) {
+					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"),
+							Arrays.equals(parameterTypes, new Object[] { Boolean.TYPE })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -562,7 +564,8 @@ class FractionJPanelTest {
 									Arrays.equals(parameterTypes, new Object[] { clz }))),
 					Boolean.logicalAnd(Objects.equals(name, "inverseBidiMap"),
 							Arrays.equals(parameterTypes, new Object[] { BidiMap.class })),
-					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"), m.getParameterCount() == 0))) {
+					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"),
+							Arrays.equals(parameterTypes, new Object[] { Boolean.TYPE })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -760,7 +763,8 @@ class FractionJPanelTest {
 	@Test
 	public void testCreateDocumentFilter() throws Throwable {
 		//
-		final DocumentFilter documentFilter = cast(DocumentFilter.class, invoke(METHOD_CREATE_DOCUMENT_FILTER, null));
+		final DocumentFilter documentFilter = cast(DocumentFilter.class,
+				invoke(METHOD_CREATE_DOCUMENT_FILTER, null, Boolean.TRUE));
 		//
 		if (documentFilter == null) {
 			//
