@@ -59,7 +59,7 @@ class FractionJPanelTest {
 	private static final String EMPTY = "";
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
-			METHOD_REPLACE_ALL, METHOD_TO_MATH_ML = null;
+			METHOD_TO_MATH_ML = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -75,9 +75,6 @@ class FractionJPanelTest {
 		(METHOD_CAST = clz.getDeclaredMethod("cast", Class.class, Object.class)).setAccessible(true);
 		//
 		(METHOD_CREATE_FOCUS_TRAVERSAL_POLICY = clz.getDeclaredMethod("createFocusTraversalPolicy", List.class))
-				.setAccessible(true);
-		//
-		(METHOD_REPLACE_ALL = clz.getDeclaredMethod("replaceAll", String.class, String.class, String.class))
 				.setAccessible(true);
 		//
 		(METHOD_TO_MATH_ML = clz.getDeclaredMethod("toMathML", String.class, String.class, String.class))
@@ -846,38 +843,6 @@ class FractionJPanelTest {
 			//
 		} // for
 			//
-	}
-
-	@Test
-	public void testReplaceAll() throws Throwable {
-		//
-		Assert.assertNull(replaceAll(EMPTY, null, null));
-		//
-		final String string = cast(String.class, Narcissus.allocateInstance(String.class));
-		//
-		Assert.assertNull(replaceAll(EMPTY, string, null));
-		//
-		Assert.assertNull(replaceAll(EMPTY, EMPTY, null));
-		//
-		Assert.assertNull(replaceAll(EMPTY, EMPTY, string));
-		//
-		Assert.assertSame(replaceAll(EMPTY, EMPTY, EMPTY), EMPTY);
-		//
-	}
-
-	private static String replaceAll(final String instance, final String regex, final String replacement)
-			throws Throwable {
-		try {
-			final Object obj = invoke(METHOD_REPLACE_ALL, null, instance, regex, replacement);
-			if (obj instanceof String) {
-				return cast(String.class, obj);
-			} else if (obj == null) {
-				return null;
-			}
-			throw new Throwable(Objects.toString(getClass(obj)));
-		} catch (final InvocationTargetException e) {
-			throw e.getTargetException();
-		}
 	}
 
 	@Test

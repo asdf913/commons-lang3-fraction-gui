@@ -405,13 +405,14 @@ public class FractionJPanel extends JPanel
 			//
 		}
 
-	}
+		private static String replaceAll(final String instance, final String regex, final String replacement) {
+			//
+			return instance != null && isValidString(instance) && regex != null && isValidString(regex)
+					&& replacement != null && isValidString(replacement) ? instance.replaceAll(regex, replacement)
+							: null;
+			//
+		}
 
-	private static String replaceAll(final String instance, final String regex, final String replacement) {
-		//
-		return instance != null && isValidString(instance) && regex != null && isValidString(regex)
-				&& replacement != null && isValidString(replacement) ? instance.replaceAll(regex, replacement) : null;
-		//
 	}
 
 	private void clear() {
