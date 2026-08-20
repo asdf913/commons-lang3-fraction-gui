@@ -3,6 +3,7 @@ package org.apache.commons.lang3.math;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -11,6 +12,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -40,6 +44,7 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.function.TriFunction;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -59,7 +64,7 @@ class FractionJPanelTest {
 	private static final String EMPTY = "";
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
-			METHOD_TO_MATH_ML = null;
+			METHOD_TO_MATH_ML, METHOD_TO_PATH = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -79,6 +84,8 @@ class FractionJPanelTest {
 		//
 		(METHOD_TO_MATH_ML = clz.getDeclaredMethod("toMathML", String.class, String.class, String.class))
 				.setAccessible(true);
+		//
+		(METHOD_TO_PATH = clz.getDeclaredMethod("toPath", File.class)).setAccessible(true);
 		//
 	}
 
@@ -125,11 +132,13 @@ class FractionJPanelTest {
 				//
 			} // if
 				//
-			if (Boolean.logicalAnd(proxy instanceof Predicate, Objects.equals(name, "test"))) {
+			if (Boolean.logicalAnd(Boolean.logicalOr(proxy instanceof Predicate, proxy instanceof BiPredicate),
+					Objects.equals(name, "test"))) {
 				//
 				return test;
 				//
-			} else if (Boolean.logicalAnd(Boolean.logicalOr(proxy instanceof Function, proxy instanceof TriFunction),
+			} else if (Boolean.logicalAnd(
+					or(proxy instanceof Function, proxy instanceof BiFunction, proxy instanceof TriFunction),
 					Objects.equals(name, "apply"))) {
 				//
 				return null;
@@ -213,10 +222,14 @@ class FractionJPanelTest {
 
 	private IH ih = null;
 
+	private FractionJPanel instance = null;
+
 	@BeforeMethod
-	void beforeMethod() {
+	void beforeMethod() throws Throwable {
 		//
 		ih = new IH();
+		//
+		instance = cast(FractionJPanel.class, Narcissus.allocateInstance(FractionJPanel.class));
 		//
 	}
 
@@ -232,8 +245,6 @@ class FractionJPanelTest {
 		String toString, name = null;
 		//
 		Object[] os = null;
-		//
-		FractionJPanel instance = null;
 		//
 		Class<?>[] parameterTypes = null;
 		//
@@ -565,7 +576,9 @@ class FractionJPanelTest {
 					Boolean.logicalAnd(Objects.equals(name, "inverseBidiMap"),
 							Arrays.equals(parameterTypes, new Object[] { BidiMap.class })),
 					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"),
-							Arrays.equals(parameterTypes, new Object[] { Boolean.TYPE })))) {
+							Arrays.equals(parameterTypes, new Object[] { Boolean.TYPE })),
+					Boolean.logicalAnd(Objects.equals(name, "getDeclaredMethods"),
+							Arrays.equals(parameterTypes, new Object[] { Class.class })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -872,6 +885,62 @@ class FractionJPanelTest {
 			final Object obj = invoke(METHOD_TO_MATH_ML, null, whole, numerator, denominator);
 			if (obj instanceof String) {
 				return cast(String.class, obj);
+			} else if (obj == null) {
+				return null;
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	@Test
+	public void testActionPerformed() throws Exception {
+		//
+		if (instance == null) {
+			//
+			return;
+			//
+		} // if
+			//
+			// btnClear
+			//
+		final AbstractButton btnClear = new JButton();
+		//
+		FieldUtils.writeDeclaredField(instance, "btnClear", btnClear, true);
+		//
+		instance.actionPerformed(new ActionEvent(btnClear, 0, null));
+		//
+		// btnShowImage
+		//
+		final AbstractButton btnShowImage = new JButton();
+		//
+		FieldUtils.writeDeclaredField(instance, "btnShowImage", btnShowImage, true);
+		//
+		instance.actionPerformed(new ActionEvent(btnShowImage, 0, null));
+		//
+		// btnSaveImage
+		//
+		final AbstractButton btnSaveImage = new JButton();
+		//
+		FieldUtils.writeDeclaredField(instance, "btnSaveImage", btnSaveImage, true);
+		//
+		instance.actionPerformed(new ActionEvent(btnSaveImage, 0, null));
+		//
+	}
+
+	@Test
+	public void testToPath() throws Throwable {
+		//
+		Assert.assertNotNull(toPath(new File(".")));
+		//
+	}
+
+	private static Path toPath(final File instance) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_TO_PATH, null, instance);
+			if (obj instanceof Path) {
+				return cast(Path.class, obj);
 			} else if (obj == null) {
 				return null;
 			}

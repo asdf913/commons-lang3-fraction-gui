@@ -4,11 +4,16 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.FocusTraversalPolicy;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -18,6 +23,9 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EventObject;
@@ -27,6 +35,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Spliterator;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -35,6 +45,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -44,6 +55,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComboBox.KeySelectionManager;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -65,6 +77,7 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.bidimap.TreeBidiMap;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.microsoft.playwright.Browser;
@@ -154,7 +167,7 @@ public class FractionJPanel extends JPanel
 	@Note("Clear")
 	private AbstractButton btnClear = null;
 
-	private AbstractButton btnShowImage = null;
+	private AbstractButton btnShowImage, btnSaveImage = null;
 
 	@Note("Fraction 1 Whole Document")
 	private transient Document documentWhole1 = null;
@@ -276,7 +289,9 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(btnShowImage = new JButton("Show Image"));
 		//
-		add(jPanel, String.format("span %1$s", 1));
+		jPanel.add(btnSaveImage = new JButton("Save Image"));
+		//
+		add(jPanel, String.format("span %1$s", 3));
 		//
 		forEach(map(
 				testAndApply(Objects::nonNull, FractionJTextComponent.class.getDeclaredFields(), Arrays::stream, null),
@@ -439,7 +454,7 @@ public class FractionJPanel extends JPanel
 		//
 		setIcon(labelImage, null);
 		//
-		forEach(Arrays.asList(btnShowImage, btnExecute), x -> setEnabled(x, false));
+		forEach(Arrays.asList(btnShowImage, btnSaveImage, btnExecute), x -> setEnabled(x, false));
 		//
 		pack(window);
 		//
@@ -766,12 +781,77 @@ public class FractionJPanel extends JPanel
 				//
 				setIcon(labelImage, new ImageIcon(screenshot(locator(page, "tbody"))));
 				//
+				setEnabled(btnSaveImage, true);
+				//
 				pack(window);
+				//
+			} // try
+				//
+		} else if (Objects.equals(source, btnSaveImage)) {
+			//
+			final ImageIcon imageIcon = cast(ImageIcon.class, labelImage != null ? labelImage.getIcon() : null);
+			//
+			try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+				//
+				final Image image = imageIcon != null ? imageIcon.getImage() : null;
+				//
+				final List<Method> ms = toList(filter(
+						testAndApply(Objects::nonNull, getDeclaredMethods(getClass(image)), Arrays::stream, null),
+						m -> m != null && Objects.equals(getName(m), "getBufferedImage")
+								&& m.getParameterCount() == 0));
+				//
+				if (IterableUtils.size(ms) > 1) {
+					//
+					throw new IllegalStateException();
+					//
+				} // if
+					//
+				testAndAccept(Objects::nonNull,
+						cast(BufferedImage.class,
+								testAndApply((a, b) -> a != null && b != null, image,
+										testAndApply(x -> IterableUtils.size(x) == 1, ms, x -> IterableUtils.get(x, 0),
+												null),
+										Narcissus::invokeMethod, null)),
+						x -> ImageIO.write(cast(BufferedImage.class, x), "png", baos));
+				//
+				final JFileChooser jfc = new JFileChooser(".");
+				//
+				if (!GraphicsEnvironment.isHeadless() && jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+					//
+					Files.write(toPath(jfc.getSelectedFile()), baos.toByteArray(), StandardOpenOption.CREATE,
+							StandardOpenOption.TRUNCATE_EXISTING);
+					//
+				} // if
+					//
+			} catch (final IOException e) {
+				//
+				throw new RuntimeException(e);
 				//
 			} // try
 				//
 		} // if
 			//
+	}
+
+	private static <T, U, R> R testAndApply(final BiPredicate<T, U> predicate, final T t, final U u,
+			final BiFunction<T, U, R> functionTrue, final BiFunction<T, U, R> functionFalse) {
+		return test(predicate, t, u) ? apply(functionTrue, t, u) : apply(functionFalse, t, u);
+	}
+
+	private static <T, U, R> R apply(final BiFunction<T, U, R> instance, final T t, final U u) {
+		return instance != null ? instance.apply(t, u) : null;
+	}
+
+	private static <T, U> boolean test(final BiPredicate<T, U> instance, final T t, final U u) {
+		return instance != null && instance.test(t, u);
+	}
+
+	private static Path toPath(final File instance) {
+		return instance != null && instance.getPath() != null ? instance.toPath() : null;
+	}
+
+	private static Method[] getDeclaredMethods(final Class<?> instance) {
+		return instance != null ? instance.getDeclaredMethods() : null;
 	}
 
 	private static Browser launch(final BrowserType instance) {
@@ -883,13 +963,14 @@ public class FractionJPanel extends JPanel
 		//
 	}
 
-	private static <T> void testAndAccept(final Predicate<T> predicate, final T value, final Consumer<T> consumer) {
+	private static <T, E extends Exception> void testAndAccept(final Predicate<T> predicate, final T value,
+			final FailableConsumer<T, E> consumer) throws E {
 		if (test(predicate, value)) {
 			accept(consumer, value);
 		}
 	}
 
-	private static <T> void accept(final Consumer<T> instance, final T value) {
+	private static <T, E extends Exception> void accept(final FailableConsumer<T, E> instance, final T value) throws E {
 		if (instance != null) {
 			instance.accept(value);
 		}
