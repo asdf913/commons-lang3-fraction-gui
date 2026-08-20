@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.FocusTraversalPolicy;
 import java.awt.GraphicsEnvironment;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -164,6 +165,8 @@ public class FractionJPanel extends JPanel
 
 	private JComboBox<?> jcb = null;
 
+	private Window window = null;
+
 	private FractionJPanel() {
 		//
 	}
@@ -261,11 +264,19 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(btnClear = new JButton("Clear"));
 		//
-		jPanel.add(btnShowImage = new JButton("Show Image"));
+		add(jPanel, wrap);
+		//
+		(jPanel = new JPanel()).setLayout(new MigLayout());
 		//
 		jPanel.add(labelImage = new JLabel());
 		//
-		add(jPanel, String.format("span %1$s", 3));
+		add(jPanel, wrap);
+		//
+		(jPanel = new JPanel()).setLayout(new MigLayout());
+		//
+		jPanel.add(btnShowImage = new JButton("Show Image"));
+		//
+		add(jPanel, String.format("span %1$s", 1));
 		//
 		forEach(map(
 				testAndApply(Objects::nonNull, FractionJTextComponent.class.getDeclaredFields(), Arrays::stream, null),
@@ -429,6 +440,8 @@ public class FractionJPanel extends JPanel
 		setIcon(labelImage, null);
 		//
 		forEach(Arrays.asList(btnShowImage, btnExecute), x -> setEnabled(x, false));
+		//
+		pack(window);
 		//
 	}
 
@@ -637,19 +650,19 @@ public class FractionJPanel extends JPanel
 
 	public static void main(final String[] args) {
 		//
+		final FractionJPanel instance = new FractionJPanel();
+		//
 		final JFrame jFrame = !GraphicsEnvironment.isHeadless() ? new JFrame() : null;
 		//
 		if (jFrame != null) {
 			//
 			jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 			//
-			final FractionJPanel instance = new FractionJPanel();
-			//
 			instance.init();
 			//
 			jFrame.add(instance);
 			//
-			jFrame.pack();
+			pack(instance.window = jFrame);
 			//
 			if (!isTestMode()) {
 				//
@@ -659,6 +672,12 @@ public class FractionJPanel extends JPanel
 				//
 		} // if
 			//
+	}
+
+	private static void pack(final Window instnace) {
+		if (instnace != null && !GraphicsEnvironment.isHeadless()) {
+			instnace.pack();
+		}
 	}
 
 	private static boolean isTestMode() {
@@ -746,6 +765,8 @@ public class FractionJPanel extends JPanel
 				setContent(page, Objects.toString(sb.append("</td></tr></tbody></table></body></html>")));
 				//
 				setIcon(labelImage, new ImageIcon(screenshot(locator(page, "tbody"))));
+				//
+				pack(window);
 				//
 			} // try
 				//
