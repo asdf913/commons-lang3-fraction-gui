@@ -167,7 +167,10 @@ public class FractionJPanel extends JPanel
 	@Note("Clear")
 	private AbstractButton btnClear = null;
 
-	private AbstractButton btnShowImage, btnSaveImage = null;
+	@Note("Show Image")
+	private AbstractButton btnShowImage = null;
+
+	private AbstractButton btnSaveImage = null;
 
 	@Note("Fraction 1 Whole Document")
 	private transient Document documentWhole1 = null;
