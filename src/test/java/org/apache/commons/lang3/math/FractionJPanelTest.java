@@ -395,8 +395,6 @@ class FractionJPanelTest {
 		//
 		Object[] os = null;
 		//
-		FractionJPanel instance = null;
-		//
 		Class<?>[] parameterTypes = null;
 		//
 		Class<?> parameterType, type = null;
