@@ -757,9 +757,13 @@ public class FractionJPanel extends JPanel
 				//
 			} // try
 				//
+			return;
+			//
 		} else if (Objects.equals(source, btnClear)) {
 			//
 			clear();
+			//
+			return;
 			//
 		} else if (Objects.equals(source, btnShowImage)) {
 			//
@@ -792,11 +796,27 @@ public class FractionJPanel extends JPanel
 				//
 			} // try
 				//
-		} else if (Objects.equals(source, btnSaveImage)) {
+			return;
+			//
+		} // if
+			//
+		actionPerformed(this, source);
+		//
+	}
+
+	private static void actionPerformed(final FractionJPanel instance, final Object source) {
+		//
+		if (instance == null) {
+			//
+			return;
+			//
+		} // if
+			//
+		if (Objects.equals(source, instance.btnSaveImage)) {
 			//
 			try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 				//
-				final Image image = getImage(cast(ImageIcon.class, getIcon(labelImage)));
+				final Image image = getImage(cast(ImageIcon.class, getIcon(instance.labelImage)));
 				//
 				final List<Method> ms = toList(filter(
 						testAndApply(Objects::nonNull, getDeclaredMethods(getClass(image)), Arrays::stream, null),
