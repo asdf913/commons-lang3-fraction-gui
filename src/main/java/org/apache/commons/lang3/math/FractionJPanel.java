@@ -986,8 +986,20 @@ public class FractionJPanel extends JPanel
 			//
 			if (!Objects.equals(whole, "0")) {
 				//
-				sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", whole));
+				final int index = StringUtils.indexOf(whole, '.');
 				//
+				final String string = index >= 0 ? StringUtils.substring(whole, index + 1) : null;
+				//
+				if (index >= 0 && (string == null || string.isEmpty() || string.matches("^0+$"))) {
+					//
+					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", StringUtils.substring(whole, 0, index)));
+					//
+				} else {
+					//
+					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", whole));
+					//
+				} // if
+					//
 			} else if (startsWith(numerator, "-")) {
 				//
 				sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", "-"));
