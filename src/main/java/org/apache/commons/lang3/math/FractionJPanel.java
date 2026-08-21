@@ -975,7 +975,7 @@ public class FractionJPanel extends JPanel
 																x -> Objects.equals(x, "0"))),
 												Boolean.logicalOr(denominator == null,
 														and(denominator, FractionJPanel::isValidString,
-																x -> Objects.equals(x, "1"))))))) {
+																x -> !Objects.equals(x, "0"))))))) {
 			//
 			return whole;
 			//
