@@ -40,6 +40,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -988,7 +989,7 @@ public class FractionJPanel extends JPanel
 				//
 				final int index = StringUtils.indexOf(whole, '.');
 				//
-				final String string = index >= 0 ? StringUtils.substring(whole, index + 1) : null;
+				final String string = testAndApply(i -> i >= 0, index, i -> StringUtils.substring(whole, i + 1), null);
 				//
 				if (index >= 0 && (StringUtils.isEmpty(string) || matches(string, "^0+$"))) {
 					//
@@ -1043,6 +1044,19 @@ public class FractionJPanel extends JPanel
 			//
 		return Objects.toString(sb.append("</math>"));
 		//
+	}
+
+	private static <R> R testAndApply(final IntPredicate predicate, final int value, final IntFunction<R> functionTrue,
+			final IntFunction<R> functionFalse) {
+		return test(predicate, value) ? apply(functionTrue, value) : apply(functionFalse, value);
+	}
+
+	private static boolean test(final IntPredicate instance, final int value) {
+		return instance != null && instance.test(value);
+	}
+
+	private static <R> R apply(final IntFunction<R> instance, final int value) {
+		return instance != null ? instance.apply(value) : null;
 	}
 
 	private static boolean matches(final String instance, final String regex) {

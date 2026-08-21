@@ -24,6 +24,8 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -136,14 +138,14 @@ class FractionJPanelTest {
 				//
 			} // if
 				//
-			if (Boolean.logicalAnd(Boolean.logicalOr(proxy instanceof Predicate, proxy instanceof BiPredicate),
+			if (Boolean.logicalAnd(
+					or(proxy instanceof Predicate, proxy instanceof BiPredicate, proxy instanceof IntPredicate),
 					Objects.equals(name, "test"))) {
 				//
 				return test;
 				//
-			} else if (Boolean.logicalAnd(
-					or(proxy instanceof Function, proxy instanceof FailableBiFunction, proxy instanceof TriFunction),
-					Objects.equals(name, "apply"))) {
+			} else if (Boolean.logicalAnd(or(proxy instanceof Function, proxy instanceof FailableBiFunction,
+					proxy instanceof TriFunction, proxy instanceof IntFunction), Objects.equals(name, "apply"))) {
 				//
 				return null;
 				//
