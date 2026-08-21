@@ -803,12 +803,12 @@ public class FractionJPanel extends JPanel
 						m -> Boolean.logicalAnd(Objects.equals(getName(m), "getBufferedImage"),
 								getParameterCount(m) == 0)));
 				//
-				if (IterableUtils.size(ms) > 1) {
+				testAndRun(IterableUtils.size(ms) > 1, () -> {
 					//
 					throw new IllegalStateException();
 					//
-				} // if
-					//
+				});
+				//
 				testAndAccept(Objects::nonNull,
 						cast(BufferedImage.class,
 								testAndApply((a, b) -> Boolean.logicalAnd(a != null, b != null), image,
@@ -834,6 +834,12 @@ public class FractionJPanel extends JPanel
 				//
 		} // if
 			//
+	}
+
+	private static void testAndRun(final boolean condition, final Runnable runnable) {
+		if (condition && runnable != null) {
+			runnable.run();
+		}
 	}
 
 	private static Icon getIcon(final JLabel instance) {
