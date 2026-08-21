@@ -893,6 +893,9 @@ class FractionJPanelTest {
 				String.format("<math><mi>%1$s</mi><mfrac><mi>%1$s</mi><mn>%2$s</mn></mfrac></math>", one, two),
 				toMathML(oneString, oneString, Integer.toString(two)));
 		//
+		Assert.assertEquals(String.format("<math><mi>-</mi><mfrac><mi>%1$s</mi><mn>%2$s</mn></mfrac></math>", one, two),
+				toMathML(EMPTY, Integer.toString(Math.negateExact(one)), Integer.toString(two)));
+		//
 	}
 
 	private static String toMathML(final String whole, final String numerator, final String denominator)
