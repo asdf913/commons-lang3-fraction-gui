@@ -801,7 +801,8 @@ public class FractionJPanel extends JPanel
 				//
 				final List<Method> ms = toList(filter(
 						testAndApply(Objects::nonNull, getDeclaredMethods(getClass(image)), Arrays::stream, null),
-						m -> Objects.equals(getName(m), "getBufferedImage") && getParameterCount(m) == 0));
+						m -> Boolean.logicalAnd(Objects.equals(getName(m), "getBufferedImage"),
+								getParameterCount(m) == 0)));
 				//
 				if (IterableUtils.size(ms) > 1) {
 					//
