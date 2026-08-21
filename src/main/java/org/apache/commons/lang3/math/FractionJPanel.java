@@ -990,7 +990,7 @@ public class FractionJPanel extends JPanel
 				//
 				final String string = index >= 0 ? StringUtils.substring(whole, index + 1) : null;
 				//
-				if (index >= 0 && (string == null || string.isEmpty() || string.matches("^0+$"))) {
+				if (index >= 0 && (StringUtils.isEmpty(string) || matches(string, "^0+$"))) {
 					//
 					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", StringUtils.substring(whole, 0, index)));
 					//
@@ -1043,6 +1043,10 @@ public class FractionJPanel extends JPanel
 			//
 		return Objects.toString(sb.append("</math>"));
 		//
+	}
+
+	private static boolean matches(final String instance, final String regex) {
+		return instance != null && isValidString(instance) && instance.matches(regex);
 	}
 
 	private static <T, E extends Exception> void testAndAccept(final Predicate<T> predicate, final T value,

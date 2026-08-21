@@ -65,7 +65,7 @@ class FractionJPanelTest {
 	private static final String EMPTY = "";
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
-			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT = null;
+			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -89,6 +89,8 @@ class FractionJPanelTest {
 		(METHOD_TO_PATH = clz.getDeclaredMethod("toPath", File.class)).setAccessible(true);
 		//
 		(METHOD_GET_PARAMETER_COUNT = clz.getDeclaredMethod("getParameterCount", Executable.class)).setAccessible(true);
+		//
+		(METHOD_MATCHES = clz.getDeclaredMethod("matches", String.class, String.class)).setAccessible(true);
 		//
 	}
 
@@ -965,6 +967,25 @@ class FractionJPanelTest {
 				return cast(Path.class, obj);
 			} else if (obj == null) {
 				return null;
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	@Test
+	public void testMatches() throws Throwable {
+		//
+		Assert.assertFalse(matches(EMPTY, "\\d+"));
+		//
+	}
+
+	private static boolean matches(final String instance, final String regex) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_MATCHES, null, instance, regex);
+			if (obj instanceof Boolean b && b != null) {
+				return b.booleanValue();
 			}
 			throw new Throwable(Objects.toString(getClass(obj)));
 		} catch (final InvocationTargetException e) {
