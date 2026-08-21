@@ -18,6 +18,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -800,8 +801,7 @@ public class FractionJPanel extends JPanel
 				//
 				final List<Method> ms = toList(filter(
 						testAndApply(Objects::nonNull, getDeclaredMethods(getClass(image)), Arrays::stream, null),
-						m -> m != null && Objects.equals(getName(m), "getBufferedImage")
-								&& m.getParameterCount() == 0));
+						m -> Objects.equals(getName(m), "getBufferedImage") && getParameterCount(m) == 0));
 				//
 				if (IterableUtils.size(ms) > 1) {
 					//
@@ -834,6 +834,30 @@ public class FractionJPanel extends JPanel
 				//
 		} // if
 			//
+	}
+
+	private static int getParameterCount(final Executable instance) {
+		//
+		if (instance instanceof Method) {
+			//
+			try {
+				//
+				if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), "parameterTypes")) == null) {
+					//
+					return 0;
+					//
+				} // if
+					//
+			} catch (final NoSuchFieldException e) {
+				//
+				throw new RuntimeException(e);
+				//
+			} // try
+				//
+		} // if
+			//
+		return instance != null ? instance.getParameterCount() : 0;
+		//
 	}
 
 	private static <T, U, R> R testAndApply(final BiPredicate<T, U> predicate, final T t, final U u,

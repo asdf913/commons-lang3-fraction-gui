@@ -5,6 +5,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.lang.reflect.Array;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -64,7 +65,7 @@ class FractionJPanelTest {
 	private static final String EMPTY = "";
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
-			METHOD_TO_MATH_ML, METHOD_TO_PATH = null;
+			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -87,6 +88,8 @@ class FractionJPanelTest {
 		//
 		(METHOD_TO_PATH = clz.getDeclaredMethod("toPath", File.class)).setAccessible(true);
 		//
+		(METHOD_GET_PARAMETER_COUNT = clz.getDeclaredMethod("getParameterCount", Executable.class)).setAccessible(true);
+		//
 	}
 
 	private static class IH implements InvocationHandler {
@@ -106,8 +109,7 @@ class FractionJPanelTest {
 				//
 			final String name = getName(method);
 			//
-			if (Boolean.logicalAnd(Objects.equals(name, "toString"),
-					method != null && method.getParameterCount() == 0)) {
+			if (Boolean.logicalAnd(Objects.equals(name, "toString"), getParameterCount(method) == 0)) {
 				//
 				return toString();
 				//
@@ -214,6 +216,18 @@ class FractionJPanelTest {
 			//
 		}
 
+	}
+
+	private static int getParameterCount(final Executable instance) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_GET_PARAMETER_COUNT, null, instance);
+			if (obj instanceof Integer integer && integer != null) {
+				return integer.intValue();
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
 	}
 
 	private static String getName(final Member instance) {
@@ -456,6 +470,10 @@ class FractionJPanelTest {
 				} else if (Objects.equals(parameterType, AbstractDocument.class)) {
 					//
 					add(collection, Narcissus.allocateInstance(PlainDocument.class));
+					//
+				} else if (Objects.equals(parameterType, Executable.class)) {
+					//
+					add(collection, Narcissus.allocateInstance(Method.class));
 					//
 				} else if (parameterType != null && parameterType.isInterface()) {
 					//
@@ -723,12 +741,12 @@ class FractionJPanelTest {
 				final Method m1 = m;
 				//
 				Assert.assertThrows(IllegalArgumentException.class, () -> Narcissus.invokeMethod(focusTraversalPolicy1,
-						m1, toArray(Collections.nCopies(m1.getParameterCount(), null))));
+						m1, toArray(Collections.nCopies(getParameterCount(m1), null))));
 				//
 			} else {
 				//
 				Assert.assertNull(Narcissus.invokeMethod(focusTraversalPolicy1, m,
-						toArray(Collections.nCopies(m.getParameterCount(), null))));
+						toArray(Collections.nCopies(getParameterCount(m), null))));
 				//
 			} // if
 				//
@@ -758,12 +776,12 @@ class FractionJPanelTest {
 				final Method m1 = m;
 				//
 				Assert.assertThrows(IllegalArgumentException.class, () -> Narcissus.invokeMethod(focusTraversalPolicy2,
-						m1, toArray(Collections.nCopies(m1.getParameterCount(), null))));
+						m1, toArray(Collections.nCopies(getParameterCount(m1), null))));
 				//
 			} else {
 				//
 				Assert.assertNotNull(Narcissus.invokeMethod(focusTraversalPolicy2, m,
-						toArray(Collections.nCopies(m.getParameterCount(), null))));
+						toArray(Collections.nCopies(getParameterCount(m), null))));
 				//
 			} // if
 				//
