@@ -858,8 +858,8 @@ public class FractionJPanel extends JPanel
 	}
 
 	private static void testAndRun(final boolean condition, final Runnable runnable) {
-		if (condition && runnable != null) {
-			runnable.run();
+		if (condition) {
+			run(runnable);
 		}
 	}
 
@@ -991,17 +991,13 @@ public class FractionJPanel extends JPanel
 				//
 				final String string = testAndApply(i -> i >= 0, index, i -> StringUtils.substring(whole, i + 1), null);
 				//
-				if (Boolean.logicalAnd(index >= 0,
-						Boolean.logicalOr(StringUtils.isEmpty(string), matches(string, "^0+$")))) {
-					//
-					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", StringUtils.substring(whole, 0, index)));
-					//
-				} else {
-					//
-					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", whole));
-					//
-				} // if
-					//
+				testAndRun(
+						Boolean.logicalAnd(index >= 0,
+								Boolean.logicalOr(StringUtils.isEmpty(string), matches(string, "^0+$"))),
+						() -> sb.append(
+								String.format("<%1$s>%2$s</%1$s>", "mi", StringUtils.substring(whole, 0, index))),
+						() -> sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", whole)));
+				//
 			} else if (startsWith(numerator, "-")) {
 				//
 				sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", "-"));
@@ -1045,6 +1041,20 @@ public class FractionJPanel extends JPanel
 			//
 		return Objects.toString(sb.append("</math>"));
 		//
+	}
+
+	private static void testAndRun(final boolean condition, final Runnable runnableTrue, final Runnable runnableFalse) {
+		if (condition) {
+			run(runnableTrue);
+		} else {
+			run(runnableFalse);
+		}
+	}
+
+	private static void run(final Runnable instance) {
+		if (instance != null) {
+			instance.run();
+		}
 	}
 
 	private static <R> R testAndApply(final IntPredicate predicate, final int value, final IntFunction<R> functionTrue,
