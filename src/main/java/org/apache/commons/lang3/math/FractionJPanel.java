@@ -811,7 +811,7 @@ public class FractionJPanel extends JPanel
 					//
 				testAndAccept(Objects::nonNull,
 						cast(BufferedImage.class,
-								testAndApply((a, b) -> a != null && b != null, image,
+								testAndApply((a, b) -> Boolean.logicalAnd(a != null, b != null), image,
 										testAndApply(x -> IterableUtils.size(x) == 1, ms, x -> IterableUtils.get(x, 0),
 												null),
 										Narcissus::invokeMethod, null)),
