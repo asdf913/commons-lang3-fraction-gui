@@ -991,7 +991,7 @@ public class FractionJPanel extends JPanel
 				//
 				final String string = testAndApply(i -> i >= 0, index, i -> StringUtils.substring(whole, i + 1), null);
 				//
-				if (index >= 0 && (StringUtils.isEmpty(string) || matches(string, "^0+$"))) {
+				if (index >= 0 && Boolean.logicalOr(StringUtils.isEmpty(string), matches(string, "^0+$"))) {
 					//
 					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", StringUtils.substring(whole, 0, index)));
 					//
