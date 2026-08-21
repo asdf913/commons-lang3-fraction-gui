@@ -1010,7 +1010,7 @@ public class FractionJPanel extends JPanel
 			if (StringUtils.isNotBlank(numerator)) {
 				//
 				if (Boolean.logicalOr(Boolean.logicalAnd(Objects.equals(whole, "0"), startsWith(numerator, "-")),
-						StringUtils.isEmpty(whole) && startsWith(numerator, "-"))) {
+						Boolean.logicalAnd(StringUtils.isEmpty(whole), startsWith(numerator, "-")))) {
 					//
 					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", StringUtils.substring(numerator, 1)));
 					//
