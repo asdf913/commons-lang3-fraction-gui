@@ -44,6 +44,7 @@ import javax.swing.text.PlainDocument;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.TriFunction;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.testng.Assert;
@@ -140,7 +141,7 @@ class FractionJPanelTest {
 				return test;
 				//
 			} else if (Boolean.logicalAnd(
-					or(proxy instanceof Function, proxy instanceof BiFunction, proxy instanceof TriFunction),
+					or(proxy instanceof Function, proxy instanceof FailableBiFunction, proxy instanceof TriFunction),
 					Objects.equals(name, "apply"))) {
 				//
 				return null;

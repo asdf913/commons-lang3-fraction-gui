@@ -78,6 +78,7 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.bidimap.TreeBidiMap;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -721,9 +722,8 @@ public class FractionJPanel extends JPanel
 			try {
 				//
 				final Fraction fraction = cast(Fraction.class,
-						Boolean.logicalAnd(fractionA != null, fractionB != null)
-								? invoke(cast(Method.class, getSelectedItem(cbm)), fractionA, fractionB)
-								: null);
+						testAndApply((a, b) -> Boolean.logicalAnd(a != null, b != null), fractionA, fractionB,
+								(a, b) -> invoke(cast(Method.class, getSelectedItem(cbm)), a, b), null));
 				//
 				if (fraction != null) {
 					//
@@ -746,13 +746,15 @@ public class FractionJPanel extends JPanel
 					//
 				setEnabled(btnShowImage, true);
 				//
-			} catch (final IllegalAccessException e) {
+			} catch (final ReflectiveOperationException e) {
 				//
+				if (e instanceof InvocationTargetException ite && ite != null) {
+					//
+					throw new RuntimeException(ObjectUtils.getIfNull(ite.getTargetException(), ite));
+					//
+				} // if
+					//
 				throw new RuntimeException(e);
-				//
-			} catch (final InvocationTargetException e) {
-				//
-				throw new RuntimeException(ObjectUtils.getIfNull(e.getTargetException(), e));
 				//
 			} // try
 				//
@@ -867,12 +869,14 @@ public class FractionJPanel extends JPanel
 		//
 	}
 
-	private static <T, U, R> R testAndApply(final BiPredicate<T, U> predicate, final T t, final U u,
-			final BiFunction<T, U, R> functionTrue, final BiFunction<T, U, R> functionFalse) {
+	private static <T, U, R, E extends Exception> R testAndApply(final BiPredicate<T, U> predicate, final T t,
+			final U u, final FailableBiFunction<T, U, R, E> functionTrue,
+			final FailableBiFunction<T, U, R, E> functionFalse) throws E {
 		return test(predicate, t, u) ? apply(functionTrue, t, u) : apply(functionFalse, t, u);
 	}
 
-	private static <T, U, R> R apply(final BiFunction<T, U, R> instance, final T t, final U u) {
+	private static <T, U, R, E extends Exception> R apply(final FailableBiFunction<T, U, R, E> instance, final T t,
+			final U u) throws E {
 		return instance != null ? instance.apply(t, u) : null;
 	}
 
