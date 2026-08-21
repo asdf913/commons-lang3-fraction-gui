@@ -795,7 +795,7 @@ public class FractionJPanel extends JPanel
 			//
 			try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 				//
-				final Image image = getImage(cast(ImageIcon.class, labelImage != null ? labelImage.getIcon() : null));
+				final Image image = getImage(cast(ImageIcon.class, getIcon(labelImage)));
 				//
 				final List<Method> ms = toList(filter(
 						testAndApply(Objects::nonNull, getDeclaredMethods(getClass(image)), Arrays::stream, null),
@@ -833,6 +833,10 @@ public class FractionJPanel extends JPanel
 				//
 		} // if
 			//
+	}
+
+	private static Icon getIcon(final JLabel instance) {
+		return instance != null ? instance.getIcon() : null;
 	}
 
 	private static Image getImage(final ImageIcon instance) {
