@@ -1339,7 +1339,7 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 				FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 		//
-		setEnabled(btnShowImage, false);
+		forEach(Arrays.asList(btnShowImage, btnSaveImage), x -> setEnabled(x, false));
 		//
 		if (Objects.equals(document, documentWhole1)) {
 			//
@@ -1464,7 +1464,7 @@ public class FractionJPanel extends JPanel
 			//
 			setIcon(labelImage, null);
 			//
-			setEnabled(btnShowImage, false);
+			forEach(Arrays.asList(btnShowImage, btnSaveImage), x -> setEnabled(x, false));
 			//
 		} // if
 			//
