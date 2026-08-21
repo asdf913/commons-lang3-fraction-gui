@@ -793,11 +793,9 @@ public class FractionJPanel extends JPanel
 				//
 		} else if (Objects.equals(source, btnSaveImage)) {
 			//
-			final ImageIcon imageIcon = cast(ImageIcon.class, labelImage != null ? labelImage.getIcon() : null);
-			//
 			try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 				//
-				final Image image = imageIcon != null ? imageIcon.getImage() : null;
+				final Image image = getImage(cast(ImageIcon.class, labelImage != null ? labelImage.getIcon() : null));
 				//
 				final List<Method> ms = toList(filter(
 						testAndApply(Objects::nonNull, getDeclaredMethods(getClass(image)), Arrays::stream, null),
@@ -835,6 +833,10 @@ public class FractionJPanel extends JPanel
 				//
 		} // if
 			//
+	}
+
+	private static Image getImage(final ImageIcon instance) {
+		return instance != null ? instance.getImage() : null;
 	}
 
 	private static int getParameterCount(final Executable instance) {
