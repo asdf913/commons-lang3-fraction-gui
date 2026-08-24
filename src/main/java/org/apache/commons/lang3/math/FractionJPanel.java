@@ -52,6 +52,7 @@ import java.util.stream.StreamSupport;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.spi.ServiceRegistry;
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -301,11 +302,8 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(btnShowImage = new JButton("Show Image"));
 		//
-		final IIORegistry iioRegistry = IIORegistry.getDefaultInstance();
-		//
-		final Iterator<ImageWriterSpi> imageWriterSpis = iioRegistry != null
-				? iioRegistry.getServiceProviders(ImageWriterSpi.class, true)
-				: null;
+		final Iterator<ImageWriterSpi> imageWriterSpis = getServiceProviders(IIORegistry.getDefaultInstance(),
+				ImageWriterSpi.class, true);
 		//
 		ImageWriterSpi imageWriterSpi = null;
 		//
@@ -372,6 +370,33 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getDenominator(fraction1),
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
+		//
+	}
+
+	private static <T> Iterator<T> getServiceProviders(final ServiceRegistry instance, final Class<T> category,
+			final boolean useOrdering) {
+		//
+		if (instance == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		try {
+			//
+			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), "categoryMap")) == null) {
+				//
+				return null;
+				//
+			} // if
+				//
+		} catch (final NoSuchFieldException e) {
+			//
+			throw new RuntimeException(e);
+			//
+		} // try
+			//
+		return instance.getServiceProviders(category, useOrdering);
 		//
 	}
 
