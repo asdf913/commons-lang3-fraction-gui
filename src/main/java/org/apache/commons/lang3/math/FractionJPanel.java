@@ -30,11 +30,14 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EventObject;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -47,6 +50,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import javax.imageio.ImageIO;
+import javax.imageio.spi.IIORegistry;
+import javax.imageio.spi.ImageWriterSpi;
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -161,7 +166,9 @@ public class FractionJPanel extends JPanel
 
 	private transient FractionJTextComponent answer = null;
 
-	private transient ComboBoxModel<Method> cbm = null;
+	private transient ComboBoxModel<Method> cbmMethod = null;
+
+	private ComboBoxModel<String> cbmFileSuffix = null;
 
 	@Note("Execute")
 	private AbstractButton btnExecute = null;
@@ -224,7 +231,7 @@ public class FractionJPanel extends JPanel
 		add(jPanel);
 		//
 		final ListCellRenderer lcr = (jcb = new JComboBox<>(
-				cbm = new DefaultComboBoxModel<>(toArray(toList(filter(Arrays.stream(Fraction.class.getMethods()),
+				cbmMethod = new DefaultComboBoxModel<>(toArray(toList(filter(Arrays.stream(Fraction.class.getMethods()),
 						m -> m != null && Arrays.equals(m.getParameterTypes(), new Class<?>[] { m.getDeclaringClass() })
 								&& Objects.equals(m.getReturnType(), m.getDeclaringClass()))),
 						Method[]::new))))
@@ -248,7 +255,7 @@ public class FractionJPanel extends JPanel
 			//
 		});
 		//
-		setSelectedItem(cbm, null);
+		setSelectedItem(cbmMethod, null);
 		//
 		jcb.setKeySelectionManager(this);
 		//
@@ -294,6 +301,37 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(btnShowImage = new JButton("Show Image"));
 		//
+		final IIORegistry iioRegistry = IIORegistry.getDefaultInstance();
+		//
+		final Iterator<ImageWriterSpi> imageWriterSpis = iioRegistry != null
+				? iioRegistry.getServiceProviders(ImageWriterSpi.class, true)
+				: null;
+		//
+		ImageWriterSpi imageWriterSpi = null;
+		//
+		String[] fileSuffixes = null;
+		//
+		Set<String> set = null;
+		//
+		while (imageWriterSpis != null && imageWriterSpis.hasNext()) {
+			//
+			if ((imageWriterSpi = imageWriterSpis.next()) == null
+					|| (fileSuffixes = imageWriterSpi.getFileSuffixes()) == null) {
+				//
+				continue;
+				//
+			} // if
+				//
+			for (final String fileSuffix : fileSuffixes) {
+				//
+				add(set = ObjectUtils.getIfNull(set, LinkedHashSet::new), fileSuffix);
+				//
+			} // for
+				//
+		} // while
+			//
+		jPanel.add(new JComboBox<>(cbmFileSuffix = new DefaultComboBoxModel<>(toArray(set, String[]::new))));
+		//
 		jPanel.add(btnSaveImage = new JButton("Save Image"));
 		//
 		add(jPanel, String.format("span %1$s", 3));
@@ -336,6 +374,12 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
+	}
+
+	private static <E> void add(final Collection<E> instance, final E item) {
+		if (instance != null) {
+			instance.add(item);
+		}
 	}
 
 	private static void setDocumentFilter(final AbstractDocument instance, final DocumentFilter documentFilter) {
@@ -455,7 +499,7 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getNumerator(answer), FractionJTextComponent.getDenominator(answer)),
 				x -> setText(x, ""));
 		//
-		setSelectedItem(cbm, null);
+		setSelectedItem(cbmMethod, null);
 		//
 		setIcon(labelImage, null);
 		//
@@ -723,7 +767,7 @@ public class FractionJPanel extends JPanel
 				//
 				final Fraction fraction = cast(Fraction.class,
 						testAndApply((a, b) -> Boolean.logicalAnd(a != null, b != null), fractionA, fractionB,
-								(a, b) -> invoke(cast(Method.class, getSelectedItem(cbm)), a, b), null));
+								(a, b) -> invoke(cast(Method.class, getSelectedItem(cbmMethod)), a, b), null));
 				//
 				if (fraction != null) {
 					//
@@ -772,8 +816,9 @@ public class FractionJPanel extends JPanel
 			//
 			sb.append(toMathML(fraction1));
 			//
-			final Object object = testAndApply(Objects::nonNull, getName(cast(Member.class, getSelectedItem(cbm))),
-					x -> get(inverseBidiMap(BIDI_MAP), x), null);
+			final Object object = testAndApply(Objects::nonNull,
+					getName(cast(Member.class, getSelectedItem(cbmMethod))), x -> get(inverseBidiMap(BIDI_MAP), x),
+					null);
 			//
 			sb.append(object);
 			//
@@ -836,7 +881,8 @@ public class FractionJPanel extends JPanel
 										testAndApply(x -> IterableUtils.size(x) == 1, ms, x -> IterableUtils.get(x, 0),
 												null),
 										Narcissus::invokeMethod, null)),
-						x -> ImageIO.write(cast(BufferedImage.class, x), "png", baos));
+						x -> ImageIO.write(cast(BufferedImage.class, x),
+								Objects.toString(getSelectedItem(instance.cbmFileSuffix)), baos));
 				//
 				final JFileChooser jfc = new JFileChooser(".");
 				//
@@ -1456,8 +1502,8 @@ public class FractionJPanel extends JPanel
 		//
 		try {
 			//
-			setEnabled(btnExecute,
-					toFraction(fraction1) != null && toFraction(fraction2) != null && getSelectedItem(cbm) != null);
+			setEnabled(btnExecute, toFraction(fraction1) != null && toFraction(fraction2) != null
+					&& getSelectedItem(cbmMethod) != null);
 			//
 		} catch (final Exception e) {
 			//

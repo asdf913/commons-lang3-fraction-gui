@@ -98,7 +98,7 @@ class FractionJPanelTest {
 
 	private static class IH implements InvocationHandler {
 
-		private Boolean test = null;
+		private Boolean test, add = null;
 
 		private Integer size, length = null;
 
@@ -132,10 +132,18 @@ class FractionJPanelTest {
 				//
 			} // if
 				//
-			if (Boolean.logicalAnd(proxy instanceof Collection, Objects.equals(name, "toArray"))) {
+			if (proxy instanceof Collection) {
 				//
-				return null;
-				//
+				if (Objects.equals(name, "toArray")) {
+					//
+					return null;
+					//
+				} else if (Objects.equals(name, "add")) {
+					//
+					return add;
+					//
+				} // if
+					//
 			} // if
 				//
 			if (Boolean.logicalAnd(
