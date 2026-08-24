@@ -168,7 +168,7 @@ public class FractionJPanel extends JPanel
 
 	private transient ComboBoxModel<Method> cbmMethod = null;
 
-	private ComboBoxModel<String> cbmFileSuffix = null;
+	private transient ComboBoxModel<String> cbmFileSuffix = null;
 
 	@Note("Execute")
 	private AbstractButton btnExecute = null;
