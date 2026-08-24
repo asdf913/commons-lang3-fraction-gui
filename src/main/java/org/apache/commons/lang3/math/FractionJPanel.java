@@ -356,8 +356,7 @@ public class FractionJPanel extends JPanel
 		//
 		forEach(map(Arrays.stream(FractionJPanel.class.getDeclaredFields()),
 				f -> cast(AbstractButton.class,
-						f != null && Modifier.isStatic(f.getModifiers()) ? Narcissus.getStaticField(f)
-								: Narcissus.getField(this, f))),
+						isStatic(f) ? Narcissus.getStaticField(f) : Narcissus.getField(this, f))),
 				x -> addActionListener(x, this));
 		//
 		clear();
@@ -374,6 +373,10 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
+	}
+
+	private static boolean isStatic(final Member instance) {
+		return instance != null && Modifier.isStatic(instance.getModifiers());
 	}
 
 	private static <E> void add(final Collection<E> instance, final E item) {

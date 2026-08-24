@@ -67,7 +67,7 @@ class FractionJPanelTest {
 	private static final String EMPTY = "";
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
-			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES = null;
+			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -94,13 +94,15 @@ class FractionJPanelTest {
 		//
 		(METHOD_MATCHES = clz.getDeclaredMethod("matches", String.class, String.class)).setAccessible(true);
 		//
+		(METHOD_IS_STATIC = clz.getDeclaredMethod("isStatic", Member.class)).setAccessible(true);
+		//
 	}
 
 	private static class IH implements InvocationHandler {
 
 		private Boolean test, add = null;
 
-		private Integer size, length = null;
+		private Integer size, length, modifiers = null;
 
 		@Override
 		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
@@ -129,6 +131,10 @@ class FractionJPanelTest {
 			} else if (Boolean.logicalAnd(proxy instanceof Iterable, Objects.equals(name, "spliterator"))) {
 				//
 				return null;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof Member, Objects.equals(name, "getModifiers"))) {
+				//
+				return modifiers;
 				//
 			} // if
 				//
@@ -994,6 +1000,25 @@ class FractionJPanelTest {
 	private static boolean matches(final String instance, final String regex) throws Throwable {
 		try {
 			final Object obj = invoke(METHOD_MATCHES, null, instance, regex);
+			if (obj instanceof Boolean b && b != null) {
+				return b.booleanValue();
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	@Test
+	public void testIsStatic() throws Throwable {
+		//
+		Assert.assertTrue(isStatic(Objects.class.getDeclaredMethod("toString", Object.class)));
+		//
+	}
+
+	private static boolean isStatic(final Member instance) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_IS_STATIC, null, instance);
 			if (obj instanceof Boolean b && b != null) {
 				return b.booleanValue();
 			}
