@@ -355,8 +355,8 @@ public class FractionJPanel extends JPanel
 				getDocument(FractionJTextComponent.getDenominator(fraction2))), x -> addDocumentListener(x, this));
 		//
 		forEach(map(Arrays.stream(FractionJPanel.class.getDeclaredFields()),
-				f -> cast(AbstractButton.class,
-						isStatic(f) ? Narcissus.getStaticField(f) : Narcissus.getField(this, f))),
+				f -> cast(AbstractButton.class, testAndApply(FractionJPanel::isStatic, f, Narcissus::getStaticField,
+						x -> Narcissus.getField(this, x)))),
 				x -> addActionListener(x, this));
 		//
 		clear();
