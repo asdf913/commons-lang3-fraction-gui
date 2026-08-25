@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.BiPredicate;
@@ -82,6 +84,7 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.bidimap.TreeBidiMap;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableBiFunction;
@@ -193,6 +196,8 @@ public class FractionJPanel extends JPanel
 
 	private Window window = null;
 
+	private Properties properties = null;
+
 	private FractionJPanel() {
 		//
 	}
@@ -303,7 +308,10 @@ public class FractionJPanel extends JPanel
 		jPanel.add(btnShowImage = new JButton("Show Image"));
 		//
 		final Iterator<ImageWriterSpi> imageWriterSpis = getServiceProviders(IIORegistry.getDefaultInstance(),
-				ImageWriterSpi.class, true);
+				ImageWriterSpi.class,
+				BooleanUtils.toBooleanDefaultIfNull(Boolean.valueOf(properties != null
+						? properties.getProperty("javax.imageio.spi.ServiceRegistry.getServiceProviders.useOrdering")
+						: null), true));
 		//
 		ImageWriterSpi imageWriterSpi = null;
 		//
@@ -740,10 +748,21 @@ public class FractionJPanel extends JPanel
 		return clz != null && clz.isInstance(instance) ? clz.cast(instance) : null;
 	}
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 		//
 		final FractionJPanel instance = new FractionJPanel();
 		//
+		try (final InputStream is = FractionJPanel.class.getResourceAsStream(
+				StringUtils.join('/', replace(FractionJPanel.class.getName(), '.', '/'), ".properties"))) {
+			//
+			final Properties properties = new Properties();
+			//
+			testAndAccept(Objects::nonNull, is, properties::load);
+			//
+			instance.properties = properties;
+			//
+		} // try
+			//
 		final JFrame jFrame = !GraphicsEnvironment.isHeadless() ? new JFrame() : null;
 		//
 		if (jFrame != null) {
@@ -764,6 +783,10 @@ public class FractionJPanel extends JPanel
 				//
 		} // if
 			//
+	}
+
+	private static String replace(final String instance, final char oldChar, final char newChar) {
+		return instance != null && isValidString(instance) ? instance.replace(oldChar, newChar) : null;
 	}
 
 	private static void pack(final Window instnace) {
