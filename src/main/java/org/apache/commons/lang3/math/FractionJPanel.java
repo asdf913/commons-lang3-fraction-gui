@@ -314,15 +314,13 @@ public class FractionJPanel extends JPanel
 						getProperty(properties, "javax.imageio.spi.ServiceRegistry.getServiceProviders.useOrdering")),
 						true));
 		//
-		ImageWriterSpi imageWriterSpi = null;
-		//
 		String[] fileSuffixes = null;
 		//
 		Set<String> set = null;
 		//
 		while (imageWriterSpis != null && imageWriterSpis.hasNext()) {
 			//
-			if ((fileSuffixes = getFileSuffixes(imageWriterSpi = imageWriterSpis.next())) == null) {
+			if ((fileSuffixes = getFileSuffixes(imageWriterSpis.next())) == null) {
 				//
 				continue;
 				//
