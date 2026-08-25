@@ -309,9 +309,9 @@ public class FractionJPanel extends JPanel
 		//
 		final Iterator<ImageWriterSpi> imageWriterSpis = getServiceProviders(IIORegistry.getDefaultInstance(),
 				ImageWriterSpi.class,
-				BooleanUtils.toBooleanDefaultIfNull(Boolean.valueOf(properties != null
-						? properties.getProperty("javax.imageio.spi.ServiceRegistry.getServiceProviders.useOrdering")
-						: null), true));
+				BooleanUtils.toBooleanDefaultIfNull(Boolean.valueOf(
+						getProperty(properties, "javax.imageio.spi.ServiceRegistry.getServiceProviders.useOrdering")),
+						true));
 		//
 		ImageWriterSpi imageWriterSpi = null;
 		//
@@ -378,6 +378,32 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getDenominator(fraction1),
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
+		//
+	}
+
+	private static String getProperty(final Properties instance, final String key) {
+		//
+		if (instance == null || key == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		try {
+			//
+			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), "map")) == null) {
+				//
+				return null;
+				//
+			} // if
+				//
+		} catch (final NoSuchFieldException e) {
+			//
+			throw new RuntimeException(e);
+			//
+		} // try
+			//
+		return instance.getProperty(key);
 		//
 	}
 

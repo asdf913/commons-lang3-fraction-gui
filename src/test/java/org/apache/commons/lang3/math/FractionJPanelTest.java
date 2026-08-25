@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -67,7 +68,8 @@ class FractionJPanelTest {
 	private static final String EMPTY = "";
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
-			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC = null;
+			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
+			METHOD_GET_PROPERTY = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -95,6 +97,9 @@ class FractionJPanelTest {
 		(METHOD_MATCHES = clz.getDeclaredMethod("matches", String.class, String.class)).setAccessible(true);
 		//
 		(METHOD_IS_STATIC = clz.getDeclaredMethod("isStatic", Member.class)).setAccessible(true);
+		//
+		(METHOD_GET_PROPERTY = clz.getDeclaredMethod("getProperty", Properties.class, String.class))
+				.setAccessible(true);
 		//
 	}
 
@@ -1021,6 +1026,31 @@ class FractionJPanelTest {
 			final Object obj = invoke(METHOD_IS_STATIC, null, instance);
 			if (obj instanceof Boolean b && b != null) {
 				return b.booleanValue();
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	@Test
+	public void testGetProperty() throws Throwable {
+		//
+		final Properties properties = new Properties();
+		//
+		Assert.assertNull(getProperty(properties, null));
+		//
+		Assert.assertNull(getProperty(properties, EMPTY));
+		//
+	}
+
+	private static String getProperty(final Properties instance, final String key) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_GET_PROPERTY, null, instance, key);
+			if (obj == null) {
+				return null;
+			} else if (obj instanceof String string) {
+				return string;
 			}
 			throw new Throwable(Objects.toString(getClass(obj)));
 		} catch (final InvocationTargetException e) {
