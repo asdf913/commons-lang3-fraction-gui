@@ -30,6 +30,7 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import javax.imageio.spi.ImageReaderWriterSpi;
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
@@ -497,6 +498,11 @@ class FractionJPanelTest {
 				} else if (Objects.equals(parameterType, Executable.class)) {
 					//
 					add(collection, Narcissus.allocateInstance(Method.class));
+					//
+				} else if (Objects.equals(parameterType, ImageReaderWriterSpi.class)) {
+					//
+					add(collection,
+							Narcissus.allocateInstance(Class.forName("com.sun.imageio.plugins.bmp.BMPImageWriterSpi")));
 					//
 				} else if (parameterType != null && parameterType.isInterface()) {
 					//

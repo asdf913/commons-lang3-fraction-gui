@@ -53,6 +53,7 @@ import java.util.stream.StreamSupport;
 
 import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
+import javax.imageio.spi.ImageReaderWriterSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.spi.ServiceRegistry;
 import javax.swing.AbstractButton;
@@ -321,8 +322,7 @@ public class FractionJPanel extends JPanel
 		//
 		while (imageWriterSpis != null && imageWriterSpis.hasNext()) {
 			//
-			if ((imageWriterSpi = imageWriterSpis.next()) == null
-					|| (fileSuffixes = imageWriterSpi.getFileSuffixes()) == null) {
+			if ((fileSuffixes = getFileSuffixes(imageWriterSpi = imageWriterSpis.next())) == null) {
 				//
 				continue;
 				//
@@ -390,6 +390,10 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
+	}
+
+	private static String[] getFileSuffixes(final ImageReaderWriterSpi instnace) {
+		return instnace != null ? instnace.getFileSuffixes() : null;
 	}
 
 	private static String getProperty(final Properties instance, final String key) {
