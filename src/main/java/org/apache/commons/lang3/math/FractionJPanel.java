@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -336,7 +337,18 @@ public class FractionJPanel extends JPanel
 				//
 		} // while
 			//
-		jPanel.add(new JComboBox<>(cbmFileSuffix = new DefaultComboBoxModel<>(toArray(set, String[]::new))));
+		fileSuffixes = toArray(set, String[]::new);
+		//
+		if (BooleanUtils.toBooleanDefaultIfNull(
+				Boolean.valueOf(
+						getProperty(properties, "org.apache.commons.lang3.math.FractionJPanel.sortFileSuffixes")),
+				false)) {
+			//
+			Arrays.sort(fileSuffixes);
+			//
+		} // if
+			//
+		jPanel.add(new JComboBox<>(cbmFileSuffix = new DefaultComboBoxModel<>(fileSuffixes)));
 		//
 		jPanel.add(btnSaveImage = new JButton("Save Image"));
 		//
