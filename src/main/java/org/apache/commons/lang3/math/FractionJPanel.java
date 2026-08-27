@@ -975,32 +975,6 @@ public class FractionJPanel extends JPanel
 				//
 			return;
 			//
-		} else if (Objects.equals(source, btnSavePdf)) {
-			//
-			try (final Playwright playwright = Playwright.create();
-					final Browser browser = launch(chromium(playwright));
-					final Page page = newPage(browser)) {
-				//
-				setContent(page, toHtml());
-				//
-				final JFileChooser jfc = new JFileChooser(".");
-				//
-				if (!GraphicsEnvironment.isHeadless() && jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-					//
-					testAndAccept((a, b) -> Boolean.logicalAnd(a != null, b != null), toPath(jfc.getSelectedFile()),
-							pdf(page), (a, b) -> Files.write(a, b, StandardOpenOption.CREATE,
-									StandardOpenOption.TRUNCATE_EXISTING));
-					//
-				} // if
-					//
-			} catch (final IOException e) {
-				//
-				throw new RuntimeException(e);
-				//
-			} // try
-				//
-			return;
-			//
 		} // if
 			//
 		actionPerformed(this, source);
@@ -1116,6 +1090,32 @@ public class FractionJPanel extends JPanel
 			setContents(toolkit != null && !Objects.equals(getName(getClass(toolkit)), "sun.awt.HeadlessToolkit")
 					? toolkit.getSystemClipboard()
 					: null, Reflection.newProxy(Transferable.class, ih), null);
+			//
+		} else if (Objects.equals(source, instance.btnSavePdf)) {
+			//
+			try (final Playwright playwright = Playwright.create();
+					final Browser browser = launch(chromium(playwright));
+					final Page page = newPage(browser)) {
+				//
+				setContent(page, instance.toHtml());
+				//
+				final JFileChooser jfc = new JFileChooser(".");
+				//
+				if (!GraphicsEnvironment.isHeadless() && jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+					//
+					testAndAccept((a, b) -> Boolean.logicalAnd(a != null, b != null), toPath(jfc.getSelectedFile()),
+							pdf(page), (a, b) -> Files.write(a, b, StandardOpenOption.CREATE,
+									StandardOpenOption.TRUNCATE_EXISTING));
+					//
+				} // if
+					//
+			} catch (final IOException e) {
+				//
+				throw new RuntimeException(e);
+				//
+			} // try
+				//
+			return;
 			//
 		} // if
 			//
