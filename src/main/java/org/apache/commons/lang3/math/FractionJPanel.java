@@ -193,7 +193,7 @@ public class FractionJPanel extends JPanel
 
 	private JLabel labelImage = null;
 
-	private JComboBox<?> jcb = null;
+	private JComboBox<?> jcbMethod, jcbFileSuffix = null;
 
 	private Window window = null;
 
@@ -237,14 +237,14 @@ public class FractionJPanel extends JPanel
 			//
 		add(jPanel);
 		//
-		final ListCellRenderer lcr = (jcb = new JComboBox<>(
+		final ListCellRenderer lcr = (jcbMethod = new JComboBox<>(
 				cbmMethod = new DefaultComboBoxModel<>(toArray(toList(filter(Arrays.stream(Fraction.class.getMethods()),
 						m -> m != null && Arrays.equals(m.getParameterTypes(), new Class<?>[] { m.getDeclaringClass() })
 								&& Objects.equals(m.getReturnType(), m.getDeclaringClass()))),
 						Method[]::new))))
 				.getRenderer();
 		//
-		jcb.setRenderer((arg0, value, arg2, arg3, arg4) -> {
+		jcbMethod.setRenderer((arg0, value, arg2, arg3, arg4) -> {
 			//
 			final Method method = cast(Method.class, value);
 			//
@@ -264,11 +264,11 @@ public class FractionJPanel extends JPanel
 		//
 		setSelectedItem(cbmMethod, null);
 		//
-		jcb.setKeySelectionManager(this);
+		jcbMethod.setKeySelectionManager(this);
 		//
-		jcb.addItemListener(this);
+		jcbMethod.addItemListener(this);
 		//
-		add(jcb);
+		add(jcbMethod);
 		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
 		//
@@ -345,7 +345,7 @@ public class FractionJPanel extends JPanel
 			//
 		} // if
 			//
-		jPanel.add(new JComboBox<>(cbmFileSuffix = new DefaultComboBoxModel<>(fileSuffixes)));
+		jPanel.add(jcbFileSuffix = new JComboBox<>(cbmFileSuffix = new DefaultComboBoxModel<>(fileSuffixes)));
 		//
 		jPanel.add(btnSaveImage = new JButton("Save Image"));
 		//
@@ -358,8 +358,8 @@ public class FractionJPanel extends JPanel
 		setFocusTraversalPolicyProvider(true);
 		//
 		setFocusTraversalPolicy(createFocusTraversalPolicy(Arrays.asList(FractionJTextComponent.getWhole(fraction1),
-				FractionJTextComponent.getNumerator(fraction1), FractionJTextComponent.getDenominator(fraction1), jcb,
-				FractionJTextComponent.getWhole(fraction2), FractionJTextComponent.getNumerator(fraction2),
+				FractionJTextComponent.getNumerator(fraction1), FractionJTextComponent.getDenominator(fraction1),
+				jcbMethod, FractionJTextComponent.getWhole(fraction2), FractionJTextComponent.getNumerator(fraction2),
 				FractionJTextComponent.getDenominator(fraction2), btnExecute)));
 		//
 		forEach(Arrays.asList(documentWhole1 = getDocument(FractionJTextComponent.getWhole(fraction1)),
@@ -579,6 +579,8 @@ public class FractionJPanel extends JPanel
 		setIcon(labelImage, null);
 		//
 		forEach(Arrays.asList(btnShowImage, btnSaveImage, btnExecute), x -> setEnabled(x, false));
+		//
+		setEnabled(jcbFileSuffix, false);
 		//
 		pack(window);
 		//
@@ -926,7 +928,7 @@ public class FractionJPanel extends JPanel
 				//
 				setIcon(labelImage, new ImageIcon(screenshot(locator(page, "tbody"))));
 				//
-				setEnabled(btnSaveImage, true);
+				forEach(Arrays.asList(btnSaveImage, jcbFileSuffix), x -> setEnabled(x, true));
 				//
 				pack(window);
 				//
@@ -1516,7 +1518,7 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 				FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 		//
-		forEach(Arrays.asList(btnShowImage, btnSaveImage), x -> setEnabled(x, false));
+		forEach(Arrays.asList(btnShowImage, btnSaveImage, jcbFileSuffix), x -> setEnabled(x, false));
 		//
 		if (Objects.equals(document, documentWhole1)) {
 			//
@@ -1586,6 +1588,8 @@ public class FractionJPanel extends JPanel
 			//
 		btnExecuteSetEnabled();
 		//
+		pack(window);
+		//
 	}
 
 	private void btnExecuteSetEnabled() {
@@ -1634,7 +1638,7 @@ public class FractionJPanel extends JPanel
 		//
 		btnExecuteSetEnabled();
 		//
-		if (Objects.equals(getSource(evt), jcb)) {
+		if (Objects.equals(getSource(evt), jcbMethod)) {
 			//
 			forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 					FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
