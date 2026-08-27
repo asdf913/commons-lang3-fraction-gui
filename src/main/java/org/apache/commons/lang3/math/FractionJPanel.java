@@ -1115,8 +1115,6 @@ public class FractionJPanel extends JPanel
 				//
 			} // try
 				//
-			return;
-			//
 		} // if
 			//
 	}
