@@ -5,7 +5,11 @@ import java.awt.Container;
 import java.awt.FocusTraversalPolicy;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -20,6 +24,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Executable;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -92,6 +97,7 @@ import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.google.common.reflect.Reflection;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Locator;
@@ -184,7 +190,7 @@ public class FractionJPanel extends JPanel
 	@Note("Show Image")
 	private AbstractButton btnShowImage = null;
 
-	private AbstractButton btnSaveImage = null;
+	private AbstractButton btnCopyImage, btnSaveImage = null;
 
 	@Note("Fraction 1 Whole Document")
 	private transient Document documentWhole1 = null;
@@ -311,6 +317,8 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(btnShowImage = new JButton("Show Image"));
 		//
+		jPanel.add(btnCopyImage = new JButton("Copy Image"));
+		//
 		final Iterator<ImageWriterSpi> imageWriterSpis = getServiceProviders(IIORegistry.getDefaultInstance(),
 				ImageWriterSpi.class,
 				BooleanUtils.toBooleanDefaultIfNull(Boolean.valueOf(
@@ -352,7 +360,7 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(btnSaveImage = new JButton("Save Image"));
 		//
-		add(jPanel, String.format("span %1$s", 3));
+		add(jPanel, String.format("span %1$s", 5));
 		//
 		forEach(map(
 				testAndApply(Objects::nonNull, FractionJTextComponent.class.getDeclaredFields(), Arrays::stream, null),
@@ -581,7 +589,7 @@ public class FractionJPanel extends JPanel
 		//
 		setIcon(labelImage, null);
 		//
-		forEach(Arrays.asList(btnShowImage, btnSaveImage, btnExecute), x -> setEnabled(x, false));
+		forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage, btnExecute), x -> setEnabled(x, false));
 		//
 		setEnabled(jcbFileSuffix, false);
 		//
@@ -847,6 +855,35 @@ public class FractionJPanel extends JPanel
 		}
 	}
 
+	private static class IH implements InvocationHandler {
+
+		private Image image = null;
+
+		@Override
+		public Object invoke(final Object instance, final Method method, Object[] arg) throws Throwable {
+			//
+			final String name = getName(method);
+			//
+			if (instance instanceof Transferable) {
+				//
+				if (Objects.equals(name, "getTransferDataFlavors")) {
+					//
+					return new DataFlavor[] { DataFlavor.imageFlavor };
+					//
+				} else if (Objects.equals(name, "getTransferData")) {
+					//
+					return image;
+					//
+				} // if
+					//
+			} // if
+				//
+			throw new Throwable(name);
+			//
+		}
+
+	}
+
 	@Override
 	public void actionPerformed(final ActionEvent evt) {
 		//
@@ -931,7 +968,7 @@ public class FractionJPanel extends JPanel
 				//
 				setIcon(labelImage, new ImageIcon(screenshot(locator(page, "tbody"))));
 				//
-				forEach(Arrays.asList(btnSaveImage, jcbFileSuffix), x -> setEnabled(x, true));
+				forEach(Arrays.asList(btnCopyImage, btnSaveImage, jcbFileSuffix), x -> setEnabled(x, true));
 				//
 				pack(window);
 				//
@@ -939,10 +976,35 @@ public class FractionJPanel extends JPanel
 				//
 			return;
 			//
+		} else if (Objects.equals(source, btnCopyImage)) {
+			//
+			final Toolkit toolkit = Toolkit.getDefaultToolkit();
+			//
+			final Clipboard systemClipboard = toolkit != null
+					&& !Objects.equals(getName(getClass(toolkit)), "sun.awt.HeadlessToolkit")
+							? toolkit.getSystemClipboard()
+							: null;
+			//
+			if (systemClipboard != null) {
+				//
+				final IH ih = new IH();
+				//
+				ih.image = getImage(cast(ImageIcon.class, getIcon(labelImage)));
+				//
+				systemClipboard.setContents(Reflection.newProxy(Transferable.class, ih), null);
+				//
+			} // if
+				//
+			return;
+			//
 		} // if
 			//
 		actionPerformed(this, source);
 		//
+	}
+
+	private static String getName(final Class<?> instance) {
+		return instance != null ? instance.getName() : null;
 	}
 
 	private static void actionPerformed(final FractionJPanel instance, final Object source) {
@@ -1521,7 +1583,7 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 				FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 		//
-		forEach(Arrays.asList(btnShowImage, btnSaveImage, jcbFileSuffix), x -> setEnabled(x, false));
+		forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage, jcbFileSuffix), x -> setEnabled(x, false));
 		//
 		if (Objects.equals(document, documentWhole1)) {
 			//
@@ -1648,7 +1710,7 @@ public class FractionJPanel extends JPanel
 			//
 			setIcon(labelImage, null);
 			//
-			forEach(Arrays.asList(btnShowImage, btnSaveImage), x -> setEnabled(x, false));
+			forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage), x -> setEnabled(x, false));
 			//
 		} // if
 			//

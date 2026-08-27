@@ -2,6 +2,8 @@ package org.apache.commons.lang3.math;
 
 import java.awt.FocusTraversalPolicy;
 import java.awt.Window;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.lang.reflect.Array;
@@ -623,6 +625,8 @@ class FractionJPanelTest {
 					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"),
 							Arrays.equals(parameterTypes, new Object[] { Boolean.TYPE })),
 					Boolean.logicalAnd(Objects.equals(name, "getDeclaredMethods"),
+							Arrays.equals(parameterTypes, new Object[] { Class.class })),
+					Boolean.logicalAnd(Objects.equals(name, "getName"),
 							Arrays.equals(parameterTypes, new Object[] { Class.class })))) {
 				//
 				Assert.assertNotNull(result, toString);
@@ -970,6 +974,14 @@ class FractionJPanelTest {
 		//
 		instance.actionPerformed(new ActionEvent(btnShowImage, 0, null));
 		//
+		// btnCopyImage
+		//
+		final AbstractButton btnCopyImage = new JButton();
+		//
+		FieldUtils.writeDeclaredField(instance, "btnCopyImage", btnCopyImage, true);
+		//
+		instance.actionPerformed(new ActionEvent(btnCopyImage, 0, null));
+		//
 		// btnSaveImage
 		//
 		final AbstractButton btnSaveImage = new JButton();
@@ -1062,6 +1074,30 @@ class FractionJPanelTest {
 		} catch (final InvocationTargetException e) {
 			throw e.getTargetException();
 		}
+	}
+
+	@Test
+	public void testIH() throws Throwable {
+		//
+		final InvocationHandler invocationHandler = cast(InvocationHandler.class,
+				Narcissus.allocateInstance(Class.forName("org.apache.commons.lang3.math.FractionJPanel$IH")));
+		//
+		if (invocationHandler != null) {
+			//
+			Assert.assertThrows(Throwable.class, () -> invocationHandler.invoke(null, null, null));
+			//
+			final Transferable transferable = Reflection.newProxy(Transferable.class, invocationHandler);
+			//
+			Assert.assertNotNull(invocationHandler.invoke(transferable,
+					Transferable.class.getDeclaredMethod("getTransferDataFlavors"), null));
+			//
+			Assert.assertNull(invocationHandler.invoke(transferable,
+					Transferable.class.getDeclaredMethod("getTransferData", DataFlavor.class), null));
+			//
+			Assert.assertThrows(Throwable.class, () -> invocationHandler.invoke(transferable, null, null));
+			//
+		} // if
+			//
 	}
 
 }
