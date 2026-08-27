@@ -1187,6 +1187,8 @@ public class FractionJPanel extends JPanel
 			//
 		final StringBuilder sb = new StringBuilder("<math>");
 		//
+		final String format = "<%1$s>%2$s</%1$s>";
+		//
 		if (and(whole, FractionJPanel::isValidString, StringUtils::isNotBlank)) {
 			//
 			if (!Objects.equals(whole, "0")) {
@@ -1198,13 +1200,12 @@ public class FractionJPanel extends JPanel
 				testAndRun(
 						Boolean.logicalAnd(index >= 0,
 								Boolean.logicalOr(StringUtils.isEmpty(string), matches(string, "^0+$"))),
-						() -> sb.append(
-								String.format("<%1$s>%2$s</%1$s>", "mi", StringUtils.substring(whole, 0, index))),
-						() -> sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", whole)));
+						() -> sb.append(String.format(format, "mi", StringUtils.substring(whole, 0, index))),
+						() -> sb.append(String.format(format, "mi", whole)));
 				//
 			} else if (startsWith(numerator, "-")) {
 				//
-				sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", "-"));
+				sb.append(String.format(format, "mi", "-"));
 				//
 			} // if
 				//
@@ -1215,7 +1216,7 @@ public class FractionJPanel extends JPanel
 			//
 			if (Boolean.logicalAnd(StringUtils.isEmpty(whole), startsWith(numerator, "-"))) {
 				//
-				sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", "-"));
+				sb.append(String.format(format, "mi", "-"));
 				//
 			} // if
 				//
@@ -1226,18 +1227,17 @@ public class FractionJPanel extends JPanel
 				if (Boolean.logicalOr(Boolean.logicalAnd(Objects.equals(whole, "0"), startsWith(numerator, "-")),
 						Boolean.logicalAnd(StringUtils.isEmpty(whole), startsWith(numerator, "-")))) {
 					//
-					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", StringUtils.substring(numerator, 1)));
+					sb.append(String.format(format, "mi", StringUtils.substring(numerator, 1)));
 					//
 				} else {
 					//
-					sb.append(String.format("<%1$s>%2$s</%1$s>", "mi", numerator));
+					sb.append(String.format(format, "mi", numerator));
 					//
 				} // if
 					//
 			} // if
 				//
-			testAndAccept(StringUtils::isNotBlank, denominator,
-					x -> sb.append(String.format("<%1$s>%2$s</%1$s>", "mn", x)));
+			testAndAccept(StringUtils::isNotBlank, denominator, x -> sb.append(String.format(format, "mn", x)));
 			//
 			sb.append("</mfrac>");
 			//
