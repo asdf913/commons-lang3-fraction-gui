@@ -396,7 +396,8 @@ class FractionJPanelTest {
 											new Object[] { String.class, String.class, String.class }),
 									Arrays.equals(parameterTypes, new Object[] { clz }))),
 					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"),
-							Arrays.equals(parameterTypes, new Object[] { Boolean.TYPE })))) {
+							Arrays.equals(parameterTypes, new Object[] { Boolean.TYPE })),
+					Boolean.logicalAnd(Objects.equals(name, "toHtml"), getParameterCount(m) == 0))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -627,7 +628,8 @@ class FractionJPanelTest {
 					Boolean.logicalAnd(Objects.equals(name, "getDeclaredMethods"),
 							Arrays.equals(parameterTypes, new Object[] { Class.class })),
 					Boolean.logicalAnd(Objects.equals(name, "getName"),
-							Arrays.equals(parameterTypes, new Object[] { Class.class })))) {
+							Arrays.equals(parameterTypes, new Object[] { Class.class })),
+					Boolean.logicalAnd(Objects.equals(name, "toHtml"), getParameterCount(m) == 0))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -989,6 +991,14 @@ class FractionJPanelTest {
 		FieldUtils.writeDeclaredField(instance, "btnSaveImage", btnSaveImage, true);
 		//
 		instance.actionPerformed(new ActionEvent(btnSaveImage, 0, null));
+		//
+		// btnSavePdf
+		//
+		final AbstractButton btnSavePdf = new JButton();
+		//
+		FieldUtils.writeDeclaredField(instance, "btnSavePdf", btnSavePdf, true);
+		//
+		instance.actionPerformed(new ActionEvent(btnSavePdf, 0, null));
 		//
 	}
 

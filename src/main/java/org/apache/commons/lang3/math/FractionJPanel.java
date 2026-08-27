@@ -94,6 +94,7 @@ import org.apache.commons.collections4.bidimap.TreeBidiMap;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.FailableBiConsumer;
 import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.tuple.Pair;
@@ -194,7 +195,7 @@ public class FractionJPanel extends JPanel
 	@Note("Copy Image")
 	private AbstractButton btnCopyImage = null;
 
-	private AbstractButton btnSaveImage = null;
+	private AbstractButton btnSaveImage, btnSavePdf = null;
 
 	@Note("Fraction 1 Whole Document")
 	private transient Document documentWhole1 = null;
@@ -364,7 +365,13 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(btnSaveImage = new JButton("Save Image"));
 		//
-		add(jPanel, String.format("span %1$s", 5));
+		add(jPanel, String.format("span %1$s,%2$s", 5, wrap));
+		//
+		(jPanel = new JPanel()).setLayout(new MigLayout());
+		//
+		jPanel.add(btnSavePdf = new JButton("Save PDF"));
+		//
+		add(jPanel);
 		//
 		forEach(map(
 				testAndApply(Objects::nonNull, FractionJTextComponent.class.getDeclaredFields(), Arrays::stream, null),
@@ -593,7 +600,8 @@ public class FractionJPanel extends JPanel
 		//
 		setIcon(labelImage, null);
 		//
-		forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage, btnExecute), x -> setEnabled(x, false));
+		forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf, btnExecute),
+				x -> setEnabled(x, false));
 		//
 		setEnabled(jcbFileSuffix, false);
 		//
@@ -948,33 +956,43 @@ public class FractionJPanel extends JPanel
 			//
 		} else if (Objects.equals(source, btnShowImage)) {
 			//
-			final StringBuilder sb = new StringBuilder("<html><body><table><tbody><tr><td>");
+			try (final Playwright playwright = Playwright.create();
+					final Browser browser = launch(chromium(playwright));
+					final Page page = newPage(browser)) {
+				//
+				setContent(page, toHtml());
+				//
+				setIcon(labelImage, new ImageIcon(screenshot(locator(page, "tbody"))));
+				//
+				forEach(Arrays.asList(btnCopyImage, btnSaveImage, btnSavePdf, jcbFileSuffix), x -> setEnabled(x, true));
+				//
+				pack(window);
+				//
+			} // try
+				//
+			return;
 			//
-			sb.append(toMathML(fraction1));
-			//
-			final Object object = testAndApply(Objects::nonNull,
-					getName(cast(Member.class, getSelectedItem(cbmMethod))), x -> get(inverseBidiMap(BIDI_MAP), x),
-					null);
-			//
-			sb.append(object);
-			//
-			sb.append(toMathML(fraction2));
-			//
-			sb.append('=');
-			//
-			sb.append(toMathML(answer));
+		} else if (Objects.equals(source, btnSavePdf)) {
 			//
 			try (final Playwright playwright = Playwright.create();
 					final Browser browser = launch(chromium(playwright));
 					final Page page = newPage(browser)) {
 				//
-				setContent(page, Objects.toString(sb.append("</td></tr></tbody></table></body></html>")));
+				setContent(page, toHtml());
 				//
-				setIcon(labelImage, new ImageIcon(screenshot(locator(page, "tbody"))));
+				final JFileChooser jfc = new JFileChooser(".");
 				//
-				forEach(Arrays.asList(btnCopyImage, btnSaveImage, jcbFileSuffix), x -> setEnabled(x, true));
+				if (!GraphicsEnvironment.isHeadless() && jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+					//
+					testAndAccept((a, b) -> a != null && b != null, toPath(jfc.getSelectedFile()),
+							page != null ? page.pdf() : null, (a, b) -> Files.write(a, b, StandardOpenOption.CREATE,
+									StandardOpenOption.TRUNCATE_EXISTING));
+					//
+				} // if
+					//
+			} catch (final IOException e) {
 				//
-				pack(window);
+				throw new RuntimeException(e);
 				//
 			} // try
 				//
@@ -983,6 +1001,41 @@ public class FractionJPanel extends JPanel
 		} // if
 			//
 		actionPerformed(this, source);
+		//
+	}
+
+	private static <T, U, E extends Exception> void testAndAccept(final BiPredicate<T, U> predicate, final T t,
+			final U u, final FailableBiConsumer<T, U, E> consumer) throws E {
+		if (test(predicate, t, u)) {
+			accept(consumer, t, u);
+		}
+	}
+
+	private static <T, U, E extends Exception> void accept(final FailableBiConsumer<T, U, E> instance, final T t,
+			final U u) throws E {
+		if (instance != null) {
+			instance.accept(t, u);
+		}
+	}
+
+	private String toHtml() {
+		//
+		final StringBuilder sb = new StringBuilder("<html><body><table><tbody><tr><td>");
+		//
+		sb.append(toMathML(fraction1));
+		//
+		final Object object = testAndApply(Objects::nonNull, getName(cast(Member.class, getSelectedItem(cbmMethod))),
+				x -> get(inverseBidiMap(BIDI_MAP), x), null);
+		//
+		sb.append(object);
+		//
+		sb.append(toMathML(fraction2));
+		//
+		sb.append('=');
+		//
+		sb.append(toMathML(answer));
+		//
+		return Objects.toString(sb.append("</td></tr></tbody></table></body></html>"));
 		//
 	}
 
@@ -1584,7 +1637,8 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 				FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 		//
-		forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage, jcbFileSuffix), x -> setEnabled(x, false));
+		forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf, jcbFileSuffix),
+				x -> setEnabled(x, false));
 		//
 		if (Objects.equals(document, documentWhole1)) {
 			//
@@ -1711,7 +1765,7 @@ public class FractionJPanel extends JPanel
 			//
 			setIcon(labelImage, null);
 			//
-			forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage), x -> setEnabled(x, false));
+			forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf), x -> setEnabled(x, false));
 			//
 		} // if
 			//
