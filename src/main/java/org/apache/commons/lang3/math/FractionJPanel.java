@@ -1567,10 +1567,13 @@ public class FractionJPanel extends JPanel
 				.mapToObj(i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i))))
 				.collect(LinkedHashMap::new, (a, b) -> a.put(getKey(b), getValue(b)), Map::putAll));
 		//
-		final Integer integer = testAndApply(x -> IterableUtils.size(x) == 1, toList(map(filter(
-				StreamSupport.stream(spliterator(entrySet), false),
-				x -> getValue(x) != null && getName(getValue(x)) != null && StringUtils.isNotEmpty(getName(getValue(x)))
-						&& getName(getValue(x)).charAt(0) == aKey),
+		final Integer integer = testAndApply(x -> IterableUtils.size(x) == 1, toList(map(
+				filter(StreamSupport.stream(spliterator(entrySet), false),
+						x -> getValue(x) != null && getName(getValue(x)) != null
+								&& StringUtils.isNotEmpty(getName(getValue(x)))
+								&& (getName(getValue(x)).charAt(0) == aKey
+										|| (StringUtils.upperCase(getName(getValue(x))) != null
+												&& StringUtils.upperCase(getName(getValue(x))).charAt(0) == aKey))),
 				FractionJPanel::getKey)), x -> IterableUtils.get(x, 0), null);
 		//
 		if (integer != null) {
