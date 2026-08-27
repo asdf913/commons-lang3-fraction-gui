@@ -987,7 +987,7 @@ public class FractionJPanel extends JPanel
 				//
 				if (!GraphicsEnvironment.isHeadless() && jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 					//
-					testAndAccept((a, b) -> a != null && b != null, toPath(jfc.getSelectedFile()),
+					testAndAccept((a, b) -> Boolean.logicalAnd(a != null, b != null), toPath(jfc.getSelectedFile()),
 							page != null ? page.pdf() : null, (a, b) -> Files.write(a, b, StandardOpenOption.CREATE,
 									StandardOpenOption.TRUNCATE_EXISTING));
 					//
