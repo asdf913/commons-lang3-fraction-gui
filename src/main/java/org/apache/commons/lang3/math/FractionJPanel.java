@@ -988,7 +988,7 @@ public class FractionJPanel extends JPanel
 				if (!GraphicsEnvironment.isHeadless() && jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 					//
 					testAndAccept((a, b) -> Boolean.logicalAnd(a != null, b != null), toPath(jfc.getSelectedFile()),
-							page != null ? page.pdf() : null, (a, b) -> Files.write(a, b, StandardOpenOption.CREATE,
+							pdf(page), (a, b) -> Files.write(a, b, StandardOpenOption.CREATE,
 									StandardOpenOption.TRUNCATE_EXISTING));
 					//
 				} // if
@@ -1005,6 +1005,10 @@ public class FractionJPanel extends JPanel
 			//
 		actionPerformed(this, source);
 		//
+	}
+
+	private static byte[] pdf(final Page instance) {
+		return instance != null ? instance.pdf() : null;
 	}
 
 	private static <T, U, E extends Exception> void testAndAccept(final BiPredicate<T, U> predicate, final T t,

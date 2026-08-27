@@ -224,7 +224,7 @@ class FractionJPanelTest {
 				//
 				return null;
 				//
-			} else if (Boolean.logicalAnd(proxy instanceof Page, Objects.equals(name, "locator"))) {
+			} else if (Boolean.logicalAnd(proxy instanceof Page, contains(Arrays.asList("locator", "pdf"), name))) {
 				//
 				return null;
 				//
