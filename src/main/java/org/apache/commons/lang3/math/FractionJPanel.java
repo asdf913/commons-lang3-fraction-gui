@@ -193,7 +193,10 @@ public class FractionJPanel extends JPanel
 
 	private JLabel labelImage = null;
 
-	private JComboBox<?> jcbMethod, jcbFileSuffix = null;
+	@Note("Method")
+	private JComboBox<?> jcbMethod = null;
+
+	private JComboBox<?> jcbFileSuffix = null;
 
 	private Window window = null;
 
