@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.function.BiPredicate;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
@@ -72,7 +73,7 @@ class FractionJPanelTest {
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
-			METHOD_GET_PROPERTY = null;
+			METHOD_GET_PROPERTY, METHOD_AND = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -104,11 +105,13 @@ class FractionJPanelTest {
 		(METHOD_GET_PROPERTY = clz.getDeclaredMethod("getProperty", Properties.class, String.class))
 				.setAccessible(true);
 		//
+		(METHOD_AND = clz.getDeclaredMethod("and", Boolean.TYPE, BooleanSupplier.class)).setAccessible(true);
+		//
 	}
 
 	private static class IH implements InvocationHandler {
 
-		private Boolean test, add = null;
+		private Boolean test, add, booleanValue = null;
 
 		private Integer size, length, modifiers = null;
 
@@ -235,6 +238,10 @@ class FractionJPanelTest {
 			} else if (Boolean.logicalAnd(proxy instanceof BrowserType, Objects.equals(name, "launch"))) {
 				//
 				return null;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof BooleanSupplier, Objects.equals(name, "getAsBoolean"))) {
+				//
+				return booleanValue;
 				//
 			} // if
 				//
@@ -1079,6 +1086,25 @@ class FractionJPanelTest {
 				return null;
 			} else if (obj instanceof String string) {
 				return string;
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	@Test
+	public void testAnd() throws Throwable {
+		//
+		Assert.assertFalse(and(true, () -> false));
+		//
+	}
+
+	private static boolean and(final boolean condition, final BooleanSupplier booleanSupplier) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_AND, null, condition, booleanSupplier);
+			if (obj instanceof Boolean booleanValue && booleanValue != null) {
+				return booleanValue.booleanValue();
 			}
 			throw new Throwable(Objects.toString(getClass(obj)));
 		} catch (final InvocationTargetException e) {

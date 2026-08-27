@@ -48,6 +48,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.BiPredicate;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -1066,7 +1067,8 @@ public class FractionJPanel extends JPanel
 				//
 				final JFileChooser jfc = new JFileChooser(".");
 				//
-				if (!GraphicsEnvironment.isHeadless() && jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+				if (and(!GraphicsEnvironment.isHeadless(),
+						() -> jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)) {
 					//
 					Files.write(toPath(jfc.getSelectedFile()), baos.toByteArray(), StandardOpenOption.CREATE,
 							StandardOpenOption.TRUNCATE_EXISTING);
@@ -1101,7 +1103,8 @@ public class FractionJPanel extends JPanel
 				//
 				final JFileChooser jfc = new JFileChooser(".");
 				//
-				if (!GraphicsEnvironment.isHeadless() && jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+				if (and(!GraphicsEnvironment.isHeadless(),
+						() -> jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)) {
 					//
 					testAndAccept((a, b) -> Boolean.logicalAnd(a != null, b != null), toPath(jfc.getSelectedFile()),
 							pdf(page), (a, b) -> Files.write(a, b, StandardOpenOption.CREATE,
@@ -1117,6 +1120,10 @@ public class FractionJPanel extends JPanel
 				//
 		} // if
 			//
+	}
+
+	private static boolean and(final boolean condition, final BooleanSupplier booleanSupplier) {
+		return condition && booleanSupplier != null && booleanSupplier.getAsBoolean();
 	}
 
 	private static void testAndRun(final boolean condition, final Runnable runnable) {
