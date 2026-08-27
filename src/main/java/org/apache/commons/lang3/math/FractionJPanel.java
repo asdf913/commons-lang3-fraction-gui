@@ -980,20 +980,6 @@ public class FractionJPanel extends JPanel
 				//
 			return;
 			//
-		} else if (Objects.equals(source, btnCopyImage)) {
-			//
-			final Toolkit toolkit = Toolkit.getDefaultToolkit();
-			//
-			final IH ih = new IH();
-			//
-			ih.image = getImage(cast(ImageIcon.class, getIcon(labelImage)));
-			//
-			setContents(toolkit != null && !Objects.equals(getName(getClass(toolkit)), "sun.awt.HeadlessToolkit")
-					? toolkit.getSystemClipboard()
-					: null, Reflection.newProxy(Transferable.class, ih), null);
-			//
-			return;
-			//
 		} // if
 			//
 		actionPerformed(this, source);
@@ -1059,6 +1045,20 @@ public class FractionJPanel extends JPanel
 				//
 			} // try
 				//
+		} else if (Objects.equals(source, instance.btnCopyImage)) {
+			//
+			final Toolkit toolkit = Toolkit.getDefaultToolkit();
+			//
+			final IH ih = new IH();
+			//
+			ih.image = getImage(cast(ImageIcon.class, getIcon(instance.labelImage)));
+			//
+			setContents(toolkit != null && !Objects.equals(getName(getClass(toolkit)), "sun.awt.HeadlessToolkit")
+					? toolkit.getSystemClipboard()
+					: null, Reflection.newProxy(Transferable.class, ih), null);
+			//
+			return;
+			//
 		} // if
 			//
 	}
