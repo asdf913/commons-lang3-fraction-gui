@@ -8,6 +8,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
@@ -983,27 +984,26 @@ public class FractionJPanel extends JPanel
 			//
 			final Toolkit toolkit = Toolkit.getDefaultToolkit();
 			//
-			final Clipboard systemClipboard = toolkit != null
-					&& !Objects.equals(getName(getClass(toolkit)), "sun.awt.HeadlessToolkit")
-							? toolkit.getSystemClipboard()
-							: null;
+			final IH ih = new IH();
 			//
-			if (systemClipboard != null) {
-				//
-				final IH ih = new IH();
-				//
-				ih.image = getImage(cast(ImageIcon.class, getIcon(labelImage)));
-				//
-				systemClipboard.setContents(Reflection.newProxy(Transferable.class, ih), null);
-				//
-			} // if
-				//
+			ih.image = getImage(cast(ImageIcon.class, getIcon(labelImage)));
+			//
+			setContents(toolkit != null && !Objects.equals(getName(getClass(toolkit)), "sun.awt.HeadlessToolkit")
+					? toolkit.getSystemClipboard()
+					: null, Reflection.newProxy(Transferable.class, ih), null);
+			//
 			return;
 			//
 		} // if
 			//
 		actionPerformed(this, source);
 		//
+	}
+
+	private static void setContents(final Clipboard instance, final Transferable contents, final ClipboardOwner owner) {
+		if (instance != null) {
+			instance.setContents(contents, owner);
+		}
 	}
 
 	private static String getName(final Class<?> instance) {
