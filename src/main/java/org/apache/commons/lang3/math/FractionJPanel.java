@@ -1057,8 +1057,6 @@ public class FractionJPanel extends JPanel
 					? toolkit.getSystemClipboard()
 					: null, Reflection.newProxy(Transferable.class, ih), null);
 			//
-			return;
-			//
 		} // if
 			//
 	}
