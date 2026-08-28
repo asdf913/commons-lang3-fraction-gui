@@ -1121,9 +1121,8 @@ class FractionJPanelTest {
 		//
 		FieldUtils.writeDeclaredField(instance, "tfFontSize", tfFontSize, true);
 		//
-		Assert.assertEquals(
-				"<html><body><table style=\"font-size:1\"><tr><td><math></math>null<math></math>=<math></math></td></tr></tbody></table></body></html>",
-				toHtml());
+		Assert.assertEquals(toHtml(),
+				"<html><body><table style=\"font-size:1\"><tr><td><math></math>null<math></math>=<math></math></td></tr></tbody></table></body></html>");
 		//
 	}
 
