@@ -73,7 +73,7 @@ class FractionJPanelTest {
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
-			METHOD_GET_PROPERTY, METHOD_AND = null;
+			METHOD_GET_PROPERTY, METHOD_AND, METHOD_TO_HTML = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -106,6 +106,8 @@ class FractionJPanelTest {
 				.setAccessible(true);
 		//
 		(METHOD_AND = clz.getDeclaredMethod("and", Boolean.TYPE, BooleanSupplier.class)).setAccessible(true);
+		//
+		(METHOD_TO_HTML = clz.getDeclaredMethod("toHtml")).setAccessible(true);
 		//
 	}
 
@@ -1105,6 +1107,33 @@ class FractionJPanelTest {
 			final Object obj = invoke(METHOD_AND, null, condition, booleanSupplier);
 			if (obj instanceof Boolean booleanValue && booleanValue != null) {
 				return booleanValue.booleanValue();
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	@Test
+	public void testToHtml() throws Throwable {
+		//
+		final JTextComponent tfFontSize = new JTextField("1");
+		//
+		FieldUtils.writeDeclaredField(instance, "tfFontSize", tfFontSize, true);
+		//
+		Assert.assertEquals(
+				"<html><body><table style=\"font-size:1\"><tr><td><math></math>null<math></math>=<math></math></td></tr></tbody></table></body></html>",
+				toHtml());
+		//
+	}
+
+	private String toHtml() throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_TO_HTML, instance);
+			if (obj == null) {
+				return null;
+			} else if (obj instanceof String string) {
+				return string;
 			}
 			throw new Throwable(Objects.toString(getClass(obj)));
 		} catch (final InvocationTargetException e) {

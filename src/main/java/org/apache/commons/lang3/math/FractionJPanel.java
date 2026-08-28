@@ -217,6 +217,8 @@ public class FractionJPanel extends JPanel
 
 	private Properties properties = null;
 
+	private JTextComponent tfFontSize = null;
+
 	private FractionJPanel() {
 		//
 	}
@@ -318,9 +320,17 @@ public class FractionJPanel extends JPanel
 		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
 		//
+		jPanel.add(new JLabel("Font Size"));
+		//
+		jPanel.add(tfFontSize = new JTextField(), "wmin 50");
+		//
+		add(jPanel, String.format("%1$s,span %2$s", wrap, 2));
+		//
+		(jPanel = new JPanel()).setLayout(new MigLayout());
+		//
 		jPanel.add(labelImage = new JLabel());
 		//
-		add(jPanel, wrap);
+		add(jPanel, String.format("%1$s,span %2$s", wrap, 5));
 		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
 		//
@@ -604,7 +614,7 @@ public class FractionJPanel extends JPanel
 		//
 		setIcon(labelImage, null);
 		//
-		forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf, btnExecute),
+		forEach(Arrays.asList(tfFontSize, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf, btnExecute),
 				x -> setEnabled(x, false));
 		//
 		setEnabled(jcbFileSuffix, false);
@@ -936,7 +946,7 @@ public class FractionJPanel extends JPanel
 					//
 				} // if
 					//
-				setEnabled(btnShowImage, true);
+				forEach(Arrays.asList(tfFontSize, btnShowImage), x -> setEnabled(x, true));
 				//
 			} catch (final ReflectiveOperationException e) {
 				//
@@ -1002,7 +1012,23 @@ public class FractionJPanel extends JPanel
 
 	private String toHtml() {
 		//
-		final StringBuilder sb = new StringBuilder("<html><body><table><tbody><tr><td>");
+		final StringBuilder sb = new StringBuilder("<html><body>");
+		//
+		sb.append('<');
+		//
+		sb.append("table");
+		//
+		final String fontSize = getText(tfFontSize);
+		//
+		if (StringUtils.isNotBlank(fontSize)) {
+			//
+			sb.append(String.format(" style=\"font-size:%1$s\"", fontSize));
+			//
+		} // if
+			//
+		sb.append('>');
+		//
+		sb.append("<tr><td>");
 		//
 		sb.append(toMathML(fraction1));
 		//
@@ -1652,7 +1678,7 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 				FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 		//
-		forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf, jcbFileSuffix),
+		forEach(Arrays.asList(tfFontSize, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf, jcbFileSuffix),
 				x -> setEnabled(x, false));
 		//
 		if (Objects.equals(document, documentWhole1)) {
@@ -1780,7 +1806,8 @@ public class FractionJPanel extends JPanel
 			//
 			setIcon(labelImage, null);
 			//
-			forEach(Arrays.asList(btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf), x -> setEnabled(x, false));
+			forEach(Arrays.asList(tfFontSize, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf),
+					x -> setEnabled(x, false));
 			//
 		} // if
 			//
