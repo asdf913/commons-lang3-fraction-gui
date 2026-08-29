@@ -339,49 +339,9 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(tfFontSize = new JTextField(), String.format("wmin %1$s,%2$s", 50, wrap));
 		//
-		final AbstractDocument abstractDocument = cast(AbstractDocument.class, getDocument(tfFontSize));
-		//
-		final int maxLength = orElse(
+		setDocumentFilter(cast(AbstractDocument.class, getDocument(tfFontSize)), createDocumentFilter(orElse(
 				max(mapToInt(LongStream.of(Long.MIN_VALUE, Long.MAX_VALUE), x -> StringUtils.length(Long.toString(x)))),
-				0);
-		//
-		setDocumentFilter(abstractDocument, new DocumentFilter() {
-			@Override
-			public void replace(final FilterBypass fb, final int offset, final int length, final String text,
-					final AttributeSet attrs) throws BadLocationException {
-				//
-				final int overLimit = (getLength(getDocument(fb)) + StringUtils.length(text) - length) - maxLength;
-				//
-				if (overLimit <= 0) {
-					//
-					super.replace(fb, offset, length, text, attrs);
-					//
-				} else {
-					//
-					if (StringUtils.length(text) > overLimit) {
-						//
-						super.replace(fb, offset, length,
-								StringUtils.substring(text, 0, StringUtils.length(text) - overLimit), attrs);
-						//
-					} // if
-						//
-				} // if
-					//
-			}
-
-			@Override
-			public void insertString(final FilterBypass fb, final int offset, final String string,
-					final AttributeSet attr) throws BadLocationException {
-				//
-				if ((getLength(getDocument(fb)) + StringUtils.length(string)) <= maxLength) {
-					//
-					super.insertString(fb, offset, string, attr);
-					//
-				} // if
-					//
-			}
-
-		});
+				0)));
 		//
 		jPanel.add(new JLabel("Font Color"));
 		//
@@ -521,6 +481,49 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getDenominator(fraction1),
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
+		//
+	}
+
+	private static DocumentFilter createDocumentFilter(final int maxLength) {
+		//
+		return new DocumentFilter() {
+
+			@Override
+			public void replace(final FilterBypass fb, final int offset, final int length, final String text,
+					final AttributeSet attrs) throws BadLocationException {
+				//
+				final int overLimit = (getLength(getDocument(fb)) + StringUtils.length(text) - length) - maxLength;
+				//
+				if (overLimit <= 0 && fb != null) {
+					//
+					super.replace(fb, offset, length, text, attrs);
+					//
+				} else {
+					//
+					if (StringUtils.length(text) > overLimit) {
+						//
+						super.replace(fb, offset, length,
+								StringUtils.substring(text, 0, StringUtils.length(text) - overLimit), attrs);
+						//
+					} // if
+						//
+				} // if
+					//
+			}
+
+			@Override
+			public void insertString(final FilterBypass fb, final int offset, final String string,
+					final AttributeSet attr) throws BadLocationException {
+				//
+				if ((getLength(getDocument(fb)) + StringUtils.length(string)) <= maxLength && fb != null) {
+					//
+					super.insertString(fb, offset, string, attr);
+					//
+				} // if
+					//
+			}
+
+		};
 		//
 	}
 

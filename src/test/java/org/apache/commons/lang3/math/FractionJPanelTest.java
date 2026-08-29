@@ -461,7 +461,9 @@ class FractionJPanelTest {
 									Arrays.equals(parameterTypes, new Object[] { clz }))),
 					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"),
 							Arrays.equals(parameterTypes, new Object[] { Boolean.TYPE })),
-					Boolean.logicalAnd(Objects.equals(name, "toHtml"), getParameterCount(m) == 0))) {
+					Boolean.logicalAnd(Objects.equals(name, "toHtml"), getParameterCount(m) == 0),
+					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"),
+							Arrays.equals(parameterTypes, new Object[] { Integer.TYPE })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -698,7 +700,9 @@ class FractionJPanelTest {
 							Arrays.equals(parameterTypes, new Object[] { Class.class })),
 					Boolean.logicalAnd(Objects.equals(name, "getName"),
 							Arrays.equals(parameterTypes, new Object[] { Class.class })),
-					Boolean.logicalAnd(Objects.equals(name, "toHtml"), getParameterCount(m) == 0))) {
+					Boolean.logicalAnd(Objects.equals(name, "toHtml"), getParameterCount(m) == 0),
+					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"),
+							Arrays.equals(parameterTypes, new Object[] { Integer.TYPE })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -1252,6 +1256,22 @@ class FractionJPanelTest {
 		} catch (final InvocationTargetException e) {
 			throw e.getTargetException();
 		}
+	}
+
+	@Test
+	public void testCreateDocumentFilter() throws Throwable {
+		//
+		final DocumentFilter documentFilter = cast(DocumentFilter.class, Narcissus
+				.invokeStaticMethod(FractionJPanel.class.getDeclaredMethod("createDocumentFilter", Integer.TYPE), 0));
+		//
+		if (documentFilter != null) {
+			//
+			documentFilter.insertString(null, 0, EMPTY, null);
+			//
+			documentFilter.replace(null, 0, 0, EMPTY, null);
+			//
+		} // if
+			//
 	}
 
 	@Test
