@@ -31,6 +31,8 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import javax.imageio.spi.ImageReaderWriterSpi;
@@ -244,6 +246,14 @@ class FractionJPanelTest {
 			} else if (Boolean.logicalAnd(proxy instanceof BooleanSupplier, Objects.equals(name, "getAsBoolean"))) {
 				//
 				return booleanValue;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof IntStream, Objects.equals(name, "max"))) {
+				//
+				return null;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof LongStream, Objects.equals(name, "mapToInt"))) {
+				//
+				return null;
 				//
 			} // if
 				//
@@ -515,6 +525,11 @@ class FractionJPanelTest {
 					//
 					add(collection,
 							Narcissus.allocateInstance(Class.forName("com.sun.imageio.plugins.bmp.BMPImageWriterSpi")));
+					//
+				} else if (Objects.equals(parameterType, FilterBypass.class)) {
+					//
+					add(collection, Narcissus
+							.allocateInstance(Class.forName("javax.swing.text.AbstractDocument$DefaultFilterBypass")));
 					//
 				} else if (parameterType != null && parameterType.isInterface()) {
 					//

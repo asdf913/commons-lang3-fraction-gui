@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Spliterator;
@@ -53,8 +54,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
+import java.util.function.LongToIntFunction;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -86,6 +89,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
+import javax.swing.text.DocumentFilter.FilterBypass;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.collections4.BidiMap;
@@ -324,6 +328,50 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(tfFontSize = new JTextField(), "wmin 50");
 		//
+		final AbstractDocument abstractDocument = cast(AbstractDocument.class, getDocument(tfFontSize));
+		//
+		final int maxLength = orElse(
+				max(mapToInt(LongStream.of(Long.MIN_VALUE, Long.MAX_VALUE), x -> StringUtils.length(Long.toString(x)))),
+				0);
+		//
+		setDocumentFilter(abstractDocument, new DocumentFilter() {
+			@Override
+			public void replace(final FilterBypass fb, final int offset, final int length, final String text,
+					final AttributeSet attrs) throws BadLocationException {
+				//
+				final int overLimit = (getLength(getDocument(fb)) + StringUtils.length(text) - length) - maxLength;
+				//
+				if (overLimit <= 0) {
+					//
+					super.replace(fb, offset, length, text, attrs);
+					//
+				} else {
+					//
+					if (StringUtils.length(text) > overLimit) {
+						//
+						super.replace(fb, offset, length,
+								StringUtils.substring(text, 0, StringUtils.length(text) - overLimit), attrs);
+						//
+					} // if
+						//
+				} // if
+					//
+			}
+
+			@Override
+			public void insertString(final FilterBypass fb, final int offset, final String string,
+					final AttributeSet attr) throws BadLocationException {
+				//
+				if ((getLength(getDocument(fb)) + StringUtils.length(string)) <= maxLength) {
+					//
+					super.insertString(fb, offset, string, attr);
+					//
+				} // if
+					//
+			}
+
+		});
+		//
 		add(jPanel, String.format("%1$s,span %2$s", wrap, 5));
 		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
@@ -424,6 +472,22 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
+	}
+
+	private static int orElse(final OptionalInt instance, final int defaultValue) {
+		return instance != null ? instance.orElse(defaultValue) : defaultValue;
+	}
+
+	private static OptionalInt max(final IntStream instance) {
+		return instance != null ? instance.max() : null;
+	}
+
+	private static IntStream mapToInt(final LongStream instance, final LongToIntFunction mapper) {
+		return instance != null ? instance.mapToInt(mapper) : null;
+	}
+
+	private static Document getDocument(final FilterBypass instance) {
+		return instance != null ? instance.getDocument() : null;
 	}
 
 	private static String[] getFileSuffixes(final ImageReaderWriterSpi instnace) {
