@@ -384,12 +384,12 @@ public class FractionJPanel extends JPanel
 		jPanel.add(new JLabel("Font Color"));
 		//
 		final ListCellRenderer lcr2 = (jcbColor = new JComboBox<>(cbmColor = new DefaultComboBoxModel<>(
-				testAndApply(Objects::nonNull, Color.class.getDeclaredFields(), Arrays::stream, null)
-						.filter(f -> Boolean.logicalAnd(isStatic(f), Objects.equals(getType(f), getDeclaringClass(f)))
+				entrySet(filter(testAndApply(Objects::nonNull, Color.class.getDeclaredFields(), Arrays::stream, null),
+						f -> Boolean.logicalAnd(isStatic(f), Objects.equals(getType(f), getDeclaringClass(f)))
 								&& Objects.equals(StringUtils.upperCase(getName(f)), getName(f)))
 						.sorted((a, b) -> StringUtils.compare(getName(a), getName(b), true))
-						.collect(LinkedHashMap::new, (a, b) -> put(a, b, Narcissus.getStaticField(b)), Map::putAll)
-						.entrySet().toArray(Entry[]::new))))
+						.collect(LinkedHashMap::new, (a, b) -> put(a, b, Narcissus.getStaticField(b)), Map::putAll))
+						.toArray(Entry[]::new))))
 				.getRenderer();
 		//
 		jPanel.add(jcbColor);
