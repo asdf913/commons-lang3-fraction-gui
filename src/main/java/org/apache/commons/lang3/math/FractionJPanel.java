@@ -263,8 +263,8 @@ public class FractionJPanel extends JPanel
 		//
 		final ListCellRenderer lcr = (jcbMethod = new JComboBox<>(
 				cbmMethod = new DefaultComboBoxModel<>(toArray(toList(filter(Arrays.stream(Fraction.class.getMethods()),
-						m -> m != null && Arrays.equals(m.getParameterTypes(), new Class<?>[] { m.getDeclaringClass() })
-								&& Objects.equals(m.getReturnType(), m.getDeclaringClass()))),
+						m -> Arrays.equals(getParameterTypes(m), new Class<?>[] { getDeclaringClass(m) })
+								&& Objects.equals(getReturnType(m), getDeclaringClass(m)))),
 						Method[]::new))))
 				.getRenderer();
 		//
@@ -471,6 +471,40 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getDenominator(fraction1),
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
+		//
+	}
+
+	private static Class<?> getReturnType(final Method instance) {
+		return instance != null ? instance.getReturnType() : null;
+	}
+
+	private static Class<?> getDeclaringClass(final Member instance) {
+		return instance != null ? instance.getDeclaringClass() : null;
+	}
+
+	private static Class<?>[] getParameterTypes(final Executable instance) {
+		//
+		if (instance == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		try {
+			//
+			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), "parameterTypes")) == null) {
+				//
+				return null;
+				//
+			} // if
+				//
+		} catch (final NoSuchFieldException e) {
+			//
+			throw new RuntimeException(e);
+			//
+		} // try
+			//
+		return instance.getParameterTypes();
 		//
 	}
 

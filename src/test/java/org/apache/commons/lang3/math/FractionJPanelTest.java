@@ -75,7 +75,7 @@ class FractionJPanelTest {
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
-			METHOD_GET_PROPERTY, METHOD_AND, METHOD_TO_HTML = null;
+			METHOD_GET_PROPERTY, METHOD_AND, METHOD_TO_HTML, METHOD_GET_PARAMETER_TYPES = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -110,6 +110,8 @@ class FractionJPanelTest {
 		(METHOD_AND = clz.getDeclaredMethod("and", Boolean.TYPE, BooleanSupplier.class)).setAccessible(true);
 		//
 		(METHOD_TO_HTML = clz.getDeclaredMethod("toHtml")).setAccessible(true);
+		//
+		(METHOD_GET_PARAMETER_TYPES = clz.getDeclaredMethod("getParameterTypes", Executable.class)).setAccessible(true);
 		//
 	}
 
@@ -194,8 +196,9 @@ class FractionJPanelTest {
 				//
 				return null;
 				//
-			} else if (Boolean.logicalAnd(proxy instanceof Member, Objects.equals(name, "getName"))) {
-				// ,
+			} else if (Boolean.logicalAnd(proxy instanceof Member,
+					contains(Arrays.asList("getName", "getDeclaringClass"), name))) {
+				//
 				return null;
 				//
 			} else if (Boolean.logicalAnd(proxy instanceof Entry,
@@ -263,6 +266,20 @@ class FractionJPanelTest {
 
 	}
 
+	private static Class<?>[] getParameterTypes(final Executable instance) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_GET_PARAMETER_TYPES, null, instance);
+			if (obj instanceof Class<?>[]) {
+				return cast(Class[].class, obj);
+			} else if (obj == null) {
+				return null;
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
 	private static int getParameterCount(final Executable instance) throws Throwable {
 		try {
 			final Object obj = invoke(METHOD_GET_PARAMETER_COUNT, null, instance);
@@ -316,7 +333,7 @@ class FractionJPanelTest {
 		for (int i = 0; ms != null && i < ms.length; i++) {
 			//
 			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
-					|| (parameterTypes = m.getParameterTypes()) == null) {
+					|| (parameterTypes = getParameterTypes(m)) == null) {
 				//
 				continue;
 				//
@@ -360,7 +377,7 @@ class FractionJPanelTest {
 				//
 				if (Boolean.logicalAnd(Objects.equals(name, "toFraction"),
 						Boolean.logicalOr(
-								Arrays.equals(parameterTypes = m.getParameterTypes(),
+								Arrays.equals(parameterTypes,
 										new Class<?>[] { String.class, String.class, String.class }),
 								Arrays.equals(parameterTypes, new Class<?>[] { clz })))) {
 					//
@@ -380,9 +397,9 @@ class FractionJPanelTest {
 				//
 				if (Boolean.logicalOr(
 						Boolean.logicalAnd(Objects.equals(name, "actionPerformed"),
-								Arrays.equals(m.getParameterTypes(), new Class<?>[] { ActionEvent.class })),
+								Arrays.equals(parameterTypes, new Class<?>[] { ActionEvent.class })),
 						Boolean.logicalAnd(Objects.equals(name, "changedUpdate"),
-								Arrays.equals(m.getParameterTypes(), new Class<?>[] { DocumentEvent.class })))) {
+								Arrays.equals(parameterTypes, new Class<?>[] { DocumentEvent.class })))) {
 					//
 					final FractionJPanel instance1 = instance = ObjectUtils.getIfNull(instance,
 							() -> (FractionJPanel) Narcissus.allocateInstance(FractionJPanel.class));
@@ -470,7 +487,7 @@ class FractionJPanelTest {
 		for (int i = 0; ms != null && i < ms.length; i++) {
 			//
 			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
-					|| (parameterTypes = m.getParameterTypes()) == null) {
+					|| (parameterTypes = getParameterTypes(m)) == null) {
 				//
 				continue;
 				//
@@ -583,7 +600,7 @@ class FractionJPanelTest {
 								Objects.equals(m
 										.getName(), "toFraction"),
 								Boolean.logicalOr(
-										Arrays.equals(parameterTypes = m.getParameterTypes(),
+										Arrays.equals(parameterTypes = getParameterTypes(m),
 												new Class<?>[] { String.class, String.class, String.class }),
 										Arrays.equals(parameterTypes, new Class<?>[] { clz })))) {
 					//
@@ -603,7 +620,7 @@ class FractionJPanelTest {
 				//
 				if (Boolean.logicalOr(
 						Boolean.logicalAnd(Objects.equals(name = m.getName(), "actionPerformed"),
-								Arrays.equals(m.getParameterTypes(), new Class<?>[] { ActionEvent.class })),
+								Arrays.equals(getParameterTypes(m), new Class<?>[] { ActionEvent.class })),
 						Boolean.logicalAnd(Objects.equals(name, "changedUpdate"),
 								Arrays.equals(parameterTypes, new Class<?>[] { DocumentEvent.class })))) {
 					//
@@ -795,7 +812,7 @@ class FractionJPanelTest {
 			} // if
 				//
 			if (Boolean.logicalAnd(Objects.equals(getName(m), "getInitialComponent"),
-					Arrays.equals(m.getParameterTypes(), new Class<?>[] { Window.class }))) {
+					Arrays.equals(getParameterTypes(m), new Class<?>[] { Window.class }))) {
 				//
 				final Method m1 = m;
 				//
@@ -830,7 +847,7 @@ class FractionJPanelTest {
 			} // if
 				//
 			if (Boolean.logicalAnd(Objects.equals(getName(m), "getInitialComponent"),
-					Arrays.equals(m.getParameterTypes(), new Class<?>[] { Window.class }))) {
+					Arrays.equals(getParameterTypes(m), new Class<?>[] { Window.class }))) {
 				//
 				final Method m1 = m;
 				//
@@ -865,7 +882,7 @@ class FractionJPanelTest {
 		for (int i = 0; ms != null && i < ms.length; i++) {
 			//
 			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
-					|| (parameterTypes = m.getParameterTypes()) == null) {
+					|| (parameterTypes = getParameterTypes(m)) == null) {
 				//
 				continue;
 				//
@@ -896,7 +913,7 @@ class FractionJPanelTest {
 		for (int i = 0; ms != null && i < ms.length; i++) {
 			//
 			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
-					|| (parameterTypes = m.getParameterTypes()) == null) {
+					|| (parameterTypes = getParameterTypes(m)) == null) {
 				//
 				continue;
 				//
