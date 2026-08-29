@@ -324,7 +324,7 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(tfFontSize = new JTextField(), "wmin 50");
 		//
-		add(jPanel, String.format("%1$s,span %2$s", wrap, 2));
+		add(jPanel, String.format("%1$s,span %2$s", wrap, 5));
 		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
 		//
