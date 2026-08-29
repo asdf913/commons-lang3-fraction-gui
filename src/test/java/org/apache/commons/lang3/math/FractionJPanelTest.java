@@ -41,6 +41,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
@@ -255,6 +256,11 @@ class FractionJPanelTest {
 				return null;
 				//
 			} else if (Boolean.logicalAnd(proxy instanceof LongStream, Objects.equals(name, "mapToInt"))) {
+				//
+				return null;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof ListCellRenderer,
+					Objects.equals(name, "getListCellRendererComponent"))) {
 				//
 				return null;
 				//
