@@ -1,5 +1,6 @@
 package org.apache.commons.lang3.math;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FocusTraversalPolicy;
@@ -189,6 +190,8 @@ public class FractionJPanel extends JPanel
 
 	private transient ComboBoxModel<String> cbmFileSuffix = null;
 
+	private transient ComboBoxModel<Entry<?, ?>> cbmColor = null;
+
 	@Note("Execute")
 	private AbstractButton btnExecute = null;
 
@@ -216,7 +219,7 @@ public class FractionJPanel extends JPanel
 	@Note("Method")
 	private JComboBox<?> jcbMethod = null;
 
-	private JComboBox<?> jcbFileSuffix = null;
+	private JComboBox<?> jcbFileSuffix, jcbColor = null;
 
 	private Window window = null;
 
@@ -262,7 +265,7 @@ public class FractionJPanel extends JPanel
 			//
 		add(jPanel);
 		//
-		final ListCellRenderer lcr = (jcbMethod = new JComboBox<>(
+		final ListCellRenderer lcr1 = (jcbMethod = new JComboBox<>(
 				cbmMethod = new DefaultComboBoxModel<>(toArray(toList(filter(Arrays.stream(Fraction.class.getMethods()),
 						m -> Boolean.logicalAnd(
 								Arrays.equals(getParameterTypes(m), new Class<?>[] { getDeclaringClass(m) }),
@@ -284,7 +287,7 @@ public class FractionJPanel extends JPanel
 				//
 			} // if
 				//
-			return getListCellRendererComponent(lcr, arg0, arg0, arg2, arg3, arg4);
+			return getListCellRendererComponent(lcr1, arg0, arg0, arg2, arg3, arg4);
 			//
 		});
 		//
@@ -328,7 +331,7 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(new JLabel("Font Size"));
 		//
-		jPanel.add(tfFontSize = new JTextField(), "wmin 50");
+		jPanel.add(tfFontSize = new JTextField(), String.format("wmin %1$s,%2$s", 50, wrap));
 		//
 		final AbstractDocument abstractDocument = cast(AbstractDocument.class, getDocument(tfFontSize));
 		//
@@ -372,6 +375,53 @@ public class FractionJPanel extends JPanel
 					//
 			}
 
+		});
+		//
+		jPanel.add(new JLabel("Font Color"));
+		//
+		final ListCellRenderer lcr2 = (jcbColor = new JComboBox<>(cbmColor = new DefaultComboBoxModel<>(
+				testAndApply(Objects::nonNull, Color.class.getDeclaredFields(), Arrays::stream, null)
+						.filter(f -> isStatic(f) && Objects.equals(f != null ? f.getType() : null, getDeclaringClass(f))
+								&& Objects.equals(StringUtils.upperCase(getName(f)), getName(f)))
+						.sorted((a, b) -> StringUtils.compare(getName(a), getName(b), true)).collect(LinkedHashMap::new,
+								(a, b) -> put(a, b, Narcissus.getStaticField(b)), (a, b) -> a.putAll(b))
+						.entrySet().toArray(Entry[]::new))))
+				.getRenderer();
+		//
+		jPanel.add(jcbColor);
+		//
+		cbmColor.setSelectedItem(null);
+		//
+		jcbColor.setRenderer((arg0, value, arg2, arg3, arg4) -> {
+			//
+			final Entry<?, ?> entry = cast(Entry.class, value);
+			//
+			if (entry != null) {
+				//
+				final JPanel jp = new JPanel();
+				//
+				jp.setLayout(new MigLayout());
+				//
+				jp.add(new JLabel(getName(cast(Member.class, getKey(entry)))));
+				//
+				final JLabel jLabel = new JLabel();
+				//
+				jLabel.setBackground(cast(Color.class, getValue(entry)));
+				//
+				jLabel.setOpaque(true);
+				//
+				jp.add(jLabel, "wmin 10,hmin 10,pushx,align right");
+				//
+				return jp;
+				//
+			} else if (value == null) {
+				//
+				return new JLabel();
+				//
+			} // if
+				//
+			return getListCellRendererComponent(lcr2, arg0, arg0, arg2, arg3, arg4);
+			//
 		});
 		//
 		add(jPanel, String.format("%1$s,span %2$s", wrap, 5));
@@ -722,7 +772,7 @@ public class FractionJPanel extends JPanel
 		//
 		setIcon(labelImage, null);
 		//
-		forEach(Arrays.asList(tfFontSize, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf, btnExecute),
+		forEach(Arrays.asList(tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf, btnExecute),
 				x -> setEnabled(x, false));
 		//
 		setEnabled(jcbFileSuffix, false);
@@ -1054,7 +1104,7 @@ public class FractionJPanel extends JPanel
 					//
 				} // if
 					//
-				forEach(Arrays.asList(tfFontSize, btnShowImage), x -> setEnabled(x, true));
+				forEach(Arrays.asList(tfFontSize, jcbColor, btnShowImage), x -> setEnabled(x, true));
 				//
 			} catch (final ReflectiveOperationException e) {
 				//
@@ -1126,11 +1176,51 @@ public class FractionJPanel extends JPanel
 		//
 		sb.append("table");
 		//
+		Map<String, String> style = null;
+		//
 		final String fontSize = getText(tfFontSize);
 		//
 		if (StringUtils.isNotBlank(fontSize)) {
 			//
-			sb.append(String.format(" style=\"font-size:%1$s\"", fontSize));
+			put(style = ObjectUtils.getIfNull(style, LinkedHashMap::new), "font-size", fontSize);
+			//
+		} // if
+			//
+		final Member color = cast(Member.class, getKey(cast(Entry.class, getSelectedItem(cbmColor))));
+		//
+		if (color != null) {
+			//
+			put(style = ObjectUtils.getIfNull(style, LinkedHashMap::new), "color", getName(color));
+			//
+		} // if
+			//
+		if (entrySet(style) != null && entrySet(style).iterator() != null) {
+			//
+			sb.append(" style=");
+			//
+			sb.append('"');
+			//
+			final int length = StringUtils.length(sb);
+			//
+			for (final Entry<?, ?> entry : entrySet(style)) {
+				//
+				if (entry == null) {
+					//
+					continue;
+					//
+				} // if
+					//
+				if (StringUtils.length(sb) > length) {
+					//
+					sb.append(';');
+					//
+				} // if
+					//
+				sb.append(StringUtils.joinWith(":", getKey(entry), getValue(entry)));
+				//
+			} // for
+				//
+			sb.append('"');
 			//
 		} // if
 			//
@@ -1153,6 +1243,12 @@ public class FractionJPanel extends JPanel
 		//
 		return Objects.toString(sb.append("</td></tr></tbody></table></body></html>"));
 		//
+	}
+
+	private static <K, V> void put(final Map<K, V> instance, final K key, final V value) {
+		if (instance != null) {
+			instance.put(key, value);
+		}
 	}
 
 	private static void setContents(final Clipboard instance, final Transferable contents, final ClipboardOwner owner) {
@@ -1699,7 +1795,7 @@ public class FractionJPanel extends JPanel
 		//
 		final Iterable<Entry<Integer, Member>> entrySet = entrySet(IntStream.range(0, getSize(aModel))
 				.mapToObj(i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i))))
-				.collect(LinkedHashMap::new, (a, b) -> a.put(getKey(b), getValue(b)), Map::putAll));
+				.collect(LinkedHashMap::new, (a, b) -> put(a, getKey(b), getValue(b)), Map::putAll));
 		//
 		final Integer integer = testAndApply(x -> IterableUtils.size(x) == 1, toList(map(
 				filter(StreamSupport.stream(spliterator(entrySet), false),
@@ -1786,8 +1882,8 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 				FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 		//
-		forEach(Arrays.asList(tfFontSize, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf, jcbFileSuffix),
-				x -> setEnabled(x, false));
+		forEach(Arrays.asList(tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf,
+				jcbFileSuffix), x -> setEnabled(x, false));
 		//
 		if (Objects.equals(document, documentWhole1)) {
 			//
@@ -1914,7 +2010,7 @@ public class FractionJPanel extends JPanel
 			//
 			setIcon(labelImage, null);
 			//
-			forEach(Arrays.asList(tfFontSize, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf),
+			forEach(Arrays.asList(tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf),
 					x -> setEnabled(x, false));
 			//
 		} // if

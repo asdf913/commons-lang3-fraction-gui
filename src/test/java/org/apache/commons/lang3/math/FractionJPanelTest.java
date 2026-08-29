@@ -1,5 +1,6 @@
 package org.apache.commons.lang3.math;
 
+import java.awt.Color;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
@@ -39,6 +40,7 @@ import java.util.stream.Stream;
 import javax.imageio.spi.ImageReaderWriterSpi;
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
@@ -229,7 +231,8 @@ class FractionJPanelTest {
 					//
 				} // if
 					//
-			} else if (Boolean.logicalAnd(proxy instanceof Map, contains(Arrays.asList("get", "entrySet"), name))) {
+			} else if (Boolean.logicalAnd(proxy instanceof Map,
+					contains(Arrays.asList("get", "entrySet", "put"), name))) {
 				//
 				return null;
 				//
@@ -1173,12 +1176,30 @@ class FractionJPanelTest {
 	@Test
 	public void testToHtml() throws Throwable {
 		//
-		final JTextComponent tfFontSize = new JTextField("1");
+		// tfFontSize
+		//
+		final String fontSize = "1";
+		//
+		final JTextComponent tfFontSize = new JTextField(fontSize);
 		//
 		FieldUtils.writeDeclaredField(instance, "tfFontSize", tfFontSize, true);
 		//
-		Assert.assertEquals(toHtml(),
-				"<html><body><table style=\"font-size:1\"><tr><td><math></math>null<math></math>=<math></math></td></tr></tbody></table></body></html>");
+		Assert.assertEquals(toHtml(), String.format(
+				"<html><body><table style=\"font-size:%1$s\"><tr><td><math></math>null<math></math>=<math></math></td></tr></tbody></table></body></html>",
+				fontSize));
+		//
+		// cbmColor
+		//
+		final String color = "RED";
+		//
+		final ComboBoxModel<?> cbmColor = new DefaultComboBoxModel<>(
+				new Object[] { Map.entry(Color.class.getDeclaredField(color), "") });
+		//
+		FieldUtils.writeDeclaredField(instance, "cbmColor", cbmColor, true);
+		//
+		Assert.assertEquals(toHtml(), String.format(
+				"<html><body><table style=\"font-size:%1$s;color:%2$s\"><tr><td><math></math>null<math></math>=<math></math></td></tr></tbody></table></body></html>",
+				fontSize, color));
 		//
 	}
 
