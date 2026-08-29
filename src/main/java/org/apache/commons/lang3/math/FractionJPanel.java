@@ -433,6 +433,17 @@ public class FractionJPanel extends JPanel
 			//
 		} // if
 			//
+		if (properties != null
+				&& properties.containsKey("org.apache.commons.lang3.math.FractionJPanel.preferredFileSuffix")) {
+			//
+			final String preferredFileSuffix = getProperty(properties,
+					"org.apache.commons.lang3.math.FractionJPanel.preferredFileSuffix");
+			//
+			Arrays.sort(fileSuffixes, (a, b) -> Boolean.logicalAnd(Objects.equals(preferredFileSuffix, a),
+					!Objects.equals(preferredFileSuffix, b)) ? -1 : 0);
+			//
+		} // if
+			//
 		jPanel.add(jcbFileSuffix = new JComboBox<>(cbmFileSuffix = new DefaultComboBoxModel<>(fileSuffixes)));
 		//
 		jPanel.add(btnSaveImage = new JButton("Save Image"));
