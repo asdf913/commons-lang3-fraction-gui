@@ -201,7 +201,8 @@ class FractionJPanelTest {
 					//
 				} // if
 					//
-			} else if (Boolean.logicalAnd(proxy instanceof Stream, contains(Arrays.asList("map", "toList"), name))) {
+			} else if (Boolean.logicalAnd(proxy instanceof Stream,
+					contains(Arrays.asList("map", "toList", "collect"), name))) {
 				//
 				return null;
 				//

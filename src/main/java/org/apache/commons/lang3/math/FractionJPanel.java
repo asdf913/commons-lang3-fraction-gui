@@ -50,6 +50,7 @@ import java.util.OptionalInt;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Spliterator;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -58,6 +59,7 @@ import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.LongToIntFunction;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -383,12 +385,13 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(new JLabel("Font Color"));
 		//
-		final ListCellRenderer lcr2 = (jcbColor = new JComboBox<>(cbmColor = new DefaultComboBoxModel<>(
-				entrySet(filter(testAndApply(Objects::nonNull, Color.class.getDeclaredFields(), Arrays::stream, null),
-						f -> Boolean.logicalAnd(isStatic(f), Objects.equals(getType(f), getDeclaringClass(f)))
-								&& Objects.equals(StringUtils.upperCase(getName(f)), getName(f)))
-						.sorted((a, b) -> StringUtils.compare(getName(a), getName(b), true))
-						.collect(LinkedHashMap::new, (a, b) -> put(a, b, Narcissus.getStaticField(b)), Map::putAll))
+		final ListCellRenderer lcr2 = (jcbColor = new JComboBox<>(
+				cbmColor = new DefaultComboBoxModel<>(entrySet(collect(
+						filter(testAndApply(Objects::nonNull, Color.class.getDeclaredFields(), Arrays::stream, null),
+								f -> Boolean.logicalAnd(isStatic(f), Objects.equals(getType(f), getDeclaringClass(f)))
+										&& Objects.equals(StringUtils.upperCase(getName(f)), getName(f)))
+								.sorted((a, b) -> StringUtils.compare(getName(a), getName(b), true)),
+						LinkedHashMap::new, (a, b) -> put(a, b, Narcissus.getStaticField(b)), Map::putAll))
 						.toArray(Entry[]::new))))
 				.getRenderer();
 		//
@@ -519,6 +522,11 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
+	}
+
+	private static <T, R> R collect(final Stream<T> instance, final Supplier<R> supplier,
+			final BiConsumer<R, ? super T> accumulator, final BiConsumer<R, R> combiner) {
+		return instance != null ? instance.collect(supplier, accumulator, combiner) : null;
 	}
 
 	private static Class<?> getType(final Field instance) {
@@ -1801,9 +1809,10 @@ public class FractionJPanel extends JPanel
 	@Override
 	public int selectionForKey(final char aKey, final ComboBoxModel<?> aModel) {
 		//
-		final Iterable<Entry<Integer, Member>> entrySet = entrySet(IntStream.range(0, getSize(aModel))
-				.mapToObj(i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i))))
-				.collect(LinkedHashMap::new, (a, b) -> put(a, getKey(b), getValue(b)), Map::putAll));
+		final Iterable<Entry<Integer, Member>> entrySet = entrySet(collect(
+				IntStream.range(0, getSize(aModel))
+						.mapToObj(i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i)))),
+				LinkedHashMap::new, (a, b) -> put(a, getKey(b), getValue(b)), Map::putAll));
 		//
 		final Integer integer = testAndApply(x -> IterableUtils.size(x) == 1, toList(map(
 				filter(StreamSupport.stream(spliterator(entrySet), false),
