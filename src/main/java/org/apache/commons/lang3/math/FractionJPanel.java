@@ -608,6 +608,8 @@ public class FractionJPanel extends JPanel
 
 	private static class DocumentFilterImpl extends DocumentFilter {
 
+		private static final String THIS_DOLLAR_ZERO = "this$0";
+
 		private boolean negative;
 
 		private DocumentFilterImpl(final boolean negative) {
@@ -618,7 +620,7 @@ public class FractionJPanel extends JPanel
 		public void insertString(final FilterBypass fb, final int offset, final String string,
 				final AttributeSet attributeSet) throws BadLocationException {
 			//
-			if (fb == null || isFieldNull(fb, "this$0")) {
+			if (fb == null || isFieldNull(fb, THIS_DOLLAR_ZERO)) {
 				//
 				return;
 				//
@@ -648,7 +650,7 @@ public class FractionJPanel extends JPanel
 		public void replace(final FilterBypass fb, int offset, final int length, final String string,
 				final AttributeSet attributeSet) throws BadLocationException {
 			//
-			if (fb == null || isFieldNull(fb, "this$0")) {
+			if (fb == null || isFieldNull(fb, THIS_DOLLAR_ZERO)) {
 				//
 				return;
 				//
@@ -669,7 +671,7 @@ public class FractionJPanel extends JPanel
 		@Override
 		public void remove(final FilterBypass fb, final int offset, final int length) throws BadLocationException {
 			//
-			if (FractionJPanel.and(fb, Objects::nonNull, x -> !isFieldNull(x, "this$0"))) {
+			if (FractionJPanel.and(fb, Objects::nonNull, x -> !isFieldNull(x, THIS_DOLLAR_ZERO))) {
 				//
 				super.remove(fb, offset, length);
 				//
