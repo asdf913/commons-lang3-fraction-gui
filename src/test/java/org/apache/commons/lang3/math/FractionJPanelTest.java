@@ -1180,9 +1180,7 @@ class FractionJPanelTest {
 		//
 		final String fontSize = "1";
 		//
-		final JTextComponent tfFontSize = new JTextField(fontSize);
-		//
-		FieldUtils.writeDeclaredField(instance, "tfFontSize", tfFontSize, true);
+		FieldUtils.writeDeclaredField(instance, "tfFontSize", new JTextField(fontSize), true);
 		//
 		Assert.assertEquals(toHtml(), String.format(
 				"<html><body><table style=\"font-size:%1$s\"><tr><td><math></math>null<math></math>=<math></math></td></tr></tbody></table></body></html>",
@@ -1192,10 +1190,8 @@ class FractionJPanelTest {
 		//
 		final String color = "RED";
 		//
-		final ComboBoxModel<?> cbmColor = new DefaultComboBoxModel<>(
-				new Object[] { Map.entry(Color.class.getDeclaredField(color), "") });
-		//
-		FieldUtils.writeDeclaredField(instance, "cbmColor", cbmColor, true);
+		FieldUtils.writeDeclaredField(instance, "cbmColor",
+				new DefaultComboBoxModel<>(new Object[] { Map.entry(Color.class.getDeclaredField(color), "") }), true);
 		//
 		Assert.assertEquals(toHtml(), String.format(
 				"<html><body><table style=\"font-size:%1$s;color:%2$s\"><tr><td><math></math>null<math></math>=<math></math></td></tr></tbody></table></body></html>",
