@@ -386,8 +386,8 @@ public class FractionJPanel extends JPanel
 				testAndApply(Objects::nonNull, Color.class.getDeclaredFields(), Arrays::stream, null)
 						.filter(f -> isStatic(f) && Objects.equals(f != null ? f.getType() : null, getDeclaringClass(f))
 								&& Objects.equals(StringUtils.upperCase(getName(f)), getName(f)))
-						.sorted((a, b) -> StringUtils.compare(getName(a), getName(b), true)).collect(LinkedHashMap::new,
-								(a, b) -> put(a, b, Narcissus.getStaticField(b)), (a, b) -> a.putAll(b))
+						.sorted((a, b) -> StringUtils.compare(getName(a), getName(b), true))
+						.collect(LinkedHashMap::new, (a, b) -> put(a, b, Narcissus.getStaticField(b)), Map::putAll)
 						.entrySet().toArray(Entry[]::new))))
 				.getRenderer();
 		//
