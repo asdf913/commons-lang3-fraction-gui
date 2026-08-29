@@ -76,7 +76,7 @@ class FractionJPanelTest {
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
-			METHOD_GET_PROPERTY, METHOD_AND, METHOD_TO_HTML, METHOD_GET_PARAMETER_TYPES = null;
+			METHOD_GET_PROPERTY, METHOD_AND, METHOD_TO_HTML, METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -114,11 +114,13 @@ class FractionJPanelTest {
 		//
 		(METHOD_GET_PARAMETER_TYPES = clz.getDeclaredMethod("getParameterTypes", Executable.class)).setAccessible(true);
 		//
+		(METHOD_ADD_ALL = clz.getDeclaredMethod("addAll", Collection.class, Collection.class)).setAccessible(true);
+		//
 	}
 
 	private static class IH implements InvocationHandler {
 
-		private Boolean test, add, booleanValue = null;
+		private Boolean test, addAll, booleanValue = null;
 
 		private Integer size, length, modifiers = null;
 
@@ -162,9 +164,9 @@ class FractionJPanelTest {
 					//
 					return null;
 					//
-				} else if (Objects.equals(name, "add")) {
+				} else if (Objects.equals(name, "addAll")) {
 					//
-					return add;
+					return addAll;
 					//
 				} // if
 					//
@@ -1173,6 +1175,21 @@ class FractionJPanelTest {
 				return string;
 			}
 			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	@Test
+	public void testAddAll() throws Throwable {
+		//
+		addAll(new ArrayList<>(), null);
+		//
+	}
+
+	private static <E> void addAll(final Collection<E> a, final Collection<? extends E> b) throws Throwable {
+		try {
+			invoke(METHOD_ADD_ALL, null, a, b);
 		} catch (final InvocationTargetException e) {
 			throw e.getTargetException();
 		}

@@ -400,18 +400,9 @@ public class FractionJPanel extends JPanel
 		//
 		while (imageWriterSpis != null && imageWriterSpis.hasNext()) {
 			//
-			if ((fileSuffixes = getFileSuffixes(imageWriterSpis.next())) == null) {
-				//
-				continue;
-				//
-			} // if
-				//
-			for (final String fileSuffix : fileSuffixes) {
-				//
-				add(set = ObjectUtils.getIfNull(set, LinkedHashSet::new), fileSuffix);
-				//
-			} // for
-				//
+			addAll(set = ObjectUtils.getIfNull(set, LinkedHashSet::new),
+					testAndApply(Objects::nonNull, getFileSuffixes(imageWriterSpis.next()), Arrays::asList, null));
+			//
 		} // while
 			//
 		fileSuffixes = toArray(set, String[]::new);
@@ -474,6 +465,12 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
+	}
+
+	private static <E> void addAll(final Collection<E> a, final Collection<? extends E> b) {
+		if (a != null && b != null) {
+			a.addAll(b);
+		}
 	}
 
 	private static <E> Component getListCellRendererComponent(final ListCellRenderer<E> instance,
@@ -592,12 +589,6 @@ public class FractionJPanel extends JPanel
 
 	private static boolean isStatic(final Member instance) {
 		return instance != null && Modifier.isStatic(instance.getModifiers());
-	}
-
-	private static <E> void add(final Collection<E> instance, final E item) {
-		if (instance != null) {
-			instance.add(item);
-		}
 	}
 
 	private static void setDocumentFilter(final AbstractDocument instance, final DocumentFilter documentFilter) {
