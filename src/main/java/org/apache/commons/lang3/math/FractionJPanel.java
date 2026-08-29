@@ -388,8 +388,8 @@ public class FractionJPanel extends JPanel
 		final ListCellRenderer lcr2 = (jcbColor = new JComboBox<>(
 				cbmColor = new DefaultComboBoxModel<>(entrySet(collect(
 						filter(testAndApply(Objects::nonNull, Color.class.getDeclaredFields(), Arrays::stream, null),
-								f -> Boolean.logicalAnd(isStatic(f), Objects.equals(getType(f), getDeclaringClass(f)))
-										&& Objects.equals(StringUtils.upperCase(getName(f)), getName(f)))
+								f -> and(isStatic(f), Objects.equals(getType(f), getDeclaringClass(f)),
+										Objects.equals(StringUtils.upperCase(getName(f)), getName(f))))
 								.sorted((a, b) -> StringUtils.compare(getName(a), getName(b), true)),
 						LinkedHashMap::new, (a, b) -> put(a, b, Narcissus.getStaticField(b)), Map::putAll))
 						.toArray(Entry[]::new))))
@@ -522,6 +522,10 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
+	}
+
+	private static boolean and(final boolean a, final boolean b, final boolean c) {
+		return Boolean.logicalAnd(Boolean.logicalAnd(a, b), c);
 	}
 
 	private static <T, R> R collect(final Stream<T> instance, final Supplier<R> supplier,
@@ -701,10 +705,6 @@ public class FractionJPanel extends JPanel
 				//
 			} // if
 				//
-		}
-
-		private static boolean and(final boolean a, final boolean b, final boolean c) {
-			return Boolean.logicalAnd(Boolean.logicalAnd(a, b), c);
 		}
 
 		private static int getLength(final Document instance) {
