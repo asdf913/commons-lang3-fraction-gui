@@ -263,8 +263,9 @@ public class FractionJPanel extends JPanel
 		//
 		final ListCellRenderer lcr = (jcbMethod = new JComboBox<>(
 				cbmMethod = new DefaultComboBoxModel<>(toArray(toList(filter(Arrays.stream(Fraction.class.getMethods()),
-						m -> Arrays.equals(getParameterTypes(m), new Class<?>[] { getDeclaringClass(m) })
-								&& Objects.equals(getReturnType(m), getDeclaringClass(m)))),
+						m -> Boolean.logicalAnd(
+								Arrays.equals(getParameterTypes(m), new Class<?>[] { getDeclaringClass(m) }),
+								Objects.equals(getReturnType(m), getDeclaringClass(m))))),
 						Method[]::new))))
 				.getRenderer();
 		//
