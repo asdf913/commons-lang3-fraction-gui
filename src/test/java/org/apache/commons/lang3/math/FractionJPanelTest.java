@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -76,7 +77,8 @@ class FractionJPanelTest {
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
-			METHOD_GET_PROPERTY, METHOD_AND, METHOD_TO_HTML, METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL = null;
+			METHOD_GET_PROPERTY, METHOD_AND, METHOD_TO_HTML, METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL,
+			METHOD_HAS_NEXT = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -116,11 +118,13 @@ class FractionJPanelTest {
 		//
 		(METHOD_ADD_ALL = clz.getDeclaredMethod("addAll", Collection.class, Collection.class)).setAccessible(true);
 		//
+		(METHOD_HAS_NEXT = clz.getDeclaredMethod("hasNext", Iterator.class)).setAccessible(true);
+		//
 	}
 
 	private static class IH implements InvocationHandler {
 
-		private Boolean test, addAll, booleanValue = null;
+		private Boolean test, addAll, booleanValue, hasNext = null;
 
 		private Integer size, length, modifiers = null;
 
@@ -266,6 +270,18 @@ class FractionJPanelTest {
 				//
 				return null;
 				//
+			} else if (proxy instanceof Iterator) {
+				//
+				if (Objects.equals(name, "hasNext")) {
+					//
+					return hasNext;
+					//
+				} else if (Objects.equals(name, "next")) {
+					//
+					return null;
+					//
+				} // if
+					//
 			} // if
 				//
 			throw new Throwable(name);
@@ -1190,6 +1206,31 @@ class FractionJPanelTest {
 	private static <E> void addAll(final Collection<E> a, final Collection<? extends E> b) throws Throwable {
 		try {
 			invoke(METHOD_ADD_ALL, null, a, b);
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	@Test
+	public void testHasNext() throws Throwable {
+		//
+		if ((ih = ObjectUtils.getIfNull(ih, IH::new)) != null) {
+			//
+			ih.hasNext = Boolean.FALSE;
+			//
+		} // if
+			//
+		Assert.assertFalse(hasNext(Reflection.newProxy(Iterator.class, ih)));
+		//
+	}
+
+	private static boolean hasNext(final Iterator<?> instance) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_HAS_NEXT, null, instance);
+			if (obj instanceof Boolean booleanValue && booleanValue != null) {
+				return booleanValue.booleanValue();
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
 		} catch (final InvocationTargetException e) {
 			throw e.getTargetException();
 		}

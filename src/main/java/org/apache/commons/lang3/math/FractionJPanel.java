@@ -398,10 +398,10 @@ public class FractionJPanel extends JPanel
 		//
 		Set<String> set = null;
 		//
-		while (imageWriterSpis != null && imageWriterSpis.hasNext()) {
+		while (hasNext(imageWriterSpis)) {
 			//
 			addAll(set = ObjectUtils.getIfNull(set, LinkedHashSet::new),
-					testAndApply(Objects::nonNull, getFileSuffixes(imageWriterSpis.next()), Arrays::asList, null));
+					testAndApply(Objects::nonNull, getFileSuffixes(next(imageWriterSpis)), Arrays::asList, null));
 			//
 		} // while
 			//
@@ -465,6 +465,14 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
+	}
+
+	private static <E> E next(final Iterator<E> instance) {
+		return instance != null ? instance.next() : null;
+	}
+
+	private static boolean hasNext(final Iterator<?> instance) {
+		return instance != null && instance.hasNext();
 	}
 
 	private static <E> void addAll(final Collection<E> a, final Collection<? extends E> b) {
