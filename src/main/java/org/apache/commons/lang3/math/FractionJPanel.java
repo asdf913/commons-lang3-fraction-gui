@@ -385,7 +385,7 @@ public class FractionJPanel extends JPanel
 		//
 		final ListCellRenderer lcr2 = (jcbColor = new JComboBox<>(cbmColor = new DefaultComboBoxModel<>(
 				testAndApply(Objects::nonNull, Color.class.getDeclaredFields(), Arrays::stream, null)
-						.filter(f -> isStatic(f) && Objects.equals(getType(f), getDeclaringClass(f))
+						.filter(f -> Boolean.logicalAnd(isStatic(f), Objects.equals(getType(f), getDeclaringClass(f)))
 								&& Objects.equals(StringUtils.upperCase(getName(f)), getName(f)))
 						.sorted((a, b) -> StringUtils.compare(getName(a), getName(b), true))
 						.collect(LinkedHashMap::new, (a, b) -> put(a, b, Narcissus.getStaticField(b)), Map::putAll)
