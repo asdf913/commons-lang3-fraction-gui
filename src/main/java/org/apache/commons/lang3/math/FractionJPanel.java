@@ -26,6 +26,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Executable;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
@@ -384,7 +385,7 @@ public class FractionJPanel extends JPanel
 		//
 		final ListCellRenderer lcr2 = (jcbColor = new JComboBox<>(cbmColor = new DefaultComboBoxModel<>(
 				testAndApply(Objects::nonNull, Color.class.getDeclaredFields(), Arrays::stream, null)
-						.filter(f -> isStatic(f) && Objects.equals(f != null ? f.getType() : null, getDeclaringClass(f))
+						.filter(f -> isStatic(f) && Objects.equals(getType(f), getDeclaringClass(f))
 								&& Objects.equals(StringUtils.upperCase(getName(f)), getName(f)))
 						.sorted((a, b) -> StringUtils.compare(getName(a), getName(b), true))
 						.collect(LinkedHashMap::new, (a, b) -> put(a, b, Narcissus.getStaticField(b)), Map::putAll)
@@ -518,6 +519,10 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
+	}
+
+	private static Class<?> getType(final Field instance) {
+		return instance != null ? instance.getType() : null;
 	}
 
 	private static <E> E next(final Iterator<E> instance) {
