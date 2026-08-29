@@ -219,7 +219,10 @@ public class FractionJPanel extends JPanel
 	@Note("Method")
 	private JComboBox<?> jcbMethod = null;
 
-	private JComboBox<?> jcbFileSuffix, jcbColor = null;
+	@Note("File Suffix")
+	private JComboBox<?> jcbFileSuffix = null;
+
+	private JComboBox<?> jcbColor = null;
 
 	private Window window = null;
 
