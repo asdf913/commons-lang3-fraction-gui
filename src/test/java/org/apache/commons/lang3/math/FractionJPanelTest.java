@@ -81,8 +81,9 @@ class FractionJPanelTest {
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
-			METHOD_GET_PROPERTY, METHOD_AND2, METHOD_AND4, METHOD_TO_HTML, METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL,
-			METHOD_HAS_NEXT, METHOD_EXISTS, METHOD_IS_FILE, METHOD_CAN_READ, METHOD_EQUALS_IGNORE_CASE = null;
+			METHOD_CONTAINS_KEY, METHOD_GET_PROPERTY, METHOD_AND2, METHOD_AND4, METHOD_TO_HTML,
+			METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL, METHOD_HAS_NEXT, METHOD_EXISTS, METHOD_IS_FILE, METHOD_CAN_READ,
+			METHOD_EQUALS_IGNORE_CASE = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -110,6 +111,9 @@ class FractionJPanelTest {
 		(METHOD_MATCHES = clz.getDeclaredMethod("matches", String.class, String.class)).setAccessible(true);
 		//
 		(METHOD_IS_STATIC = clz.getDeclaredMethod("isStatic", Member.class)).setAccessible(true);
+		//
+		(METHOD_CONTAINS_KEY = clz.getDeclaredMethod("containsKey", Properties.class, String.class))
+				.setAccessible(true);
 		//
 		(METHOD_GET_PROPERTY = clz.getDeclaredMethod("getProperty", Properties.class, String.class))
 				.setAccessible(true);
@@ -347,6 +351,8 @@ class FractionJPanelTest {
 	private IH ih = null;
 
 	private FractionJPanel instance = null;
+	
+	private Properties properties = null;
 
 	@BeforeMethod
 	void beforeMethod() throws Throwable {
@@ -354,6 +360,8 @@ class FractionJPanelTest {
 		ih = new IH();
 		//
 		instance = cast(FractionJPanel.class, Narcissus.allocateInstance(FractionJPanel.class));
+		//
+		properties = new Properties();
 		//
 	}
 
@@ -1155,9 +1163,28 @@ class FractionJPanelTest {
 	}
 
 	@Test
-	public void testGetProperty() throws Throwable {
+	public void testContainsKey() throws Throwable {
 		//
-		final Properties properties = new Properties();
+		Assert.assertFalse(containsKey(properties, null));
+		//
+		Assert.assertFalse(containsKey(properties, EMPTY));
+		//
+	}
+
+	private static boolean containsKey(final Properties instance, final String key) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_CONTAINS_KEY, null, instance, key);
+			if (obj instanceof Boolean booleanValue && booleanValue != null) {
+				return booleanValue.booleanValue();
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	@Test
+	public void testGetProperty() throws Throwable {
 		//
 		Assert.assertNull(getProperty(properties, null));
 		//

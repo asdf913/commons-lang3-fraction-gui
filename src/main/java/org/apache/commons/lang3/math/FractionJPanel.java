@@ -361,7 +361,7 @@ public class FractionJPanel extends JPanel
 		//
 		cbmColor.setSelectedItem(null);
 		//
-		if (properties != null && properties.containsKey("org.apache.commons.lang3.math.FractionJPanel.color")) {
+		if (containsKey(properties, "org.apache.commons.lang3.math.FractionJPanel.color")) {
 			//
 			final List<?> list = toList(
 					filter(mapToObj(IntStream.rangeClosed(0, getSize(cbmColor)), i -> getElementAt(cbmColor, i)),
@@ -453,8 +453,7 @@ public class FractionJPanel extends JPanel
 			//
 		} // if
 			//
-		if (properties != null
-				&& properties.containsKey("org.apache.commons.lang3.math.FractionJPanel.preferredFileSuffix")) {
+		if (containsKey(properties, "org.apache.commons.lang3.math.FractionJPanel.preferredFileSuffix")) {
 			//
 			final String preferredFileSuffix = getProperty(properties,
 					"org.apache.commons.lang3.math.FractionJPanel.preferredFileSuffix");
@@ -652,6 +651,32 @@ public class FractionJPanel extends JPanel
 
 	private static String[] getFileSuffixes(final ImageReaderWriterSpi instnace) {
 		return instnace != null ? instnace.getFileSuffixes() : null;
+	}
+
+	private static boolean containsKey(final Properties instance, final String key) {
+		//
+		if (instance == null || key == null) {
+			//
+			return false;
+			//
+		} // if
+			//
+		try {
+			//
+			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), "map")) == null) {
+				//
+				return false;
+				//
+			} // if
+				//
+		} catch (final NoSuchFieldException e) {
+			//
+			throw new RuntimeException(e);
+			//
+		} // try
+			//
+		return instance.containsKey(key);
+		//
 	}
 
 	private static String getProperty(final Properties instance, final String key) {
