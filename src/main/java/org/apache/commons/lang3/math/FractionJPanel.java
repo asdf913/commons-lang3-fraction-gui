@@ -361,6 +361,24 @@ public class FractionJPanel extends JPanel
 		//
 		cbmColor.setSelectedItem(null);
 		//
+		if (properties != null && properties.containsKey("org.apache.commons.lang3.math.FractionJPanel.color")) {
+			//
+			final List<?> list = toList(
+					filter(mapToObj(IntStream.rangeClosed(0, getSize(cbmColor)), i -> getElementAt(cbmColor, i)),
+							x -> equalsIgnoreCase(getName(cast(Member.class, getKey(cast(Entry.class, x)))),
+									getProperty(properties, "org.apache.commons.lang3.math.FractionJPanel.color"))));
+			//
+			testAndRun(IterableUtils.size(list) > 1, () -> {
+				//
+				throw new IllegalStateException();
+				//
+			});
+			//
+			testAndAccept(x -> IterableUtils.size(x) == 1, list,
+					x -> setSelectedItem(cbmColor, IterableUtils.get(x, 0)));
+			//
+		} // if
+			//
 		jcbColor.setRenderer((arg0, value, arg2, arg3, arg4) -> {
 			//
 			final Entry<?, ?> entry = cast(Entry.class, value);
@@ -495,6 +513,14 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
+	}
+
+	private static <U> Stream<U> mapToObj(final IntStream instance, final IntFunction<? extends U> mapper) {
+		return instance != null ? instance.mapToObj(mapper) : null;
+	}
+
+	private static boolean equalsIgnoreCase(final String a, final String b) {
+		return a != null && isValidString(a) && isValidString(b) && a.equalsIgnoreCase(b);
 	}
 
 	private static DocumentFilter createDocumentFilter(final int maxLength) {
@@ -1852,8 +1878,8 @@ public class FractionJPanel extends JPanel
 	public int selectionForKey(final char aKey, final ComboBoxModel<?> aModel) {
 		//
 		final Iterable<Entry<Integer, Member>> entrySet = entrySet(collect(
-				IntStream.range(0, getSize(aModel))
-						.mapToObj(i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i)))),
+				mapToObj(IntStream.range(0, getSize(aModel)),
+						i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i)))),
 				LinkedHashMap::new, (a, b) -> put(a, getKey(b), getValue(b)), Map::putAll));
 		//
 		final Integer integer = testAndApply(x -> IterableUtils.size(x) == 1, toList(map(

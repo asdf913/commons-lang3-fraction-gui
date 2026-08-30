@@ -82,7 +82,7 @@ class FractionJPanelTest {
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
 			METHOD_GET_PROPERTY, METHOD_AND2, METHOD_AND4, METHOD_TO_HTML, METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL,
-			METHOD_HAS_NEXT, METHOD_EXISTS, METHOD_IS_FILE, METHOD_CAN_READ = null;
+			METHOD_HAS_NEXT, METHOD_EXISTS, METHOD_IS_FILE, METHOD_CAN_READ, METHOD_EQUALS_IGNORE_CASE = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -132,6 +132,9 @@ class FractionJPanelTest {
 		(METHOD_IS_FILE = clz.getDeclaredMethod("isFile", File.class)).setAccessible(true);
 		//
 		(METHOD_CAN_READ = clz.getDeclaredMethod("canRead", File.class)).setAccessible(true);
+		//
+		(METHOD_EQUALS_IGNORE_CASE = clz.getDeclaredMethod("equalsIgnoreCase", String.class, String.class))
+				.setAccessible(true);
 		//
 	}
 
@@ -279,6 +282,10 @@ class FractionJPanelTest {
 				return null;
 				//
 			} else if (Boolean.logicalAnd(proxy instanceof LongStream, Objects.equals(name, "mapToInt"))) {
+				//
+				return null;
+				//
+			} else if (Boolean.logicalAnd(proxy instanceof IntStream, Objects.equals(name, "mapToObj"))) {
 				//
 				return null;
 				//
@@ -1312,6 +1319,18 @@ class FractionJPanelTest {
 	public void testCanRead() throws IllegalAccessException, InvocationTargetException {
 		//
 		Assert.assertEquals(invoke(METHOD_CAN_READ, null, new File("pom.xml")), Boolean.TRUE);
+		//
+	}
+
+	@Test
+	public void testEqualsIgnoreCase() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertEquals(invoke(METHOD_EQUALS_IGNORE_CASE, null, EMPTY, Narcissus.allocateInstance(String.class)),
+				Boolean.FALSE);
+		//
+		Assert.assertEquals(invoke(METHOD_EQUALS_IGNORE_CASE, null, EMPTY, EMPTY), Boolean.TRUE);
+		//
+		Assert.assertEquals(invoke(METHOD_EQUALS_IGNORE_CASE, null, EMPTY, "A"), Boolean.FALSE);
 		//
 	}
 
