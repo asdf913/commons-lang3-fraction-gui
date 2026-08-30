@@ -1295,24 +1295,24 @@ class FractionJPanelTest {
 	@Test
 	public void testExists() throws IllegalAccessException, InvocationTargetException {
 		//
-		Assert.assertEquals(Boolean.TRUE, invoke(METHOD_EXISTS, null, new File("pom.xml")));
+		Assert.assertEquals(invoke(METHOD_EXISTS, null, new File("pom.xml")), Boolean.TRUE);
 		//
 	}
 
 	@Test
 	public void testIsFile() throws IllegalAccessException, InvocationTargetException {
 		//
-		Assert.assertEquals(Boolean.TRUE, invoke(METHOD_IS_FILE, null, new File("pom.xml")));
+		Assert.assertEquals(invoke(METHOD_IS_FILE, null, new File("pom.xml")), Boolean.TRUE);
 		//
-		Assert.assertEquals(Boolean.FALSE, invoke(METHOD_IS_FILE, null, new File(".")));
+		Assert.assertEquals(invoke(METHOD_IS_FILE, null, new File(".")), Boolean.FALSE);
 		//
 	}
 
 	@Test
 	public void testCanRead() throws IllegalAccessException, InvocationTargetException {
 		//
-		Assert.assertEquals(Boolean.TRUE, invoke(METHOD_CAN_READ, null, new File("pom.xml")));
-		// s
+		Assert.assertEquals(invoke(METHOD_CAN_READ, null, new File("pom.xml")), Boolean.TRUE);
+		//
 	}
 
 	@Test
