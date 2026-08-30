@@ -57,6 +57,7 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.function.FailableBiFunction;
+import org.apache.commons.lang3.function.FailableFunction;
 import org.apache.commons.lang3.function.TriFunction;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.testng.Assert;
@@ -64,6 +65,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.google.common.base.Predicates;
 import com.google.common.reflect.Reflection;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserType;
@@ -79,8 +81,8 @@ class FractionJPanelTest {
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
-			METHOD_GET_PROPERTY, METHOD_AND, METHOD_TO_HTML, METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL,
-			METHOD_HAS_NEXT = null;
+			METHOD_GET_PROPERTY, METHOD_AND2, METHOD_AND4, METHOD_TO_HTML, METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL,
+			METHOD_HAS_NEXT, METHOD_EXISTS, METHOD_IS_FILE, METHOD_CAN_READ = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -112,7 +114,10 @@ class FractionJPanelTest {
 		(METHOD_GET_PROPERTY = clz.getDeclaredMethod("getProperty", Properties.class, String.class))
 				.setAccessible(true);
 		//
-		(METHOD_AND = clz.getDeclaredMethod("and", Boolean.TYPE, BooleanSupplier.class)).setAccessible(true);
+		(METHOD_AND2 = clz.getDeclaredMethod("and", Boolean.TYPE, BooleanSupplier.class)).setAccessible(true);
+		//
+		(METHOD_AND4 = clz.getDeclaredMethod("and", Object.class, Predicate.class, Predicate.class, Predicate.class))
+				.setAccessible(true);
 		//
 		(METHOD_TO_HTML = clz.getDeclaredMethod("toHtml")).setAccessible(true);
 		//
@@ -121,6 +126,12 @@ class FractionJPanelTest {
 		(METHOD_ADD_ALL = clz.getDeclaredMethod("addAll", Collection.class, Collection.class)).setAccessible(true);
 		//
 		(METHOD_HAS_NEXT = clz.getDeclaredMethod("hasNext", Iterator.class)).setAccessible(true);
+		//
+		(METHOD_EXISTS = clz.getDeclaredMethod("exists", File.class)).setAccessible(true);
+		//
+		(METHOD_IS_FILE = clz.getDeclaredMethod("isFile", File.class)).setAccessible(true);
+		//
+		(METHOD_CAN_READ = clz.getDeclaredMethod("canRead", File.class)).setAccessible(true);
 		//
 	}
 
@@ -184,8 +195,10 @@ class FractionJPanelTest {
 				//
 				return test;
 				//
-			} else if (Boolean.logicalAnd(or(proxy instanceof Function, proxy instanceof FailableBiFunction,
-					proxy instanceof TriFunction, proxy instanceof IntFunction), Objects.equals(name, "apply"))) {
+			} else if (Boolean.logicalAnd(
+					or(proxy instanceof FailableFunction, proxy instanceof FailableBiFunction,
+							proxy instanceof TriFunction, proxy instanceof IntFunction),
+					Objects.equals(name, "apply"))) {
 				//
 				return null;
 				//
@@ -1164,11 +1177,32 @@ class FractionJPanelTest {
 		//
 		Assert.assertFalse(and(true, () -> false));
 		//
+		final Predicate<Object> alwaysTrue = Predicates.alwaysTrue();
+		//
+		Assert.assertFalse(and(null, alwaysTrue, null, null));
+		//
+		Assert.assertFalse(and(null, alwaysTrue, alwaysTrue, null));
+		//
+		Assert.assertTrue(and(null, alwaysTrue, alwaysTrue, alwaysTrue));
+		//
 	}
 
 	private static boolean and(final boolean condition, final BooleanSupplier booleanSupplier) throws Throwable {
 		try {
-			final Object obj = invoke(METHOD_AND, null, condition, booleanSupplier);
+			final Object obj = invoke(METHOD_AND2, null, condition, booleanSupplier);
+			if (obj instanceof Boolean booleanValue && booleanValue != null) {
+				return booleanValue.booleanValue();
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	private static <T> boolean and(final T value, final Predicate<T> predicateA, final Predicate<T> predicateB,
+			final Predicate<T> predicateC) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_AND4, null, value, predicateA, predicateB, predicateC);
 			if (obj instanceof Boolean booleanValue && booleanValue != null) {
 				return booleanValue.booleanValue();
 			}
@@ -1256,6 +1290,29 @@ class FractionJPanelTest {
 		} catch (final InvocationTargetException e) {
 			throw e.getTargetException();
 		}
+	}
+
+	@Test
+	public void testExists() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertEquals(Boolean.TRUE, invoke(METHOD_EXISTS, null, new File("pom.xml")));
+		//
+	}
+
+	@Test
+	public void testIsFile() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertEquals(Boolean.TRUE, invoke(METHOD_IS_FILE, null, new File("pom.xml")));
+		//
+		Assert.assertEquals(Boolean.FALSE, invoke(METHOD_IS_FILE, null, new File(".")));
+		//
+	}
+
+	@Test
+	public void testCanRead() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertEquals(Boolean.TRUE, invoke(METHOD_CAN_READ, null, new File("pom.xml")));
+		// s
 	}
 
 	@Test

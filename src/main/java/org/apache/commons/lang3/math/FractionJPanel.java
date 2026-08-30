@@ -19,6 +19,7 @@ import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.ElementType;
@@ -107,6 +108,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableBiConsumer;
 import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableConsumer;
+import org.apache.commons.lang3.function.FailableFunction;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.reflect.Reflection;
@@ -1018,12 +1020,20 @@ public class FractionJPanel extends JPanel
 		//
 		final FractionJPanel instance = new FractionJPanel();
 		//
-		try (final InputStream is = FractionJPanel.class.getResourceAsStream(
-				StringUtils.join('/', replace(FractionJPanel.class.getName(), '.', '/'), ".properties"))) {
+		final String propertiesClassPath = StringUtils.join('/', replace(FractionJPanel.class.getName(), '.', '/'),
+				".properties");
+		//
+		try (final InputStream is1 = FractionJPanel.class.getResourceAsStream(propertiesClassPath);
+				final InputStream is2 = testAndApply(
+						x -> and(x, FractionJPanel::exists, FractionJPanel::isFile, FractionJPanel::canRead),
+						new File(StringUtils.substringAfterLast(propertiesClassPath, "/")), FileInputStream::new,
+						null)) {
 			//
 			final Properties properties = new Properties();
 			//
-			testAndAccept(Objects::nonNull, is, properties::load);
+			testAndAccept(Objects::nonNull, is1, properties::load);
+			//
+			testAndAccept(Objects::nonNull, is2, properties::load);
 			//
 			instance.properties = properties;
 			//
@@ -1049,6 +1059,18 @@ public class FractionJPanel extends JPanel
 				//
 		} // if
 			//
+	}
+
+	private static boolean exists(final File instance) {
+		return instance != null && instance.getPath() != null && instance.exists();
+	}
+
+	private static boolean isFile(final File instance) {
+		return instance != null && instance.getPath() != null && instance.isFile();
+	}
+
+	private static boolean canRead(final File instance) {
+		return instance != null && instance.getPath() != null && instance.canRead();
 	}
 
 	private static String replace(final String instance, final char oldChar, final char newChar) {
@@ -1620,6 +1642,11 @@ public class FractionJPanel extends JPanel
 		return test(predicateA, value) && test(predicateB, value);
 	}
 
+	private static <T> boolean and(final T value, final Predicate<T> predicateA, final Predicate<T> predicateB,
+			final Predicate<T> predicateC) {
+		return test(predicateA, value) && test(predicateB, value) && test(predicateC, value);
+	}
+
 	private static boolean startsWith(final String instance, final String prefix) {
 		return instance != null && isValidString(instance) && instance.startsWith(prefix);
 	}
@@ -1807,8 +1834,8 @@ public class FractionJPanel extends JPanel
 		//
 	}
 
-	private static <T, R> R testAndApply(final Predicate<T> predicate, final T value, final Function<T, R> functionTrue,
-			final Function<T, R> functionFalse) {
+	private static <T, R, E extends Exception> R testAndApply(final Predicate<T> predicate, final T value,
+			final FailableFunction<T, R, E> functionTrue, final FailableFunction<T, R, E> functionFalse) throws E {
 		return test(predicate, value) ? apply(functionTrue, value) : apply(functionFalse, value);
 	}
 
@@ -1816,7 +1843,8 @@ public class FractionJPanel extends JPanel
 		return instance != null && instance.test(value);
 	}
 
-	private static <T, R> R apply(final Function<T, R> instance, final T value) {
+	private static <T, R, E extends Exception> R apply(final FailableFunction<T, R, E> instance, final T value)
+			throws E {
 		return instance != null ? instance.apply(value) : null;
 	}
 
