@@ -62,8 +62,6 @@ import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableFunction;
 import org.apache.commons.lang3.function.TriFunction;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.meeuw.functional.Consumers;
-import org.meeuw.functional.Functions;
 import org.meeuw.functional.ThrowingTriConsumer;
 import org.meeuw.functional.TriPredicate;
 import org.testng.Assert;
