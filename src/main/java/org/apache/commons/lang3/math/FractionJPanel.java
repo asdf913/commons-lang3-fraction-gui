@@ -1329,14 +1329,6 @@ public class FractionJPanel extends JPanel
 				//
 			return;
 			//
-		} else if (Objects.equals(source, cbChopImage)) {
-			//
-			setIcon(labelImage, null);
-			//
-			forEach(Arrays.asList(btnCopyImage, btnSaveImage, btnSavePdf, jcbFileSuffix), x -> setEnabled(x, false));
-			//
-			return;
-			//
 		} // if
 			//
 		actionPerformed(this, source);
@@ -1681,6 +1673,13 @@ public class FractionJPanel extends JPanel
 				//
 			} // try
 				//
+		} else if (Objects.equals(source, instance.cbChopImage)) {
+			//
+			setIcon(instance.labelImage, null);
+			//
+			forEach(Arrays.asList(instance.btnCopyImage, instance.btnSaveImage, instance.btnSavePdf,
+					instance.jcbFileSuffix), x -> setEnabled(x, false));
+			//
 		} // if
 			//
 	}

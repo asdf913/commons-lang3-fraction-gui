@@ -1136,6 +1136,14 @@ class FractionJPanelTest {
 		//
 		instance.actionPerformed(new ActionEvent(btnSavePdf, 0, null));
 		//
+		// cbChopImage
+		//
+		final AbstractButton cbChopImage = new JCheckBox();
+		//
+		FieldUtils.writeDeclaredField(instance, "cbChopImage", cbChopImage, true);
+		//
+		instance.actionPerformed(new ActionEvent(cbChopImage, 0, null));
+		//
 	}
 
 	@Test
