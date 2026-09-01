@@ -44,6 +44,7 @@ import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
@@ -87,7 +88,7 @@ class FractionJPanelTest {
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
 			METHOD_CONTAINS_KEY, METHOD_GET_PROPERTY, METHOD_AND2, METHOD_AND3, METHOD_AND4, METHOD_TO_HTML,
 			METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL, METHOD_HAS_NEXT, METHOD_EXISTS, METHOD_IS_FILE, METHOD_CAN_READ,
-			METHOD_EQUALS_IGNORE_CASE, METHOD_CHOP_IMAGE, METHOD_TEST_AND_ACCEPT = null;
+			METHOD_EQUALS_IGNORE_CASE, METHOD_CHOP_IMAGE, METHOD_TEST_AND_ACCEPT, METHOD_IS_SELECTED = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -150,6 +151,8 @@ class FractionJPanelTest {
 		//
 		(METHOD_TEST_AND_ACCEPT = clz.getDeclaredMethod("testAndAccept", TriPredicate.class, Object.class, Object.class,
 				Object.class, ThrowingTriConsumer.class)).setAccessible(true);
+		//
+		(METHOD_IS_SELECTED = clz.getDeclaredMethod("isSelected", AbstractButton.class)).setAccessible(true);
 		//
 	}
 
@@ -1428,6 +1431,19 @@ class FractionJPanelTest {
 		final ThrowingTriConsumer<?, ?, ?, ?> throwingTriConsumer = Reflection.newProxy(ThrowingTriConsumer.class, ih);
 		//
 		Assert.assertNull(invoke(METHOD_TEST_AND_ACCEPT, null, triPredicate, null, null, null, throwingTriConsumer));
+		//
+	}
+
+	@Test
+	public void testIsSelected() throws IllegalAccessException, InvocationTargetException {
+		//
+		final AbstractButton abstractButton = new JCheckBox();
+		//
+		Assert.assertEquals(invoke(METHOD_IS_SELECTED, null, abstractButton), Boolean.FALSE);
+		//
+		abstractButton.setSelected(true);
+		//
+		Assert.assertEquals(invoke(METHOD_IS_SELECTED, null, abstractButton), Boolean.TRUE);
 		//
 	}
 

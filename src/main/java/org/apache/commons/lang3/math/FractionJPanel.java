@@ -1275,7 +1275,7 @@ public class FractionJPanel extends JPanel
 				//
 				final byte[] bs = screenshot(locator(page, "tbody"));
 				//
-				if (cbChopImage != null && cbChopImage.isSelected()) {
+				if (isSelected(cbChopImage)) {
 					//
 					setIcon(labelImage, new ImageIcon(chopImage(toBufferedImage(bs))));
 					//
@@ -1301,6 +1301,10 @@ public class FractionJPanel extends JPanel
 			//
 		actionPerformed(this, source);
 		//
+	}
+
+	private static boolean isSelected(final AbstractButton instance) {
+		return instance != null && instance.getModel() != null && instance.isSelected();
 	}
 
 	private static BufferedImage chopImage(final BufferedImage bufferedImage) {
