@@ -88,7 +88,8 @@ class FractionJPanelTest {
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
 			METHOD_CONTAINS_KEY, METHOD_GET_PROPERTY, METHOD_AND2, METHOD_AND3, METHOD_AND4, METHOD_TO_HTML,
 			METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL, METHOD_HAS_NEXT, METHOD_EXISTS, METHOD_IS_FILE, METHOD_CAN_READ,
-			METHOD_EQUALS_IGNORE_CASE, METHOD_CHOP_IMAGE, METHOD_TEST_AND_ACCEPT, METHOD_IS_SELECTED = null;
+			METHOD_EQUALS_IGNORE_CASE, METHOD_CHOP_IMAGE, METHOD_TEST_AND_ACCEPT, METHOD_IS_SELECTED,
+			METHOD_SET_SELECTED = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -153,6 +154,9 @@ class FractionJPanelTest {
 				Object.class, ThrowingTriConsumer.class)).setAccessible(true);
 		//
 		(METHOD_IS_SELECTED = clz.getDeclaredMethod("isSelected", AbstractButton.class)).setAccessible(true);
+		//
+		(METHOD_SET_SELECTED = clz.getDeclaredMethod("setSelected", AbstractButton.class, Boolean.TYPE))
+				.setAccessible(true);
 		//
 	}
 
@@ -367,6 +371,8 @@ class FractionJPanelTest {
 
 	private Properties properties = null;
 
+	private AbstractButton abstractButton = null;
+
 	@BeforeMethod
 	void beforeMethod() throws Throwable {
 		//
@@ -375,6 +381,8 @@ class FractionJPanelTest {
 		instance = cast(FractionJPanel.class, Narcissus.allocateInstance(FractionJPanel.class));
 		//
 		properties = new Properties();
+		//
+		abstractButton = new JCheckBox();
 		//
 	}
 
@@ -1437,13 +1445,18 @@ class FractionJPanelTest {
 	@Test
 	public void testIsSelected() throws IllegalAccessException, InvocationTargetException {
 		//
-		final AbstractButton abstractButton = new JCheckBox();
-		//
 		Assert.assertEquals(invoke(METHOD_IS_SELECTED, null, abstractButton), Boolean.FALSE);
 		//
 		abstractButton.setSelected(true);
 		//
 		Assert.assertEquals(invoke(METHOD_IS_SELECTED, null, abstractButton), Boolean.TRUE);
+		//
+	}
+
+	@Test
+	public void testSetSelected() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertNull(invoke(METHOD_SET_SELECTED, null, abstractButton, false));
 		//
 	}
 

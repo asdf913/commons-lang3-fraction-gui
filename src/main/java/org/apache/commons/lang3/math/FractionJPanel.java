@@ -434,6 +434,9 @@ public class FractionJPanel extends JPanel
 		//
 		jPanel.add(cbChopImage = new JCheckBox("Chop Image"));
 		//
+		testAndAccept(x -> containsKey(properties, x), "org.apache.commons.lang3.math.FractionJPanel.chopImage",
+				x -> setSelected(cbChopImage, Boolean.valueOf(getProperty(properties, x))));
+		//
 		add(jPanel, wrap);
 		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
@@ -1300,6 +1303,12 @@ public class FractionJPanel extends JPanel
 
 	private static Throwable getTargetException(final InvocationTargetException instance) {
 		return instance != null ? instance.getTargetException() : null;
+	}
+
+	private static void setSelected(final AbstractButton instance, final boolean selected) {
+		if (instance != null && instance.getModel() != null) {
+			instance.setSelected(selected);
+		}
 	}
 
 	private static boolean isSelected(final AbstractButton instance) {
