@@ -215,7 +215,10 @@ public class FractionJPanel extends JPanel
 	@Note("Save Image")
 	private AbstractButton btnSaveImage = null;
 
-	private AbstractButton btnSavePdf, cbChopImage = null;
+	@Note("Save PDF")
+	private AbstractButton btnSavePdf = null;
+
+	private AbstractButton cbChopImage = null;
 
 	@Note("Fraction 1 Whole Document")
 	private transient Document documentWhole1 = null;
