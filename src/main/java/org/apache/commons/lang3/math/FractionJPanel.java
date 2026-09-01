@@ -1572,8 +1572,8 @@ public class FractionJPanel extends JPanel
 					//
 				} else if (image instanceof BufferedImage bufferedImage) {
 					//
-					testAndAccept((a, b, c) -> Boolean.logicalAnd(a != null, b != null) && c != null, bufferedImage,
-							format, baos, ImageIO::write);
+					testAndAccept((a, b, c) -> and(a != null, b != null, c != null), bufferedImage, format, baos,
+							ImageIO::write);
 					//
 				} // if
 					//
