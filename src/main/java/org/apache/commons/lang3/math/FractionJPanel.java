@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -77,6 +78,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComboBox.KeySelectionManager;
 import javax.swing.JComponent;
@@ -109,6 +111,7 @@ import org.apache.commons.lang3.function.FailableBiConsumer;
 import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.function.FailableFunction;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.reflect.Reflection;
@@ -212,7 +215,7 @@ public class FractionJPanel extends JPanel
 	@Note("Save Image")
 	private AbstractButton btnSaveImage = null;
 
-	private AbstractButton btnSavePdf = null;
+	private AbstractButton btnSavePdf, cbChopImage = null;
 
 	@Note("Fraction 1 Whole Document")
 	private transient Document documentWhole1 = null;
@@ -421,6 +424,12 @@ public class FractionJPanel extends JPanel
 		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
 		//
+		jPanel.add(cbChopImage = new JCheckBox("Chop Image"));
+		//
+		add(jPanel, wrap);
+		//
+		(jPanel = new JPanel()).setLayout(new MigLayout());
+		//
 		jPanel.add(btnShowImage = new JButton("Show Image"));
 		//
 		jPanel.add(btnCopyImage = new JButton("Copy Image"));
@@ -565,8 +574,28 @@ public class FractionJPanel extends JPanel
 		//
 	}
 
-	private static boolean and(final boolean a, final boolean b, final boolean c) {
-		return Boolean.logicalAnd(Boolean.logicalAnd(a, b), c);
+	private static boolean and(final boolean a, final boolean b, final boolean... bs) {
+		//
+		boolean result = Boolean.logicalAnd(a, b);
+		//
+		if (!result) {
+			//
+			return result;
+			//
+		} // if
+			//
+		for (int i = 0; bs != null && i < bs.length; i++) {
+			//
+			if (!(result &= bs[i])) {
+				//
+				return result;
+				//
+			} // if
+				//
+		} // for
+			//
+		return result;
+		//
 	}
 
 	private static <T, R> R collect(final Stream<T> instance, final Supplier<R> supplier,
@@ -855,8 +884,8 @@ public class FractionJPanel extends JPanel
 		//
 		setIcon(labelImage, null);
 		//
-		forEach(Arrays.asList(tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf, btnExecute),
-				x -> setEnabled(x, false));
+		forEach(Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf,
+				btnExecute), x -> setEnabled(x, false));
 		//
 		setEnabled(jcbFileSuffix, false);
 		//
@@ -1207,7 +1236,7 @@ public class FractionJPanel extends JPanel
 					//
 				} // if
 					//
-				forEach(Arrays.asList(tfFontSize, jcbColor, btnShowImage), x -> setEnabled(x, true));
+				forEach(Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage), x -> setEnabled(x, true));
 				//
 			} catch (final ReflectiveOperationException e) {
 				//
@@ -1237,11 +1266,25 @@ public class FractionJPanel extends JPanel
 				//
 				setContent(page, toHtml());
 				//
-				setIcon(labelImage, new ImageIcon(screenshot(locator(page, "tbody"))));
+				final byte[] bs = screenshot(locator(page, "tbody"));
 				//
+				if (cbChopImage != null && cbChopImage.isSelected()) {
+					//
+					setIcon(labelImage, new ImageIcon(chopImage(toBufferedImage(bs))));
+					//
+				} else {
+					//
+					setIcon(labelImage, new ImageIcon(bs));
+					//
+				} // if
+					//
 				forEach(Arrays.asList(btnCopyImage, btnSaveImage, btnSavePdf, jcbFileSuffix), x -> setEnabled(x, true));
 				//
 				pack(window);
+				//
+			} catch (final IOException e) {
+				//
+				throw new RuntimeException();
 				//
 			} // try
 				//
@@ -1251,6 +1294,126 @@ public class FractionJPanel extends JPanel
 			//
 		actionPerformed(this, source);
 		//
+	}
+
+	private static BufferedImage chopImage(final BufferedImage bufferedImage) {
+		//
+		if (bufferedImage == null) {
+			//
+			return bufferedImage;
+			//
+		} // if
+			//
+		final int width = getWidth(bufferedImage);
+		//
+		final int height = getHeight(bufferedImage);
+		//
+		Integer firstColor = null, minX = null, minY = null, maxX = null, maxY = null;
+		//
+		for (int x = 0; x < width && bufferedImage != null; x++) {
+			//
+			for (int y = 0; y < height; y++) {
+				//
+				if (firstColor == null) {
+					//
+					firstColor = Integer.valueOf(bufferedImage.getRGB(x, y));
+					//
+					continue;
+					//
+				} // if
+					//
+				if (firstColor != null && firstColor.intValue() != bufferedImage.getRGB(x, y)) {
+					//
+					minX = Integer.valueOf(Math.min(intValue(minX, x), x));
+					//
+					maxX = Integer.valueOf(Math.max(intValue(maxX, x), x));
+					//
+					minY = Integer.valueOf(Math.min(intValue(minY, y), y));
+					//
+					maxY = Integer.valueOf(Math.max(intValue(maxY, y), y));
+					//
+				} // if
+					//
+			} // for
+				//
+		} // for
+			//
+		final Iterable<Field> fs = toList(filter(stream(FieldUtils.getAllFieldsList(getClass(bufferedImage))),
+				x -> Objects.equals(getName(x), "raster")));
+		//
+		testAndRun(IterableUtils.size(fs) > 1, () -> {
+			//
+			throw new IllegalStateException();
+			//
+		});
+		//
+		if (bufferedImage != null
+				&& testAndApply(Objects::nonNull,
+						testAndApply(x -> IterableUtils.size(x) == 1, fs, x -> IterableUtils.get(x, 0), null),
+						x -> Narcissus.getField(bufferedImage, x), null) != null
+				&& and(Objects::nonNull, minX, minY, maxX, maxY)) {
+			//
+			return bufferedImage.getSubimage(intValue(minX, 0), intValue(minY, 0),
+					intValue(maxX, 0) - intValue(minX, 0) + 1, intValue(maxY, 0) - intValue(minY, 0) + 1);
+			//
+		} // if
+			//
+		return bufferedImage;
+		//
+	}
+
+	private static <T> boolean and(final Predicate<T> predicate, final T a, final T b, final T c, final T d) {
+		return and(test(predicate, a), test(predicate, b), test(predicate, c), test(predicate, d));
+	}
+
+	private static int getHeight(final BufferedImage instance) {
+		//
+		final Iterable<Field> fs = toList(
+				filter(stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						x -> Objects.equals(getName(x), "raster")));
+		//
+		testAndRun(IterableUtils.size(fs) > 1, () -> {
+			//
+			throw new IllegalStateException();
+			//
+		});
+		//
+		final Field f = testAndApply(x -> IterableUtils.size(x) == 1, fs, x -> IterableUtils.get(x, 0), null);
+		//
+		return f != null && Narcissus.getField(instance, f) != null ? instance.getHeight() : 0;
+		//
+	}
+
+	private static int getWidth(final BufferedImage instance) {
+		//
+		final Iterable<Field> fs = toList(
+				filter(stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						x -> Objects.equals(getName(x), "raster")));
+		//
+		testAndRun(IterableUtils.size(fs) > 1, () -> {
+			//
+			throw new IllegalStateException();
+			//
+		});
+		//
+		final Field f = testAndApply(x -> IterableUtils.size(x) == 1, fs, x -> IterableUtils.get(x, 0), null);
+		//
+		return f != null && Narcissus.getField(instance, f) != null ? instance.getWidth() : 0;
+		//
+	}
+
+	private static <E> Stream<E> stream(final Collection<E> instance) {
+		return instance != null ? instance.stream() : null;
+	}
+
+	private static BufferedImage toBufferedImage(final byte[] bs) throws IOException {
+		//
+		try (final InputStream is = testAndApply(Objects::nonNull, bs, ByteArrayInputStream::new, null)) {
+			//
+			return testAndApply(Objects::nonNull, is, ImageIO::read, null);
+			//
+		} // try
+			//
 	}
 
 	private static byte[] pdf(final Page instance) {
@@ -1389,15 +1552,23 @@ public class FractionJPanel extends JPanel
 					//
 				});
 				//
-				testAndAccept(Objects::nonNull,
-						cast(BufferedImage.class,
-								testAndApply((a, b) -> Boolean.logicalAnd(a != null, b != null), image,
-										testAndApply(x -> IterableUtils.size(x) == 1, ms, x -> IterableUtils.get(x, 0),
-												null),
-										Narcissus::invokeMethod, null)),
-						x -> ImageIO.write(cast(BufferedImage.class, x),
-								Objects.toString(getSelectedItem(instance.cbmFileSuffix)), baos));
+				final String format = Objects.toString(getSelectedItem(instance.cbmFileSuffix));
 				//
+				if (IterableUtils.size(ms) == 1) {
+					//
+					testAndAccept(Objects::nonNull, cast(BufferedImage.class,
+							testAndApply((a, b) -> Boolean.logicalAnd(a != null, b != null), image,
+									testAndApply(x -> IterableUtils.size(x) == 1, ms, x -> IterableUtils.get(x, 0),
+											null),
+									Narcissus::invokeMethod, null)),
+							x -> ImageIO.write(cast(BufferedImage.class, x), format, baos));
+					//
+				} else if (image instanceof BufferedImage bufferedImage && bufferedImage != null) {
+					//
+					ImageIO.write(bufferedImage, format, baos);
+					//
+				} // if
+					//
 				final JFileChooser jfc = new JFileChooser(".");
 				//
 				if (and(!GraphicsEnvironment.isHeadless(),
@@ -1992,7 +2163,7 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 				FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 		//
-		forEach(Arrays.asList(tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf,
+		forEach(Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf,
 				jcbFileSuffix), x -> setEnabled(x, false));
 		//
 		if (Objects.equals(document, documentWhole1)) {
@@ -2120,8 +2291,8 @@ public class FractionJPanel extends JPanel
 			//
 			setIcon(labelImage, null);
 			//
-			forEach(Arrays.asList(tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf),
-					x -> setEnabled(x, false));
+			forEach(Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage,
+					btnSavePdf), x -> setEnabled(x, false));
 			//
 		} // if
 			//

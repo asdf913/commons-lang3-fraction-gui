@@ -6,6 +6,7 @@ import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Executable;
@@ -81,9 +82,9 @@ class FractionJPanelTest {
 
 	private static Method METHOD_TO_FRACTION, METHOD_INVOKE, METHOD_CAST, METHOD_CREATE_FOCUS_TRAVERSAL_POLICY,
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
-			METHOD_CONTAINS_KEY, METHOD_GET_PROPERTY, METHOD_AND2, METHOD_AND4, METHOD_TO_HTML,
+			METHOD_CONTAINS_KEY, METHOD_GET_PROPERTY, METHOD_AND2, METHOD_AND3, METHOD_AND4, METHOD_TO_HTML,
 			METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL, METHOD_HAS_NEXT, METHOD_EXISTS, METHOD_IS_FILE, METHOD_CAN_READ,
-			METHOD_EQUALS_IGNORE_CASE = null;
+			METHOD_EQUALS_IGNORE_CASE, METHOD_CHOP_IMAGE = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -120,6 +121,8 @@ class FractionJPanelTest {
 		//
 		(METHOD_AND2 = clz.getDeclaredMethod("and", Boolean.TYPE, BooleanSupplier.class)).setAccessible(true);
 		//
+		(METHOD_AND3 = clz.getDeclaredMethod("and", Boolean.TYPE, Boolean.TYPE, boolean[].class)).setAccessible(true);
+		//
 		(METHOD_AND4 = clz.getDeclaredMethod("and", Object.class, Predicate.class, Predicate.class, Predicate.class))
 				.setAccessible(true);
 		//
@@ -139,6 +142,8 @@ class FractionJPanelTest {
 		//
 		(METHOD_EQUALS_IGNORE_CASE = clz.getDeclaredMethod("equalsIgnoreCase", String.class, String.class))
 				.setAccessible(true);
+		//
+		(METHOD_CHOP_IMAGE = clz.getDeclaredMethod("chopImage", BufferedImage.class)).setAccessible(true);
 		//
 	}
 
@@ -184,7 +189,7 @@ class FractionJPanelTest {
 				//
 			if (proxy instanceof Collection) {
 				//
-				if (Objects.equals(name, "toArray")) {
+				if (contains(Arrays.asList("toArray", "stream"), name)) {
 					//
 					return null;
 					//
@@ -351,7 +356,7 @@ class FractionJPanelTest {
 	private IH ih = null;
 
 	private FractionJPanel instance = null;
-	
+
 	private Properties properties = null;
 
 	@BeforeMethod
@@ -389,7 +394,9 @@ class FractionJPanelTest {
 		for (int i = 0; ms != null && i < ms.length; i++) {
 			//
 			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
-					|| (parameterTypes = getParameterTypes(m)) == null) {
+					|| (parameterTypes = getParameterTypes(m)) == null
+					|| Boolean.logicalAnd(Objects.equals(name = getName(m), "and"), Arrays.equals(parameterTypes,
+							new Class<?>[] { Boolean.TYPE, Boolean.TYPE, boolean[].class }))) {
 				//
 				continue;
 				//
@@ -426,8 +433,6 @@ class FractionJPanelTest {
 			final Method m1 = m;
 			//
 			final Object[] os1 = os;
-			//
-			name = getName(m);
 			//
 			if (Modifier.isStatic(m.getModifiers())) {
 				//
@@ -730,7 +735,9 @@ class FractionJPanelTest {
 							Arrays.equals(parameterTypes, new Object[] { Class.class })),
 					Boolean.logicalAnd(Objects.equals(name, "toHtml"), getParameterCount(m) == 0),
 					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"),
-							Arrays.equals(parameterTypes, new Object[] { Integer.TYPE })))) {
+							Arrays.equals(parameterTypes, new Object[] { Integer.TYPE })),
+					Boolean.logicalAnd(Objects.equals(name, "chopImage"),
+							Arrays.equals(parameterTypes, new Object[] { BufferedImage.class })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -1211,6 +1218,10 @@ class FractionJPanelTest {
 		//
 		Assert.assertFalse(and(true, () -> false));
 		//
+		Assert.assertTrue(and(true, true, null));
+		//
+		Assert.assertFalse(and(true, true, false));
+		//
 		final Predicate<Object> alwaysTrue = Predicates.alwaysTrue();
 		//
 		Assert.assertFalse(and(null, alwaysTrue, null, null));
@@ -1224,6 +1235,18 @@ class FractionJPanelTest {
 	private static boolean and(final boolean condition, final BooleanSupplier booleanSupplier) throws Throwable {
 		try {
 			final Object obj = invoke(METHOD_AND2, null, condition, booleanSupplier);
+			if (obj instanceof Boolean booleanValue && booleanValue != null) {
+				return booleanValue.booleanValue();
+			}
+			throw new Throwable(Objects.toString(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	private static boolean and(final boolean a, final boolean b, final boolean... bs) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_AND3, null, a, b, bs);
 			if (obj instanceof Boolean booleanValue && booleanValue != null) {
 				return booleanValue.booleanValue();
 			}
@@ -1358,6 +1381,17 @@ class FractionJPanelTest {
 		Assert.assertEquals(invoke(METHOD_EQUALS_IGNORE_CASE, null, EMPTY, EMPTY), Boolean.TRUE);
 		//
 		Assert.assertEquals(invoke(METHOD_EQUALS_IGNORE_CASE, null, EMPTY, "A"), Boolean.FALSE);
+		//
+	}
+
+	@Test
+	public void testChopImage() throws IllegalAccessException, InvocationTargetException {
+		//
+		final BufferedImage bufferedImage = new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB);
+		//
+		bufferedImage.setRGB(1, 1, 1);
+		//
+		Assert.assertNotNull(invoke(METHOD_CHOP_IMAGE, null, bufferedImage));
 		//
 	}
 
