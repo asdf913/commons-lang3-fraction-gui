@@ -1248,9 +1248,9 @@ public class FractionJPanel extends JPanel
 				//
 			} catch (final ReflectiveOperationException e) {
 				//
-				if (e instanceof InvocationTargetException ite && ite != null) {
+				if (e instanceof InvocationTargetException ite) {
 					//
-					throw new RuntimeException(ObjectUtils.getIfNull(ite.getTargetException(), ite));
+					throw new RuntimeException(ObjectUtils.getIfNull(getTargetException(ite), ite));
 					//
 				} // if
 					//
@@ -1296,6 +1296,10 @@ public class FractionJPanel extends JPanel
 			//
 		actionPerformed(this, source);
 		//
+	}
+
+	private static Throwable getTargetException(final InvocationTargetException instance) {
+		return instance != null ? instance.getTargetException() : null;
 	}
 
 	private static boolean isSelected(final AbstractButton instance) {
