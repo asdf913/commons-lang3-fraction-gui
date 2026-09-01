@@ -48,6 +48,12 @@
 			<artifactId>guava</artifactId>
 			<version>33.7.1-jre</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.meeuw.util/mihxil-functional -->
+		<dependency>
+			<groupId>org.meeuw.util</groupId>
+			<artifactId>mihxil-functional</artifactId>
+			<version>1.20</version>
+		</dependency>
 		<!--https://mvnrepository.com/artifact/org.testng/testng-->
 		<dependency>
 			<groupId>org.testng</groupId>

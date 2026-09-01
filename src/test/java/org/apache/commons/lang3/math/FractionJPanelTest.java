@@ -62,6 +62,10 @@ import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableFunction;
 import org.apache.commons.lang3.function.TriFunction;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.meeuw.functional.Consumers;
+import org.meeuw.functional.Functions;
+import org.meeuw.functional.ThrowingTriConsumer;
+import org.meeuw.functional.TriPredicate;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -85,7 +89,7 @@ class FractionJPanelTest {
 			METHOD_TO_MATH_ML, METHOD_TO_PATH, METHOD_GET_PARAMETER_COUNT, METHOD_MATCHES, METHOD_IS_STATIC,
 			METHOD_CONTAINS_KEY, METHOD_GET_PROPERTY, METHOD_AND2, METHOD_AND3, METHOD_AND4, METHOD_TO_HTML,
 			METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL, METHOD_HAS_NEXT, METHOD_EXISTS, METHOD_IS_FILE, METHOD_CAN_READ,
-			METHOD_EQUALS_IGNORE_CASE, METHOD_CHOP_IMAGE = null;
+			METHOD_EQUALS_IGNORE_CASE, METHOD_CHOP_IMAGE, METHOD_TEST_AND_ACCEPT = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -146,6 +150,9 @@ class FractionJPanelTest {
 		//
 		(METHOD_CHOP_IMAGE = clz.getDeclaredMethod("chopImage", BufferedImage.class)).setAccessible(true);
 		//
+		(METHOD_TEST_AND_ACCEPT = clz.getDeclaredMethod("testAndAccept", TriPredicate.class, Object.class, Object.class,
+				Object.class, ThrowingTriConsumer.class)).setAccessible(true);
+		//
 	}
 
 	private static class IH implements InvocationHandler {
@@ -202,9 +209,8 @@ class FractionJPanelTest {
 					//
 			} // if
 				//
-			if (Boolean.logicalAnd(
-					or(proxy instanceof Predicate, proxy instanceof BiPredicate, proxy instanceof IntPredicate),
-					Objects.equals(name, "test"))) {
+			if (Boolean.logicalAnd(or(proxy instanceof Predicate, proxy instanceof BiPredicate,
+					proxy instanceof IntPredicate, proxy instanceof TriPredicate), Objects.equals(name, "test"))) {
 				//
 				return test;
 				//
@@ -1397,6 +1403,33 @@ class FractionJPanelTest {
 		bufferedImage.setRGB(1, 1, 1);
 		//
 		Assert.assertNotNull(invoke(METHOD_CHOP_IMAGE, null, bufferedImage));
+		//
+	}
+
+	@Test
+	public void testTestAndAccept() throws IllegalAccessException, InvocationTargetException {
+		//
+		if ((ih = ObjectUtils.getIfNull(ih, IH::new)) != null) {
+			//
+			ih.test = Boolean.FALSE;
+			//
+		} // if
+			//
+		final TriPredicate<?, ?, ?> triPredicate = Reflection.newProxy(TriPredicate.class, ih);
+		//
+		Assert.assertNull(invoke(METHOD_TEST_AND_ACCEPT, null, triPredicate, null, null, null, null));
+		//
+		if (ih != null) {
+			//
+			ih.test = Boolean.TRUE;
+			//
+		} // if
+			//
+		Assert.assertNull(invoke(METHOD_TEST_AND_ACCEPT, null, triPredicate, null, null, null, null));
+		//
+		final ThrowingTriConsumer<?, ?, ?, ?> throwingTriConsumer = Reflection.newProxy(ThrowingTriConsumer.class, ih);
+		//
+		Assert.assertNull(invoke(METHOD_TEST_AND_ACCEPT, null, triPredicate, null, null, null, throwingTriConsumer));
 		//
 	}
 

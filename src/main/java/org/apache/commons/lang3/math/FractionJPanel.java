@@ -113,6 +113,8 @@ import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.function.FailableFunction;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.meeuw.functional.ThrowingTriConsumer;
+import org.meeuw.functional.TriPredicate;
 
 import com.google.common.reflect.Reflection;
 import com.microsoft.playwright.Browser;
@@ -1566,9 +1568,10 @@ public class FractionJPanel extends JPanel
 									Narcissus::invokeMethod, null)),
 							x -> ImageIO.write(cast(BufferedImage.class, x), format, baos));
 					//
-				} else if (image instanceof BufferedImage bufferedImage && bufferedImage != null) {
+				} else if (image instanceof BufferedImage bufferedImage) {
 					//
-					ImageIO.write(bufferedImage, format, baos);
+					testAndAccept((a, b, c) -> a != null && b != null && c != null, bufferedImage, format, baos,
+							ImageIO::write);
 					//
 				} // if
 					//
@@ -1622,6 +1625,17 @@ public class FractionJPanel extends JPanel
 				//
 			} // try
 				//
+		} // if
+			//
+	}
+
+	private static <T, U, V, E extends Exception> void testAndAccept(final TriPredicate<T, U, V> predicate, final T t,
+			final U u, final V v, final ThrowingTriConsumer<T, U, V, E> consumer) {
+		//
+		if (predicate != null && predicate.test(t, u, v) && consumer != null) {
+			//
+			consumer.accept(t, u, v);
+			//
 		} // if
 			//
 	}
