@@ -133,6 +133,8 @@ public class FractionJPanel extends JPanel
 
 	private static final String WMIN = "wmin";
 
+	private static final String RASTER = "raster";
+
 	private static final BidiMap<Character, String> BIDI_MAP = new TreeBidiMap<>(
 			Map.of(Character.valueOf('+'), "add", Character.valueOf('-'), "subtract", Character.valueOf('*'),
 					"multiplyBy", Character.valueOf('/'), "divideBy"));
@@ -1344,7 +1346,7 @@ public class FractionJPanel extends JPanel
 		} // for
 			//
 		final Iterable<Field> fs = toList(filter(stream(FieldUtils.getAllFieldsList(getClass(bufferedImage))),
-				x -> Objects.equals(getName(x), "raster")));
+				x -> Objects.equals(getName(x), RASTER)));
 		//
 		testAndRun(IterableUtils.size(fs) > 1, () -> {
 			//
@@ -1375,7 +1377,7 @@ public class FractionJPanel extends JPanel
 		//
 		final Iterable<Field> fs = toList(
 				filter(stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
-						x -> Objects.equals(getName(x), "raster")));
+						x -> Objects.equals(getName(x), RASTER)));
 		//
 		testAndRun(IterableUtils.size(fs) > 1, () -> {
 			//
@@ -1393,7 +1395,7 @@ public class FractionJPanel extends JPanel
 		//
 		final Iterable<Field> fs = toList(
 				filter(stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
-						x -> Objects.equals(getName(x), "raster")));
+						x -> Objects.equals(getName(x), RASTER)));
 		//
 		testAndRun(IterableUtils.size(fs) > 1, () -> {
 			//
