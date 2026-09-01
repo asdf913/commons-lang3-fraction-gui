@@ -2,6 +2,7 @@ package org.apache.commons.lang3.math;
 
 import java.awt.Color;
 import java.awt.FocusTraversalPolicy;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -610,6 +611,10 @@ class FractionJPanelTest {
 					//
 					add(collection, Narcissus
 							.allocateInstance(Class.forName("javax.swing.text.AbstractDocument$DefaultFilterBypass")));
+					//
+				} else if (Objects.equals(parameterType, Toolkit.class)) {
+					//
+					add(collection, Toolkit.getDefaultToolkit());
 					//
 				} else if (parameterType != null && parameterType.isInterface()) {
 					//
