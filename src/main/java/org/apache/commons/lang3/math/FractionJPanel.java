@@ -111,6 +111,7 @@ import org.apache.commons.lang3.function.FailableBiConsumer;
 import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.function.FailableFunction;
+import org.apache.commons.lang3.function.FailableRunnable;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.meeuw.functional.ThrowingTriConsumer;
@@ -1275,16 +1276,10 @@ public class FractionJPanel extends JPanel
 				//
 				final byte[] bs = screenshot(locator(page, "tbody"));
 				//
-				if (isSelected(cbChopImage)) {
-					//
-					setIcon(labelImage, new ImageIcon(chopImage(toBufferedImage(bs))));
-					//
-				} else {
-					//
-					setIcon(labelImage, new ImageIcon(bs));
-					//
-				} // if
-					//
+				testAndRun(isSelected(cbChopImage),
+						() -> setIcon(labelImage, new ImageIcon(chopImage(toBufferedImage(bs)))),
+						() -> setIcon(labelImage, new ImageIcon(bs)));
+
 				forEach(Arrays.asList(btnCopyImage, btnSaveImage, btnSavePdf, jcbFileSuffix), x -> setEnabled(x, true));
 				//
 				pack(window);
@@ -1664,6 +1659,12 @@ public class FractionJPanel extends JPanel
 		}
 	}
 
+	private static void run(final Runnable instance) {
+		if (instance != null) {
+			instance.run();
+		}
+	}
+
 	private static Icon getIcon(final JLabel instance) {
 		return instance != null ? instance.getIcon() : null;
 	}
@@ -1844,7 +1845,8 @@ public class FractionJPanel extends JPanel
 		//
 	}
 
-	private static void testAndRun(final boolean condition, final Runnable runnableTrue, final Runnable runnableFalse) {
+	private static <E extends Exception> void testAndRun(final boolean condition,
+			final FailableRunnable<E> runnableTrue, final FailableRunnable<E> runnableFalse) throws E {
 		if (condition) {
 			run(runnableTrue);
 		} else {
@@ -1852,7 +1854,7 @@ public class FractionJPanel extends JPanel
 		}
 	}
 
-	private static void run(final Runnable instance) {
+	private static <E extends Exception> void run(final FailableRunnable<E> instance) throws E {
 		if (instance != null) {
 			instance.run();
 		}
