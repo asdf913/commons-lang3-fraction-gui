@@ -2,11 +2,14 @@ package org.apache.commons.lang3.math;
 
 import java.awt.Color;
 import java.awt.FocusTraversalPolicy;
+import java.awt.ItemSelectable;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.Array;
@@ -42,9 +45,11 @@ import java.util.stream.Stream;
 import javax.imageio.spi.ImageReaderWriterSpi;
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
+import javax.swing.DefaultButtonModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
@@ -89,7 +94,7 @@ class FractionJPanelTest {
 			METHOD_CONTAINS_KEY, METHOD_GET_PROPERTY, METHOD_AND2, METHOD_AND3, METHOD_AND4, METHOD_TO_HTML,
 			METHOD_GET_PARAMETER_TYPES, METHOD_ADD_ALL, METHOD_HAS_NEXT, METHOD_EXISTS, METHOD_IS_FILE, METHOD_CAN_READ,
 			METHOD_EQUALS_IGNORE_CASE, METHOD_CHOP_IMAGE, METHOD_TEST_AND_ACCEPT, METHOD_IS_SELECTED,
-			METHOD_SET_SELECTED = null;
+			METHOD_SET_SELECTED, METHOD_ADD_ITEM_LISTENER = null;
 
 	@BeforeClass
 	static void beforeClass() throws NoSuchMethodException {
@@ -156,6 +161,9 @@ class FractionJPanelTest {
 		(METHOD_IS_SELECTED = clz.getDeclaredMethod("isSelected", AbstractButton.class)).setAccessible(true);
 		//
 		(METHOD_SET_SELECTED = clz.getDeclaredMethod("setSelected", AbstractButton.class, Boolean.TYPE))
+				.setAccessible(true);
+		//
+		(METHOD_ADD_ITEM_LISTENER = clz.getDeclaredMethod("addItemListener", ItemSelectable.class, ItemListener.class))
 				.setAccessible(true);
 		//
 	}
@@ -1461,6 +1469,17 @@ class FractionJPanelTest {
 	}
 
 	@Test
+	public void testAddItemListener() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertNull(invoke(METHOD_ADD_ITEM_LISTENER, null, new JComboBox<>(), null));
+		//
+		Assert.assertNull(invoke(METHOD_ADD_ITEM_LISTENER, null, Narcissus.allocateInstance(JComboBox.class), null));
+		//
+		Assert.assertNull(invoke(METHOD_ADD_ITEM_LISTENER, null, new DefaultButtonModel(), null));
+		//
+	}
+
+	@Test
 	public void testCreateDocumentFilter() throws Throwable {
 		//
 		final DocumentFilter documentFilter = cast(DocumentFilter.class, Narcissus
@@ -1498,6 +1517,27 @@ class FractionJPanelTest {
 			//
 		} // if
 			//
+	}
+
+	@Test
+	public void testItemStateChanged() throws Exception {
+		//
+		if (instance == null) {
+			//
+			return;
+			//
+		} // if
+			//
+		final JComboBox<?> jcbColor = new JComboBox<>();
+		//
+		final ItemEvent itemEvent = new ItemEvent(jcbColor, 0, null, 0);
+		//
+		instance.itemStateChanged(itemEvent);
+		//
+		FieldUtils.writeDeclaredField(instance, "jcbColor", jcbColor, true);
+		//
+		instance.itemStateChanged(itemEvent);
+		//
 	}
 
 }

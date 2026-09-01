@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.FocusTraversalPolicy;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.ItemSelectable;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
@@ -34,6 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -314,8 +316,6 @@ public class FractionJPanel extends JPanel
 		//
 		jcbMethod.setKeySelectionManager(this);
 		//
-		jcbMethod.addItemListener(this);
-		//
 		add(jcbMethod);
 		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
@@ -518,6 +518,11 @@ public class FractionJPanel extends JPanel
 						x -> Narcissus.getField(this, x)))),
 				x -> addActionListener(x, this));
 		//
+		forEach(map(Arrays.stream(FractionJPanel.class.getDeclaredFields()),
+				f -> cast(ItemSelectable.class, testAndApply(FractionJPanel::isStatic, f, Narcissus::getStaticField,
+						x -> Narcissus.getField(this, x)))),
+				x -> addItemListener(x, this));
+		//
 		clear();
 		//
 		final DocumentFilter documentFilter1 = new DocumentFilterImpl(true);
@@ -531,6 +536,35 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getDenominator(fraction1),
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
+		//
+	}
+
+	private static void addItemListener(final ItemSelectable instance, final ItemListener itemListener) {
+		//
+		final Class<?> clz = getClass(instance);
+		//
+		if (instance == null || Proxy.isProxyClass(clz)) {
+			//
+			return;
+			//
+		} // if
+			//
+		try {
+			//
+			if (instance instanceof JComponent
+					&& Narcissus.getField(instance, Narcissus.findField(clz, "listenerList")) == null) {
+				//
+				return;
+				//
+			} // if
+				//
+		} catch (final NoSuchFieldException e) {
+			//
+			throw new RuntimeException(e);
+			//
+		} // try
+			//
+		instance.addItemListener(itemListener);
 		//
 	}
 
@@ -2335,7 +2369,9 @@ public class FractionJPanel extends JPanel
 		//
 		btnExecuteSetEnabled();
 		//
-		if (Objects.equals(getSource(evt), jcbMethod)) {
+		final Object source = getSource(evt);
+		//
+		if (Objects.equals(source, jcbMethod)) {
 			//
 			forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 					FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
@@ -2343,7 +2379,13 @@ public class FractionJPanel extends JPanel
 			setIcon(labelImage, null);
 			//
 			forEach(Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage,
-					btnSavePdf), x -> setEnabled(x, false));
+					btnSavePdf, jcbFileSuffix), x -> setEnabled(x, false));
+			//
+		} else if (Objects.equals(source, jcbColor)) {
+			//
+			setIcon(labelImage, null);
+			//
+			forEach(Arrays.asList(btnCopyImage, btnSaveImage, btnSavePdf, jcbFileSuffix), x -> setEnabled(x, false));
 			//
 		} // if
 			//
