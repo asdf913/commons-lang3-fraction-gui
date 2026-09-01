@@ -1,6 +1,7 @@
 package org.apache.commons.lang3.math;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FocusTraversalPolicy;
 import java.awt.ItemSelectable;
 import java.awt.Toolkit;
@@ -50,7 +51,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.event.DocumentEvent;
@@ -604,8 +604,7 @@ class FractionJPanelTest {
 					//
 					add(collection, Class.class);
 					//
-				} else if (Boolean.logicalOr(Objects.equals(parameterType, JComponent.class),
-						Objects.equals(parameterType, JTextComponent.class))) {
+				} else if (contains(Arrays.asList(Component.class, JTextComponent.class), parameterType)) {
 					//
 					add(collection, Narcissus.allocateInstance(JTextField.class));
 					//

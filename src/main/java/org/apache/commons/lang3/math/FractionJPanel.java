@@ -938,7 +938,7 @@ public class FractionJPanel extends JPanel
 		//
 	}
 
-	private static void setEnabled(final JComponent instance, final boolean enabled) {
+	private static void setEnabled(final Component instance, final boolean enabled) {
 		//
 		try {
 			//
