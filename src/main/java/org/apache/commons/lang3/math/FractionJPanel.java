@@ -2317,8 +2317,8 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 				FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 		//
-		forEach(Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf,
-				jcbFileSuffix), x -> setEnabled(x, false));
+		forEach(Iterables.concat(readFieldsByGroup(Component.class, "Image"),
+				Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage)), x -> setEnabled(x, false));
 		//
 		if (Objects.equals(document, documentWhole1)) {
 			//
