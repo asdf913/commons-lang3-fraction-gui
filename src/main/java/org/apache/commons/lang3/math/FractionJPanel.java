@@ -1677,7 +1677,7 @@ public class FractionJPanel extends JPanel
 					//
 				final JFileChooser jfc = new JFileChooser(".");
 				//
-				if (and(!GraphicsEnvironment.isHeadless() && !isTestMode(),
+				if (and(Boolean.logicalAnd(!GraphicsEnvironment.isHeadless(), !isTestMode()),
 						() -> jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)) {
 					//
 					Files.write(toPath(jfc.getSelectedFile()), baos.toByteArray(), StandardOpenOption.CREATE,
