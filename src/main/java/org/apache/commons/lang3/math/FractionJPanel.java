@@ -1315,32 +1315,6 @@ public class FractionJPanel extends JPanel
 			//
 			return;
 			//
-		} else if (Objects.equals(source, btnShowImage)) {
-			//
-			try (final Playwright playwright = Playwright.create();
-					final Browser browser = launch(chromium(playwright));
-					final Page page = newPage(browser)) {
-				//
-				setContent(page, toHtml());
-				//
-				final byte[] bs = screenshot(locator(page, "tbody"));
-				//
-				testAndRun(isSelected(cbChopImage),
-						() -> setIcon(labelImage, new ImageIcon(chopImage(toBufferedImage(bs)))),
-						() -> setIcon(labelImage, new ImageIcon(bs)));
-
-				forEach(Arrays.asList(btnCopyImage, btnSaveImage, btnSavePdf, jcbFileSuffix), x -> setEnabled(x, true));
-				//
-				pack(window);
-				//
-			} catch (final IOException e) {
-				//
-				throw new RuntimeException();
-				//
-			} // try
-				//
-			return;
-			//
 		} // if
 			//
 		final Iterable<BiPredicate<FractionJPanel, Object>> biPredicates = Arrays
@@ -1722,6 +1696,33 @@ public class FractionJPanel extends JPanel
 			} catch (final IOException e) {
 				//
 				throw new RuntimeException(e);
+				//
+			} // try
+				//
+			return true;
+			//
+		} else if (Objects.equals(source, instance.btnShowImage)) {
+			//
+			try (final Playwright playwright = Playwright.create();
+					final Browser browser = launch(chromium(playwright));
+					final Page page = newPage(browser)) {
+				//
+				setContent(page, instance.toHtml());
+				//
+				final byte[] bs = screenshot(locator(page, "tbody"));
+				//
+				testAndRun(isSelected(instance.cbChopImage),
+						() -> setIcon(instance.labelImage, new ImageIcon(chopImage(toBufferedImage(bs)))),
+						() -> setIcon(instance.labelImage, new ImageIcon(bs)));
+
+				forEach(Arrays.asList(instance.btnCopyImage, instance.btnSaveImage, instance.btnSavePdf,
+						instance.jcbFileSuffix), x -> setEnabled(x, true));
+				//
+				pack(instance.window);
+				//
+			} catch (final IOException e) {
+				//
+				throw new RuntimeException();
 				//
 			} // try
 				//
