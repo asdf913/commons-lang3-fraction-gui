@@ -121,6 +121,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.meeuw.functional.ThrowingTriConsumer;
 import org.meeuw.functional.TriPredicate;
 
+import com.google.common.collect.Iterables;
 import com.google.common.reflect.Reflection;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserType;
@@ -941,8 +942,8 @@ public class FractionJPanel extends JPanel
 		//
 		setIcon(labelImage, null);
 		//
-		forEach(Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf,
-				jcbFileSuffix, btnExecute), x -> setEnabled(x, false));
+		forEach(Iterables.concat(readFieldsByGroup(Component.class, "Image"),
+				Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage, btnExecute)), x -> setEnabled(x, false));
 		//
 		pack(window);
 		//
