@@ -69,6 +69,7 @@ import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableFunction;
 import org.apache.commons.lang3.function.TriFunction;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.meeuw.functional.ThrowingTriConsumer;
 import org.meeuw.functional.TriPredicate;
 import org.testng.Assert;
@@ -1171,6 +1172,28 @@ class FractionJPanelTest {
 		FieldUtils.writeDeclaredField(instance, "cbChopImage", cbChopImage, true);
 		//
 		instance.actionPerformed(new ActionEvent(cbChopImage, 0, null));
+		//
+	}
+
+	@Test
+	public void testSelectionForKey() throws Exception {
+		//
+		if (instance == null) {
+			//
+			return;
+			//
+		} // if
+			//
+		final ComboBoxModel<?> cbmColor = new DefaultComboBoxModel<>(
+				new Object[] { null, Pair.of(Object.class.getDeclaredMethod("toString"), null) });
+		//
+		FieldUtils.writeDeclaredField(instance, "cbmColor", cbmColor, true);
+		//
+		Assert.assertEquals(instance.selectionForKey(' ', cbmColor), -1);
+		//
+		Assert.assertEquals(instance.selectionForKey('t', cbmColor), 1);
+		//
+		Assert.assertEquals(instance.selectionForKey('T', cbmColor), 1);
 		//
 	}
 

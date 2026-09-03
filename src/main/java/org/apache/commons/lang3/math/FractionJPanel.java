@@ -108,6 +108,7 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.bidimap.TreeBidiMap;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -382,6 +383,8 @@ public class FractionJPanel extends JPanel
 						LinkedHashMap::new, (a, b) -> put(a, b, Narcissus.getStaticField(b)), Map::putAll))
 						.toArray(Entry[]::new))))
 				.getRenderer();
+		//
+		jcbColor.setKeySelectionManager(this);
 		//
 		jPanel.add(jcbColor);
 		//
@@ -2229,36 +2232,72 @@ public class FractionJPanel extends JPanel
 	@Override
 	public int selectionForKey(final char aKey, final ComboBoxModel<?> aModel) {
 		//
-		final Iterable<Entry<Integer, Member>> entrySet = entrySet(collect(
-				mapToObj(IntStream.range(0, getSize(aModel)),
-						i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i)))),
-				LinkedHashMap::new, (a, b) -> put(a, getKey(b), getValue(b)), Map::putAll));
-		//
-		final Integer integer = testAndApply(x -> IterableUtils.size(x) == 1, toList(map(
-				filter(StreamSupport.stream(spliterator(entrySet), false),
-						x -> getValue(x) != null && getName(getValue(x)) != null
-								&& StringUtils.isNotEmpty(getName(getValue(x)))
-								&& (getName(getValue(x)).charAt(0) == aKey
-										|| (StringUtils.upperCase(getName(getValue(x))) != null
-												&& StringUtils.upperCase(getName(getValue(x))).charAt(0) == aKey))),
-				FractionJPanel::getKey)), x -> IterableUtils.get(x, 0), null);
-		//
-		if (integer != null) {
+		if (Objects.equals(aModel, cbmMethod)) {
 			//
-			return integer.intValue();
+			final Iterable<Entry<Integer, Member>> entrySet = entrySet(collect(
+					mapToObj(IntStream.range(0, getSize(aModel)),
+							i -> Pair.of(Integer.valueOf(i), cast(Member.class, getElementAt(aModel, i)))),
+					LinkedHashMap::new, (a, b) -> put(a, getKey(b), getValue(b)), Map::putAll));
 			//
+			final Integer integer = testAndApply(x -> IterableUtils.size(x) == 1, toList(map(
+					filter(StreamSupport.stream(spliterator(entrySet), false),
+							x -> getValue(x) != null && getName(getValue(x)) != null
+									&& StringUtils.isNotEmpty(getName(getValue(x)))
+									&& (getName(getValue(x)).charAt(0) == aKey
+											|| (StringUtils.upperCase(getName(getValue(x))) != null
+													&& StringUtils.upperCase(getName(getValue(x))).charAt(0) == aKey))),
+					FractionJPanel::getKey)), x -> IterableUtils.get(x, 0), null);
+			//
+			if (integer != null) {
+				//
+				return integer.intValue();
+				//
+			} // if
+				//
+			return intValue(
+					testAndApply(x -> IterableUtils.size(x) == 1,
+							toList(map(
+									filter(StreamSupport.stream(spliterator(entrySet), false),
+											x -> getValue(x) != null && getName(getValue(x)) != null
+													&& Objects.equals(getName(getValue(x)),
+															get(BIDI_MAP, Character.valueOf(aKey)))),
+									FractionJPanel::getKey)),
+							x -> IterableUtils.get(x, 0), null),
+					-1);
+			//
+		} else if (Objects.equals(aModel, cbmColor)) {
+			//
+			String name = null;
+			//
+			int[] ints = null;
+			//
+			for (int i = 0; i < getSize(aModel); i++) {
+				//
+				if ((name = getName(cast(Member.class, getKey(cast(Entry.class, getElementAt(aModel, i)))))) == null) {
+					//
+					continue;
+					//
+				} // if
+					//
+				if (StringUtils.length(name) > 0 && ArrayUtils.contains(
+						new char[] { Character.toLowerCase(name.charAt(0)), Character.toUpperCase(name.charAt(0)) },
+						aKey)) {
+					//
+					ints = ArrayUtils.add(ints, i);
+					//
+				} // if
+					//
+			} // for
+				//
+			if (ints != null && ints.length == 1) {
+				//
+				return ints[0];
+				//
+			} // if
+				//
 		} // if
 			//
-		return intValue(
-				testAndApply(x -> IterableUtils.size(x) == 1,
-						toList(map(
-								filter(StreamSupport.stream(spliterator(entrySet), false),
-										x -> getValue(x) != null && getName(getValue(x)) != null
-												&& Objects.equals(getName(getValue(x)),
-														get(BIDI_MAP, Character.valueOf(aKey)))),
-								FractionJPanel::getKey)),
-						x -> IterableUtils.get(x, 0), null),
-				-1);
+		return -1;
 		//
 	}
 
