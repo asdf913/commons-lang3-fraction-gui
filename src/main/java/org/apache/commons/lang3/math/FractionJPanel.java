@@ -141,6 +141,8 @@ public class FractionJPanel extends JPanel
 
 	private static final String RASTER = "raster";
 
+	private static final String IMAGE = "Image";
+
 	private static final BidiMap<Character, String> BIDI_MAP = new TreeBidiMap<>(
 			Map.of(Character.valueOf('+'), "add", Character.valueOf('-'), "subtract", Character.valueOf('*'),
 					"multiplyBy", Character.valueOf('/'), "divideBy"));
@@ -225,15 +227,15 @@ public class FractionJPanel extends JPanel
 	@Note("Show Image")
 	private AbstractButton btnShowImage = null;
 
-	@Group("Image")
+	@Group(IMAGE)
 	@Note("Copy Image")
 	private AbstractButton btnCopyImage = null;
 
-	@Group("Image")
+	@Group(IMAGE)
 	@Note("Save Image")
 	private AbstractButton btnSaveImage = null;
 
-	@Group("Image")
+	@Group(IMAGE)
 	@Note("Save PDF")
 	private AbstractButton btnSavePdf = null;
 
@@ -249,7 +251,7 @@ public class FractionJPanel extends JPanel
 	@Note("Method")
 	private JComboBox<?> jcbMethod = null;
 
-	@Group("Image")
+	@Group(IMAGE)
 	@Note("File Suffix")
 	private JComboBox<?> jcbFileSuffix = null;
 
@@ -942,7 +944,7 @@ public class FractionJPanel extends JPanel
 		//
 		setIcon(labelImage, null);
 		//
-		forEach(Iterables.concat(readFieldsByGroup(Component.class, "Image"),
+		forEach(Iterables.concat(readFieldsByGroup(Component.class, IMAGE),
 				Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage, btnExecute)), x -> setEnabled(x, false));
 		//
 		pack(window);
@@ -1718,7 +1720,7 @@ public class FractionJPanel extends JPanel
 			//
 			setIcon(instance.labelImage, null);
 			//
-			forEach(instance.readFieldsByGroup(Component.class, "Image"), x -> setEnabled(x, false));
+			forEach(instance.readFieldsByGroup(Component.class, IMAGE), x -> setEnabled(x, false));
 			//
 			return true;
 			//
@@ -1736,7 +1738,7 @@ public class FractionJPanel extends JPanel
 						() -> setIcon(instance.labelImage, new ImageIcon(chopImage(toBufferedImage(bs)))),
 						() -> setIcon(instance.labelImage, new ImageIcon(bs)));
 				//
-				forEach(instance.readFieldsByGroup(Component.class, "Image"), x -> setEnabled(x, true));
+				forEach(instance.readFieldsByGroup(Component.class, IMAGE), x -> setEnabled(x, true));
 				//
 				pack(instance.window);
 				//
@@ -2317,7 +2319,7 @@ public class FractionJPanel extends JPanel
 		forEach(Arrays.asList(FractionJTextComponent.getWhole(answer), FractionJTextComponent.getNumerator(answer),
 				FractionJTextComponent.getDenominator(answer)), x -> setText(x, ""));
 		//
-		forEach(Iterables.concat(readFieldsByGroup(Component.class, "Image"),
+		forEach(Iterables.concat(readFieldsByGroup(Component.class, IMAGE),
 				Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage)), x -> setEnabled(x, false));
 		//
 		if (Objects.equals(document, documentWhole1)) {
@@ -2447,14 +2449,14 @@ public class FractionJPanel extends JPanel
 			//
 			setIcon(labelImage, null);
 			//
-			forEach(Iterables.concat(readFieldsByGroup(Component.class, "Image"),
+			forEach(Iterables.concat(readFieldsByGroup(Component.class, IMAGE),
 					Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage)), x -> setEnabled(x, false));
 			//
 		} else if (Objects.equals(source, jcbColor)) {
 			//
 			setIcon(labelImage, null);
 			//
-			forEach(readFieldsByGroup(Component.class, "Image"), x -> setEnabled(x, false));
+			forEach(readFieldsByGroup(Component.class, IMAGE), x -> setEnabled(x, false));
 			//
 		} // if
 			//
