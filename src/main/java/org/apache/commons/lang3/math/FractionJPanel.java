@@ -219,7 +219,7 @@ public class FractionJPanel extends JPanel
 	@Retention(RetentionPolicy.RUNTIME)
 	private @interface Group {
 		String value();
-	};
+	}
 
 	@Note("Show Image")
 	private AbstractButton btnShowImage = null;
