@@ -144,6 +144,8 @@ public class FractionJPanel extends JPanel
 
 	private static final String IMAGE = "Image";
 
+	private static final String OBJECT_LOCK = "objectLock";
+
 	private static final BidiMap<Character, String> BIDI_MAP = new TreeBidiMap<>(
 			Map.of(Character.valueOf('+'), "add", Character.valueOf('-'), "subtract", Character.valueOf('*'),
 					"multiplyBy", Character.valueOf('/'), "divideBy"));
@@ -989,7 +991,7 @@ public class FractionJPanel extends JPanel
 			//
 		try {
 			//
-			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), "objectLock")) == null) {
+			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), OBJECT_LOCK)) == null) {
 				//
 				return;
 				//
@@ -1137,7 +1139,7 @@ public class FractionJPanel extends JPanel
 			//
 		try {
 			//
-			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), "objectLock")) == null) {
+			if (Narcissus.getField(instance, Narcissus.findField(getClass(instance), OBJECT_LOCK)) == null) {
 				//
 				return;
 				//
@@ -1232,7 +1234,7 @@ public class FractionJPanel extends JPanel
 			//
 		try {
 			//
-			if (Narcissus.getObjectField(instance, Component.class.getDeclaredField("objectLock")) == null) {
+			if (Narcissus.getObjectField(instance, Component.class.getDeclaredField(OBJECT_LOCK)) == null) {
 				//
 				return;
 				//
