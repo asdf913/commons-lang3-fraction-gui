@@ -330,8 +330,6 @@ public class FractionJPanel extends JPanel
 		//
 		setSelectedItem(cbmMethod, null);
 		//
-		jcbMethod.setKeySelectionManager(this);
-		//
 		add(jcbMethod);
 		//
 		(jPanel = new JPanel()).setLayout(new MigLayout());
@@ -383,8 +381,6 @@ public class FractionJPanel extends JPanel
 						LinkedHashMap::new, (a, b) -> put(a, b, Narcissus.getStaticField(b)), Map::putAll))
 						.toArray(Entry[]::new))))
 				.getRenderer();
-		//
-		jcbColor.setKeySelectionManager(this);
 		//
 		jPanel.add(jcbColor);
 		//
@@ -531,15 +527,16 @@ public class FractionJPanel extends JPanel
 				getDocument(FractionJTextComponent.getNumerator(fraction2)),
 				getDocument(FractionJTextComponent.getDenominator(fraction2))), x -> addDocumentListener(x, this));
 		//
-		forEach(map(Arrays.stream(FractionJPanel.class.getDeclaredFields()),
-				f -> cast(AbstractButton.class, testAndApply(FractionJPanel::isStatic, f, Narcissus::getStaticField,
-						x -> Narcissus.getField(this, x)))),
-				x -> addActionListener(x, this));
+		final Field[] fs = FractionJPanel.class.getDeclaredFields();
 		//
-		forEach(map(Arrays.stream(FractionJPanel.class.getDeclaredFields()),
-				f -> cast(ItemSelectable.class, testAndApply(FractionJPanel::isStatic, f, Narcissus::getStaticField,
-						x -> Narcissus.getField(this, x)))),
-				x -> addItemListener(x, this));
+		forEach(map(Arrays.stream(fs), f -> cast(AbstractButton.class, testAndApply(FractionJPanel::isStatic, f,
+				Narcissus::getStaticField, x -> Narcissus.getField(this, x)))), x -> addActionListener(x, this));
+		//
+		forEach(map(Arrays.stream(fs), f -> cast(ItemSelectable.class, testAndApply(FractionJPanel::isStatic, f,
+				Narcissus::getStaticField, x -> Narcissus.getField(this, x)))), x -> addItemListener(x, this));
+		//
+		forEach(map(Arrays.stream(fs), f -> cast(JComboBox.class, testAndApply(FractionJPanel::isStatic, f,
+				Narcissus::getStaticField, x -> Narcissus.getField(this, x)))), x -> setKeySelectionManager(x, this));
 		//
 		clear();
 		//
@@ -555,6 +552,13 @@ public class FractionJPanel extends JPanel
 				FractionJTextComponent.getDenominator(fraction2)),
 				x -> setDocumentFilter(cast(AbstractDocument.class, getDocument(x)), documentFilter2));
 		//
+	}
+
+	private static void setKeySelectionManager(final JComboBox<?> instance,
+			final KeySelectionManager keySelectionManager) {
+		if (instance != null) {
+			instance.setKeySelectionManager(keySelectionManager);
+		}
 	}
 
 	private static void addItemListener(final ItemSelectable instance, final ItemListener itemListener) {
