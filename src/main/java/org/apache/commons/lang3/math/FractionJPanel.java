@@ -942,9 +942,7 @@ public class FractionJPanel extends JPanel
 		setIcon(labelImage, null);
 		//
 		forEach(Arrays.asList(cbChopImage, tfFontSize, jcbColor, btnShowImage, btnCopyImage, btnSaveImage, btnSavePdf,
-				btnExecute), x -> setEnabled(x, false));
-		//
-		setEnabled(jcbFileSuffix, false);
+				jcbFileSuffix, btnExecute), x -> setEnabled(x, false));
 		//
 		pack(window);
 		//
