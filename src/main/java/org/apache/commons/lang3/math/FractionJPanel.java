@@ -1735,9 +1735,8 @@ public class FractionJPanel extends JPanel
 				testAndRun(isSelected(instance.cbChopImage),
 						() -> setIcon(instance.labelImage, new ImageIcon(chopImage(toBufferedImage(bs)))),
 						() -> setIcon(instance.labelImage, new ImageIcon(bs)));
-
-				forEach(Arrays.asList(instance.btnCopyImage, instance.btnSaveImage, instance.btnSavePdf,
-						instance.jcbFileSuffix), x -> setEnabled(x, true));
+				//
+				forEach(instance.readFieldsByGroup(Component.class, "Image"), x -> setEnabled(x, true));
 				//
 				pack(instance.window);
 				//
