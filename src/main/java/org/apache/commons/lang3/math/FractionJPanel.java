@@ -1343,8 +1343,19 @@ public class FractionJPanel extends JPanel
 			//
 		} // if
 			//
-		actionPerformed(this, source);
+		final Iterable<BiPredicate<FractionJPanel, Object>> biPredicates = Arrays
+				.asList(FractionJPanel::actionPerformed1, FractionJPanel::actionPerformed2);
 		//
+		for (int i = 0; i < IterableUtils.size(biPredicates); i++) {
+			//
+			if (test(IterableUtils.get(biPredicates, i), this, source)) {
+				//
+				break;
+				//
+			} // if
+				//
+		} // for
+			//
 	}
 
 	private <T> Iterable<T> readFieldsByGroup(final Class<T> clz, final String name) {
@@ -1617,11 +1628,11 @@ public class FractionJPanel extends JPanel
 		return instance != null ? instance.getName() : null;
 	}
 
-	private static void actionPerformed(final FractionJPanel instance, final Object source) {
+	private static boolean actionPerformed1(final FractionJPanel instance, final Object source) {
 		//
 		if (instance == null) {
 			//
-			return;
+			return false;
 			//
 		} // if
 			//
@@ -1676,6 +1687,8 @@ public class FractionJPanel extends JPanel
 				//
 			} // try
 				//
+			return true;
+			//
 		} else if (Objects.equals(source, instance.btnCopyImage)) {
 			//
 			final IH ih = new IH();
@@ -1684,6 +1697,8 @@ public class FractionJPanel extends JPanel
 			//
 			setContents(getSystemClipboard(Toolkit.getDefaultToolkit()), Reflection.newProxy(Transferable.class, ih),
 					null);
+			//
+			return true;
 			//
 		} else if (Objects.equals(source, instance.btnSavePdf)) {
 			//
@@ -1710,14 +1725,34 @@ public class FractionJPanel extends JPanel
 				//
 			} // try
 				//
-		} else if (Objects.equals(source, instance.cbChopImage)) {
+			return true;
+			//
+		} // if
+			//
+		return false;
+		//
+	}
+
+	private static boolean actionPerformed2(final FractionJPanel instance, final Object source) {
+		//
+		if (instance == null) {
+			//
+			return false;
+			//
+		} // if
+			//
+		if (Objects.equals(source, instance.cbChopImage)) {
 			//
 			setIcon(instance.labelImage, null);
 			//
 			forEach(instance.readFieldsByGroup(Component.class, "Image"), x -> setEnabled(x, false));
 			//
+			return true;
+			//
 		} // if
 			//
+		return false;
+		//
 	}
 
 	private static <T, U, V, E extends Exception> void testAndAccept(final TriPredicate<T, U, V> predicate, final T t,
