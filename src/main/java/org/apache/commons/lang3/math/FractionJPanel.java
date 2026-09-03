@@ -1701,6 +1701,28 @@ public class FractionJPanel extends JPanel
 				//
 			return true;
 			//
+		} // if
+			//
+		return false;
+		//
+	}
+
+	private static boolean actionPerformed2(final FractionJPanel instance, final Object source) {
+		//
+		if (instance == null) {
+			//
+			return false;
+			//
+		} // if
+			//
+		if (Objects.equals(source, instance.cbChopImage)) {
+			//
+			setIcon(instance.labelImage, null);
+			//
+			forEach(instance.readFieldsByGroup(Component.class, "Image"), x -> setEnabled(x, false));
+			//
+			return true;
+			//
 		} else if (Objects.equals(source, instance.btnShowImage)) {
 			//
 			try (final Playwright playwright = Playwright.create();
@@ -1726,28 +1748,6 @@ public class FractionJPanel extends JPanel
 				//
 			} // try
 				//
-			return true;
-			//
-		} // if
-			//
-		return false;
-		//
-	}
-
-	private static boolean actionPerformed2(final FractionJPanel instance, final Object source) {
-		//
-		if (instance == null) {
-			//
-			return false;
-			//
-		} // if
-			//
-		if (Objects.equals(source, instance.cbChopImage)) {
-			//
-			setIcon(instance.labelImage, null);
-			//
-			forEach(instance.readFieldsByGroup(Component.class, "Image"), x -> setEnabled(x, false));
-			//
 			return true;
 			//
 		} // if
