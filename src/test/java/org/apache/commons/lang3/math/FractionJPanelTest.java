@@ -3,6 +3,7 @@ package org.apache.commons.lang3.math;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FocusTraversalPolicy;
+import java.awt.GraphicsEnvironment;
 import java.awt.ItemSelectable;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -794,7 +795,9 @@ class FractionJPanelTest {
 					Boolean.logicalAnd(Objects.equals(name, "chopImage"),
 							Arrays.equals(parameterTypes, new Object[] { BufferedImage.class })),
 					Boolean.logicalAnd(Objects.equals(name, "readFieldsByGroup"),
-							Arrays.equals(parameterTypes, new Object[] { Class.class, String.class })))) {
+							Arrays.equals(parameterTypes, new Object[] { Class.class, String.class })),
+					and(!GraphicsEnvironment.isHeadless(), Objects.equals(name, "getSystemClipboard"),
+							Arrays.equals(parameterTypes, new Object[] { Toolkit.class })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//

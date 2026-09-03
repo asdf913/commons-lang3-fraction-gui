@@ -1222,10 +1222,30 @@ public class FractionJPanel extends JPanel
 		return instance != null && isValidString(instance) ? instance.replace(oldChar, newChar) : null;
 	}
 
-	private static void pack(final Window instnace) {
-		if (instnace != null && !GraphicsEnvironment.isHeadless()) {
-			instnace.pack();
-		}
+	private static void pack(final Window instance) {
+		//
+		if (instance == null || GraphicsEnvironment.isHeadless()) {
+			//
+			return;
+			//
+		} // if
+			//
+		try {
+			//
+			if (Narcissus.getObjectField(instance, Component.class.getDeclaredField("objectLock")) == null) {
+				//
+				return;
+				//
+			} // if
+				//
+		} catch (final NoSuchFieldException e) {
+			//
+			throw new RuntimeException(e);
+			//
+		} // try
+			//
+		instance.pack();
+		//
 	}
 
 	private static boolean isTestMode() {
