@@ -13,6 +13,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
@@ -170,7 +171,7 @@ class FractionJPanelTest {
 
 	private static class IH implements InvocationHandler {
 
-		private Boolean test, addAll, booleanValue, hasNext = null;
+		private Boolean test, addAll, booleanValue, hasNext, isAnnotationPresent = null;
 
 		private Integer size, length, modifiers = null;
 
@@ -194,7 +195,7 @@ class FractionJPanelTest {
 				//
 				return equals(proxy);
 				//
-			} else if (Objects.equals(getReturnType(method), method != null ? method.getDeclaringClass() : null)) {
+			} else if (Objects.equals(getReturnType(method), getDeclaringClass(method))) {
 				//
 				return proxy;
 				//
@@ -335,12 +336,36 @@ class FractionJPanelTest {
 					//
 				} // if
 					//
+			} else if (Boolean.logicalAnd(isAnnotation(getDeclaringClass(method)), Objects.equals(name, "value"))) {
+				//
+				return null;
+				//
+			} else if (proxy instanceof AnnotatedElement) {
+				//
+				if (Objects.equals(name, "isAnnotationPresent")) {
+					//
+					return isAnnotationPresent;
+					//
+				} else if (Objects.equals(name, "getAnnotation")) {
+					//
+					return null;
+					//
+				} // if
+					//
 			} // if
 				//
 			throw new Throwable(name);
 			//
 		}
 
+		private static boolean isAnnotation(final Class<?> a) {
+			return a != null && a.isAnnotation();
+		}
+
+	}
+
+	private static Class<?> getDeclaringClass(final Member instance) {
+		return instance != null ? instance.getDeclaringClass() : null;
 	}
 
 	private static Class<?>[] getParameterTypes(final Executable instance) throws Throwable {
@@ -520,7 +545,9 @@ class FractionJPanelTest {
 							Arrays.equals(parameterTypes, new Object[] { Boolean.TYPE })),
 					Boolean.logicalAnd(Objects.equals(name, "toHtml"), getParameterCount(m) == 0),
 					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"),
-							Arrays.equals(parameterTypes, new Object[] { Integer.TYPE })))) {
+							Arrays.equals(parameterTypes, new Object[] { Integer.TYPE })),
+					Boolean.logicalAnd(Objects.equals(name, "readFieldsByGroup"),
+							Arrays.equals(parameterTypes, new Object[] { Class.class, String.class })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//
@@ -764,7 +791,9 @@ class FractionJPanelTest {
 					Boolean.logicalAnd(Objects.equals(name, "createDocumentFilter"),
 							Arrays.equals(parameterTypes, new Object[] { Integer.TYPE })),
 					Boolean.logicalAnd(Objects.equals(name, "chopImage"),
-							Arrays.equals(parameterTypes, new Object[] { BufferedImage.class })))) {
+							Arrays.equals(parameterTypes, new Object[] { BufferedImage.class })),
+					Boolean.logicalAnd(Objects.equals(name, "readFieldsByGroup"),
+							Arrays.equals(parameterTypes, new Object[] { Class.class, String.class })))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//

@@ -24,10 +24,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -213,15 +215,24 @@ public class FractionJPanel extends JPanel
 	@Note("Clear")
 	private AbstractButton btnClear = null;
 
+	@Target(ElementType.FIELD)
+	@Retention(RetentionPolicy.RUNTIME)
+	private @interface Group {
+		String value();
+	};
+
 	@Note("Show Image")
 	private AbstractButton btnShowImage = null;
 
+	@Group("Image")
 	@Note("Copy Image")
 	private AbstractButton btnCopyImage = null;
 
+	@Group("Image")
 	@Note("Save Image")
 	private AbstractButton btnSaveImage = null;
 
+	@Group("Image")
 	@Note("Save PDF")
 	private AbstractButton btnSavePdf = null;
 
@@ -237,6 +248,7 @@ public class FractionJPanel extends JPanel
 	@Note("Method")
 	private JComboBox<?> jcbMethod = null;
 
+	@Group("Image")
 	@Note("File Suffix")
 	private JComboBox<?> jcbFileSuffix = null;
 
@@ -1335,6 +1347,31 @@ public class FractionJPanel extends JPanel
 		//
 	}
 
+	private <T> Iterable<T> readFieldsByGroup(final Class<T> clz, final String name) {
+		//
+		return toList(filter(map(
+				filter(stream(FieldUtils.getAllFieldsList(FractionJPanel.class)),
+						f -> and(name, FractionJPanel::isValidString,
+								x -> Objects.equals(value(testAndApply(FractionJPanel::isAnnotationPresent, f,
+										Group.class, FractionJPanel::getAnnotation, null)), x))),
+				f -> cast(clz, Narcissus.getField(this, f))), Objects::nonNull));
+		//
+	}
+
+	private static <T extends Annotation> T getAnnotation(final AnnotatedElement instance,
+			final Class<T> annotationClass) {
+		return instance != null ? instance.getAnnotation(annotationClass) : null;
+	}
+
+	private static boolean isAnnotationPresent(final AnnotatedElement instance,
+			final Class<? extends Annotation> annotationClass) {
+		return instance != null && instance.isAnnotationPresent(annotationClass);
+	}
+
+	private static String value(final Group instance) {
+		return instance != null ? instance.value() : null;
+	}
+
 	private static Throwable getTargetException(final InvocationTargetException instance) {
 		return instance != null ? instance.getTargetException() : null;
 	}
@@ -1677,8 +1714,7 @@ public class FractionJPanel extends JPanel
 			//
 			setIcon(instance.labelImage, null);
 			//
-			forEach(Arrays.asList(instance.btnCopyImage, instance.btnSaveImage, instance.btnSavePdf,
-					instance.jcbFileSuffix), x -> setEnabled(x, false));
+			forEach(instance.readFieldsByGroup(Component.class, "Image"), x -> setEnabled(x, false));
 			//
 		} // if
 			//
@@ -2384,7 +2420,7 @@ public class FractionJPanel extends JPanel
 			//
 			setIcon(labelImage, null);
 			//
-			forEach(Arrays.asList(btnCopyImage, btnSaveImage, btnSavePdf, jcbFileSuffix), x -> setEnabled(x, false));
+			forEach(readFieldsByGroup(Component.class, "Image"), x -> setEnabled(x, false));
 			//
 		} // if
 			//
