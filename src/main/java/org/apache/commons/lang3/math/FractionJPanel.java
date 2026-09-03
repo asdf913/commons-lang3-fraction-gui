@@ -2265,7 +2265,15 @@ public class FractionJPanel extends JPanel
 							x -> IterableUtils.get(x, 0), null),
 					-1);
 			//
-		} else if (Objects.equals(aModel, cbmColor)) {
+		} // if
+			//
+		return intValue(selectionForKey1(aKey, aModel), -1);
+		//
+	}
+
+	private Integer selectionForKey1(final char aKey, final ComboBoxModel<?> aModel) {
+		//
+		if (Objects.equals(aModel, cbmColor)) {
 			//
 			String name = null;
 			//
@@ -2291,13 +2299,13 @@ public class FractionJPanel extends JPanel
 				//
 			if (ints != null && ints.length == 1) {
 				//
-				return ints[0];
+				return Integer.valueOf(ints[0]);
 				//
 			} // if
 				//
 		} // if
 			//
-		return -1;
+		return null;
 		//
 	}
 
