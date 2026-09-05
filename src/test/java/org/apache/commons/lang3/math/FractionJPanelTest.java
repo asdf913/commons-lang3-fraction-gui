@@ -993,10 +993,10 @@ class FractionJPanelTest {
 	}
 
 	@Test
-	public void testDocumentFilterImpl() throws Throwable {
+	public void testDocumentFilterImpl1() throws Throwable {
 		//
 		final DocumentFilter documentFilter = cast(DocumentFilter.class, Narcissus
-				.allocateInstance(Class.forName("org.apache.commons.lang3.math.FractionJPanel$DocumentFilterImpl")));
+				.allocateInstance(Class.forName("org.apache.commons.lang3.math.FractionJPanel$DocumentFilterImpl1")));
 		//
 		final Method[] ms = DocumentFilter.class.getDeclaredMethods();
 		//
@@ -1035,6 +1035,93 @@ class FractionJPanelTest {
 			//
 		} // for
 			//
+		Class<?> parameterType = null;
+		//
+		for (int i = 0; ms != null && i < ms.length; i++) {
+			//
+			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
+					|| (parameterTypes = getParameterTypes(m)) == null) {
+				//
+				continue;
+				//
+			} // if
+				//
+			clear(collection = ObjectUtils.getIfNull(collection, ArrayList::new));
+			//
+			for (int j = 0; j < parameterTypes.length; j++) {
+				//
+				if (Objects.equals(parameterType = ArrayUtils.get(parameterTypes, j), Integer.TYPE)) {
+					//
+					add(collection, Integer.valueOf(0));
+					//
+				} else if (Objects.equals(parameterType, FilterBypass.class)) {
+					//
+					add(collection, Narcissus
+							.allocateInstance(Class.forName("javax.swing.text.AbstractDocument$DefaultFilterBypass")));
+					//
+				} else if (parameterType != null && parameterType.isInterface()) {
+					//
+					add(collection, Reflection.newProxy(parameterType, ih = ObjectUtils.getIfNull(ih, IH::new)));
+					//
+				} else {
+					//
+					add(collection, Narcissus.allocateInstance(parameterType));
+					//
+				} // if
+					//
+			} // for
+				//
+			Assert.assertNull(Narcissus.invokeMethod(documentFilter, m, toArray(collection)));
+			//
+		} // for
+			//
+	}
+
+	@Test
+	public void testDocumentFilterImpl2() throws Throwable {
+		//
+		final DocumentFilter documentFilter = cast(DocumentFilter.class, Narcissus
+				.allocateInstance(Class.forName("org.apache.commons.lang3.math.FractionJPanel$DocumentFilterImpl2")));
+		//
+		final Method[] ms = DocumentFilter.class.getDeclaredMethods();
+		//
+		Method m = null;
+		//
+		Class<?>[] parameterTypes = null;
+		//
+		Collection<Object> collection = null;
+		//
+		for (int i = 0; ms != null && i < ms.length; i++) {
+			//
+			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
+					|| (parameterTypes = getParameterTypes(m)) == null) {
+				//
+				continue;
+				//
+			} // if
+				//
+			clear(collection = ObjectUtils.getIfNull(collection, ArrayList::new));
+			//
+			for (int j = 0; j < parameterTypes.length; j++) {
+				//
+				if (Objects.equals(ArrayUtils.get(parameterTypes, j), Integer.TYPE)) {
+					//
+					add(collection, Integer.valueOf(0));
+					//
+				} else {
+					//
+					add(collection, null);
+					//
+				} // if
+					//
+			} // for
+				//
+			Assert.assertNull(Narcissus.invokeMethod(documentFilter, m, toArray(collection)));
+			//
+		} // for
+			//
+		FieldUtils.writeDeclaredField(documentFilter, "instance", instance, true);
+		//
 		Class<?> parameterType = null;
 		//
 		for (int i = 0; ms != null && i < ms.length; i++) {
